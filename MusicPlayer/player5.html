@@ -217,38 +217,42 @@
 
 
         .song {
-            padding: 7px 8px;
+    padding: 7px 8px;
+    cursor: pointer;
+    border-radius: 5px;
+    color: #999;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
-            cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
-            border-radius: 5px;
+.song:hover {
+    background: #1b1b1b;
+    color: white;
+}
 
-            color: #999;
+.song.active {
+    background: #292929;
+    color: white;
+    font-weight: bold;
+}
 
-            font-size: 13px;
+.song-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-            white-space: nowrap;
-
-            overflow: hidden;
-
-            text-overflow: ellipsis;
-        }
-
-
-        .song:hover {
-            background: #1b1b1b;
-
-            color: white;
-        }
-
-
-        .song.active {
-            background: #292929;
-
-            color: white;
-
-            font-weight: bold;
-        }
+.song-artist {
+    color: #666;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 
         /* =========================================================
@@ -362,43 +366,30 @@
            ========================================================= */
 
         .song-info {
-            width: 100%;
+    width: 100%;
+    margin-top: 20px;
+    text-align: center;
+}
 
-            margin-top: 20px;
+#song-title {
+    font-size: 25px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-            text-align: center;
-        }
+#song-artist {
+    margin-top: 7px;
+    color: #aaa;
+    font-size: 17px;
+}
 
-
-        #song-title {
-            font-size: 25px;
-
-            font-weight: bold;
-
-            white-space: nowrap;
-
-            overflow: hidden;
-
-            text-overflow: ellipsis;
-        }
-
-
-        #song-artist {
-            margin-top: 6px;
-
-            color: #aaa;
-
-            font-size: 16px;
-        }
-
-
-        #song-album {
-            margin-top: 3px;
-
-            color: #666;
-
-            font-size: 14px;
-        }
+#song-album {
+    margin-top: 4px;
+    color: #666;
+    font-size: 14px;
+}
 
 
         /* =========================================================
@@ -950,7 +941,7 @@ const repeatButton =
    LOAD MUSIC.JSON
    ============================================================ */
 
-fetch("music.json")
+fetch("songs/music.json")
 
     .then(response => response.json())
 
@@ -983,40 +974,27 @@ function buildLibrary() {
 
     library = {};
 
-
     songs.forEach((song, index) => {
 
-        const artist =
-            song.artist || "Unknown Artist";
+        const albumArtist =
+            song.albumartist || "Unknown Album Artist";
 
         const album =
             song.album || "Unknown Album";
 
-
-        if (!library[artist]) {
-
-            library[artist] = {};
-
+        if (!library[albumArtist]) {
+            library[albumArtist] = {};
         }
 
-
-        if (!library[artist][album]) {
-
-            library[artist][album] = [];
-
+        if (!library[albumArtist][album]) {
+            library[albumArtist][album] = [];
         }
 
-
-        library[artist][album].push({
-
+        library[albumArtist][album].push({
             ...song,
-
             index: index
-
         });
-
     });
-
 }
 
 
@@ -1029,27 +1007,25 @@ function renderLibrary(filter = "") {
 
     libraryElement.innerHTML = "";
 
-
     const query =
         filter.toLowerCase().trim();
 
-
-    const artists =
+    const albumArtists =
         Object.keys(library).sort(
             (a, b) => a.localeCompare(b)
         );
 
-
-    artists.forEach(artist => {
+    albumArtists.forEach(albumArtist => {
 
         const artistElement =
             document.createElement("div");
 
-        artistElement.className =
-            "artist";
+        artistElement.className = "artist";
 
 
-        /* ARTIST HEADER */
+        // ============================
+        // ALBUM ARTIST HEADER
+        // ============================
 
         const artistHeader =
             document.createElement("div");
@@ -1057,18 +1033,18 @@ function renderLibrary(filter = "") {
         artistHeader.className =
             "artist-header";
 
-
         artistHeader.innerHTML =
             `<span class="artist-arrow">▶</span>
-             ${escapeHTML(artist)}`;
-
+             ${escapeHTML(albumArtist)}`;
 
         artistElement.appendChild(
             artistHeader
         );
 
 
-        /* ALBUM CONTAINER */
+        // ============================
+        // ALBUMS
+        // ============================
 
         const albumsElement =
             document.createElement("div");
@@ -1076,9 +1052,8 @@ function renderLibrary(filter = "") {
         albumsElement.className =
             "albums";
 
-
         const albums =
-            Object.keys(library[artist]).sort(
+            Object.keys(library[albumArtist]).sort(
                 (a, b) => a.localeCompare(b)
             );
 
@@ -1086,14 +1061,10 @@ function renderLibrary(filter = "") {
         albums.forEach(album => {
 
             const albumSongsList =
-                library[artist][album];
+                library[albumArtist][album];
 
 
-            /*
-             * If searching, determine whether
-             * this album has matching songs.
-             */
-
+            // Search filtering
             const matchingSongs =
                 albumSongsList.filter(song => {
 
@@ -1101,14 +1072,13 @@ function renderLibrary(filter = "") {
                         song,
                         query
                     );
-
                 });
 
-
-            if (query && matchingSongs.length === 0) {
-
+            if (
+                query &&
+                matchingSongs.length === 0
+            ) {
                 return;
-
             }
 
 
@@ -1119,7 +1089,9 @@ function renderLibrary(filter = "") {
                 "album";
 
 
-            /* ALBUM HEADER */
+            // ============================
+            // ALBUM HEADER
+            // ============================
 
             const albumHeader =
                 document.createElement("div");
@@ -1127,18 +1099,18 @@ function renderLibrary(filter = "") {
             albumHeader.className =
                 "album-header";
 
-
             albumHeader.innerHTML =
                 `<span class="album-arrow">▶</span>
                  ${escapeHTML(album)}`;
-
 
             albumElement.appendChild(
                 albumHeader
             );
 
 
-            /* SONG CONTAINER */
+            // ============================
+            // SONGS
+            // ============================
 
             const songsElement =
                 document.createElement("div");
@@ -1162,9 +1134,37 @@ function renderLibrary(filter = "") {
                     "song";
 
 
-                songElement.textContent =
+                // Track title
+                const titleElement =
+                    document.createElement("span");
+
+                titleElement.className =
+                    "song-title";
+
+                titleElement.textContent =
                     song.title ||
                     "Unknown Title";
+
+
+                // Track artist
+                const artistElement =
+                    document.createElement("span");
+
+                artistElement.className =
+                    "song-artist";
+
+                artistElement.textContent =
+                    song.artist ||
+                    "Unknown Artist";
+
+
+                songElement.appendChild(
+                    titleElement
+                );
+
+                songElement.appendChild(
+                    artistElement
+                );
 
 
                 songElement.dataset.index =
@@ -1178,7 +1178,6 @@ function renderLibrary(filter = "") {
                         event.stopPropagation();
 
                         playSong(song.index);
-
                     }
                 );
 
@@ -1186,7 +1185,6 @@ function renderLibrary(filter = "") {
                 songsElement.appendChild(
                     songElement
                 );
-
             });
 
 
@@ -1195,8 +1193,7 @@ function renderLibrary(filter = "") {
             );
 
 
-            /* ALBUM CLICK */
-
+            // Album open/close
             albumHeader.addEventListener(
                 "click",
                 event => {
@@ -1206,7 +1203,6 @@ function renderLibrary(filter = "") {
                     albumElement.classList.toggle(
                         "open"
                     );
-
                 }
             );
 
@@ -1214,7 +1210,6 @@ function renderLibrary(filter = "") {
             albumsElement.appendChild(
                 albumElement
             );
-
         });
 
 
@@ -1223,8 +1218,7 @@ function renderLibrary(filter = "") {
         );
 
 
-        /* ARTIST CLICK */
-
+        // Album artist open/close
         artistHeader.addEventListener(
             "click",
             () => {
@@ -1232,16 +1226,12 @@ function renderLibrary(filter = "") {
                 artistElement.classList.toggle(
                     "open"
                 );
-
             }
         );
 
 
-        /*
-         * Only display artist if it contains
-         * something after filtering.
-         */
-
+        // Only show album artists
+        // containing search results
         if (
             !query ||
             albumsElement.children.length > 0
@@ -1250,14 +1240,11 @@ function renderLibrary(filter = "") {
             libraryElement.appendChild(
                 artistElement
             );
-
         }
-
     });
 
 
     updateSongList();
-
 }
 
 
@@ -1361,8 +1348,16 @@ function playSong(index) {
     songArtist.textContent =
         song.artist || "Unknown Artist";
 
-    songAlbum.textContent =
-        song.album || "Unknown Album";
+    const albumName =
+    song.album || "Unknown Album";
+
+const albumYear =
+    song.year || "";
+
+songAlbum.textContent =
+    albumYear
+        ? `${albumName} (${albumYear})`
+        : albumName;
 
 
     /*
@@ -1497,72 +1492,210 @@ nextButton.addEventListener(
 function nextSong() {
 
     if (songs.length === 0) {
-
         return;
-
     }
 
-
-    /*
-     * Repeat current song
-     */
-
+    // Repeat current song
     if (repeat) {
-
         playSong(currentSong);
-
         return;
-
     }
 
-
-    /*
-     * Shuffle
-     */
-
+    // Shuffle
     if (shuffle) {
 
         let nextIndex;
 
-
         do {
-
             nextIndex =
                 Math.floor(
                     Math.random() * songs.length
                 );
 
-        }
-        while (
+        } while (
             songs.length > 1 &&
             nextIndex === currentSong
         );
 
-
         playSong(nextIndex);
+        return;
+    }
+
+
+    // =========================================
+    // NORMAL PLAYBACK
+    // Follow:
+    // Album Artist → Album → Track
+    // =========================================
+
+    const albumArtists =
+        Object.keys(library).sort(
+            (a, b) => a.localeCompare(b)
+        );
+
+
+    // Find current song's album artist and album
+    const current =
+        songs[currentSong];
+
+    const currentAlbumArtist =
+        current.albumartist ||
+        "Unknown Album Artist";
+
+    const currentAlbum =
+        current.album ||
+        "Unknown Album";
+
+
+    const artistIndex =
+        albumArtists.indexOf(
+            currentAlbumArtist
+        );
+
+
+    if (artistIndex === -1) {
+        return;
+    }
+
+
+    const albums =
+        Object.keys(
+            library[currentAlbumArtist]
+        ).sort(
+            (a, b) => a.localeCompare(b)
+        );
+
+
+    const albumIndex =
+        albums.indexOf(currentAlbum);
+
+
+    if (albumIndex === -1) {
+        return;
+    }
+
+
+    const currentAlbumSongs =
+        library[currentAlbumArtist][currentAlbum];
+
+
+    // Find current track inside its album
+    const trackIndex =
+        currentAlbumSongs.findIndex(
+            song =>
+                song.index === currentSong
+        );
+
+
+    // =========================================
+    // NEXT TRACK IN SAME ALBUM
+    // =========================================
+
+    if (
+        trackIndex !== -1 &&
+        trackIndex < currentAlbumSongs.length - 1
+    ) {
+
+        playSong(
+            currentAlbumSongs[
+                trackIndex + 1
+            ].index
+        );
 
         return;
-
     }
 
 
-    /*
-     * Normal next
-     */
+    // =========================================
+    // LAST TRACK OF ALBUM
+    // → NEXT ALBUM
+    // =========================================
 
-    let nextIndex =
-        currentSong + 1;
+    if (
+        albumIndex <
+        albums.length - 1
+    ) {
 
+        const nextAlbum =
+            albums[albumIndex + 1];
 
-    if (nextIndex >= songs.length) {
+        const nextAlbumSongs =
+            library[currentAlbumArtist][
+                nextAlbum
+            ];
 
-        nextIndex = 0;
+        playSong(
+            nextAlbumSongs[0].index
+        );
 
+        return;
     }
 
 
-    playSong(nextIndex);
+    // =========================================
+    // LAST ALBUM OF ALBUM ARTIST
+    // → NEXT ALBUM ARTIST
+    // =========================================
 
+    if (
+        artistIndex <
+        albumArtists.length - 1
+    ) {
+
+        const nextArtist =
+            albumArtists[
+                artistIndex + 1
+            ];
+
+        const nextArtistAlbums =
+            Object.keys(
+                library[nextArtist]
+            ).sort(
+                (a, b) => a.localeCompare(b)
+            );
+
+        const firstAlbum =
+            nextArtistAlbums[0];
+
+        const firstAlbumSongs =
+            library[nextArtist][
+                firstAlbum
+            ];
+
+        playSong(
+            firstAlbumSongs[0].index
+        );
+
+        return;
+    }
+
+
+    // =========================================
+    // END OF ENTIRE LIBRARY
+    // → START FROM FIRST SONG
+    // =========================================
+
+    const firstArtist =
+        albumArtists[0];
+
+    const firstArtistAlbums =
+        Object.keys(
+            library[firstArtist]
+        ).sort(
+            (a, b) => a.localeCompare(b)
+        );
+
+    const firstAlbum =
+        firstArtistAlbums[0];
+
+    const firstAlbumSongs =
+        library[firstArtist][
+            firstAlbum
+        ];
+
+    playSong(
+        firstAlbumSongs[0].index
+    );
 }
 
 
