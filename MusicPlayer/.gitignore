@@ -1,4 +1,2 @@
 # Ignore everything inside songs/
-# except music.json
 /songs/*
-!/songs/music.json

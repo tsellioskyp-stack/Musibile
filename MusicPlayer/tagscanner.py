@@ -17,15 +17,15 @@ for root, dirs, files in os.walk(music_folder):
 
     for file in files:
 
-        if file.lower().endswith(".flac"):
+        if file.lower().endswith((".flac", ".mp3", ".m4a")):
 
-            # Full path to the FLAC file
+            # Full path to the file
             full_path = os.path.join(root, file)
 
-            # Directory containing the FLAC
+            # Directory containing the file
             dir_path = os.path.dirname(full_path)
 
-            # Read FLAC metadata
+            # Read file metadata
             audio = mutagen.File(full_path)
 
             if audio is None:

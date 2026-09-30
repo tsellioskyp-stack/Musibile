@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Music Player</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #0b0b0b;
+            color: white;
+            font-family: Arial, Helvetica, sans-serif;
+            overflow: hidden;
+        }
+
+        /* =========================================================
+           MAIN LAYOUT
+           ========================================================= */
+
+        .app {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+
+        /* =========================================================
+           LEFT LIBRARY
+           ========================================================= */
+
+        .sidebar {
+            width: 320px;
+            min-width: 320px;
+
+            background: #111;
+            border-right: 1px solid #252525;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        .library-header {
+            padding: 20px;
+            border-bottom: 1px solid #252525;
+        }
+
+
+        .library-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+
+        /* SEARCH */
+
+        #search {
+            width: 100%;
+
+            padding: 11px 13px;
+
+            background: #1d1d1d;
+            color: white;
+
+            border: 1px solid #333;
+            border-radius: 7px;
+
+            outline: none;
+
+            font-size: 14px;
+        }
+
+
+        #search:focus {
+            border-color: #666;
+        }
+
+
+        /* LIBRARY TREE */
+
+        #library {
+            flex: 1;
+
+            overflow-y: auto;
+
+            padding: 10px;
+        }
+
+
+        /* Scrollbar */
+
+        #library::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #library::-webkit-scrollbar-track {
+            background: #111;
+        }
+
+        #library::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 5px;
+        }
+
+
+        /* ARTIST */
+
+        .artist {
+            margin-bottom: 3px;
+        }
+
+
+        .artist-header {
+            padding: 9px 10px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+            border-radius: 6px;
+
+            user-select: none;
+        }
+
+
+        .artist-header:hover {
+            background: #1d1d1d;
+        }
+
+
+        .artist-arrow {
+            display: inline-block;
+
+            width: 18px;
+
+            transition: transform 0.15s;
+        }
+
+
+        .artist.open > .artist-header .artist-arrow {
+            transform: rotate(90deg);
+        }
+
+
+        /* ALBUM */
+
+        .albums {
+            display: none;
+
+            margin-left: 18px;
+        }
+
+
+        .artist.open > .albums {
+            display: block;
+        }
+
+
+        .album {
+            margin-bottom: 2px;
+        }
+
+
+        .album-header {
+            padding: 7px 8px;
+
+            cursor: pointer;
+
+            color: #cfcfcf;
+
+            border-radius: 5px;
+
+            user-select: none;
+        }
+
+
+        .album-header:hover {
+            background: #1b1b1b;
+        }
+
+
+        .album-arrow {
+            display: inline-block;
+
+            width: 18px;
+
+            transition: transform 0.15s;
+        }
+
+
+        .album.open > .album-header .album-arrow {
+            transform: rotate(90deg);
+        }
+
+
+        /* SONGS */
+
+        .songs {
+            display: none;
+
+            margin-left: 20px;
+        }
+
+
+        .album.open > .songs {
+            display: block;
+        }
+
+
+        .song {
+    padding: 7px 8px;
+    cursor: pointer;
+    border-radius: 5px;
+    color: #999;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.song:hover {
+    background: #1b1b1b;
+    color: white;
+}
+
+.song.active {
+    background: #292929;
+    color: white;
+    font-weight: bold;
+}
+
+.song-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.song-artist {
+    color: #666;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+        /* =========================================================
+           PLAYER AREA
+           ========================================================= */
+
+        .player-area {
+    position: relative;
+
+    flex: 1;
+
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+
+    padding: 40px 0;
+}
+
+
+        /* =========================================================
+           BLURRED BACKGROUND
+           ========================================================= */
+
+        .background {
+            position: absolute;
+
+            inset: -50px;
+
+            background-position: center;
+            background-size: cover;
+
+            filter: blur(45px);
+
+            opacity: 0.18;
+
+            transform: scale(1.1);
+
+            z-index: 0;
+        }
+
+
+        /* Dark overlay */
+
+        .background-overlay {
+            position: absolute;
+
+            inset: 0;
+
+            background: rgba(0, 0, 0, 0.72);
+
+            z-index: 1;
+        }
+
+
+        /* Everything above background */
+
+        .player-content {
+            position: relative;
+
+            z-index: 2;
+
+            width: min(700px, 90%);
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+        }
+
+
+        /* =========================================================
+           COVER
+           ========================================================= */
+
+        .cover-container {
+    width: min(500px, 58vh);
+    aspect-ratio: 1 / 1;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    background: #181818;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.7);
+}
+
+
+        #cover {
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+
+            display: block;
+        }
+
+
+        /* =========================================================
+           SONG INFORMATION
+           ========================================================= */
+
+        .song-info {
+    width: 100%;
+    margin-top: 20px;
+    text-align: center;
+}
+
+#song-title {
+    font-size: 25px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#song-artist {
+    margin-top: 7px;
+    color: #aaa;
+    font-size: 17px;
+}
+
+#song-album {
+    margin-top: 4px;
+    color: #666;
+    font-size: 14px;
+}
+
+
+        /* =========================================================
+           PROGRESS BAR
+           ========================================================= */
+
+        .progress-container {
+            width: 100%;
+
+            margin-top: 25px;
+        }
+
+
+        #progress {
+            width: 100%;
+
+            cursor: pointer;
+        }
+
+
+        .time {
+            display: flex;
+
+            justify-content: space-between;
+
+            margin-top: 5px;
+
+            color: #888;
+
+            font-size: 12px;
+        }
+
+
+        /* =========================================================
+           CONTROLS
+           ========================================================= */
+
+        .controls {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 25px;
+
+            margin-top: 20px;
+        }
+
+
+        .control-button {
+            border: none;
+
+            background: none;
+
+            color: white;
+
+            cursor: pointer;
+
+            font-size: 25px;
+
+            width: 45px;
+            height: 45px;
+
+            border-radius: 50%;
+        }
+
+
+        .control-button:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+
+        #playButton {
+    width: 60px;
+    height: 60px;
+
+    background: white;
+    color: black;
+
+    font-size: 25px;
+
+    border: none;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    cursor: pointer;
+}
+
+#playButton:hover {
+    background: #ddd;
+}
+
+
+        /* =========================================================
+           EXTRA CONTROLS
+           ========================================================= */
+
+        .extra-controls {
+            width: 100%;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-top: 20px;
+        }
+
+
+        .left-controls,
+        .right-controls {
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+        }
+
+
+        .toggle-button {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 7px 11px;
+
+    background: #171717;
+    color: #888;
+
+    border: 1px solid #333;
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    font-size: 13px;
+
+    transition:
+        background 0.15s,
+        color 0.15s,
+        border-color 0.15s;
+}
+
+.play-icon {
+    display: block;
+    transform: translateX(1px);
+}
+.toggle-button:hover {
+    background: #222;
+    color: white;
+}
+
+.toggle-button.active {
+    background: #303030;
+    color: white;
+
+    border-color: #777;
+
+    box-shadow:
+        inset 0 0 0 1px #555;
+}
+
+.toggle-button span {
+    font-size: 12px;
+}
+
+
+        #volume {
+            width: 100px;
+        }
+
+
+        /* =========================================================
+           ALBUM DROPDOWN
+           ========================================================= */
+
+        #albumSelect {
+            margin-top: 15px;
+
+            background: #171717;
+
+            color: white;
+
+            border: 1px solid #333;
+
+            padding: 8px 12px;
+
+            border-radius: 6px;
+
+            outline: none;
+
+            max-width: 250px;
+        }
+
+
+        /* =========================================================
+           MOBILE
+           ========================================================= */
+
+        @media (max-width: 700px) {
+
+            body {
+                overflow: auto;
+            }
+
+
+            .app {
+                height: auto;
+
+                min-height: 100vh;
+
+                flex-direction: column;
+            }
+
+
+            .sidebar {
+                width: 100%;
+
+                min-width: 0;
+
+                height: 400px;
+
+                order: 2;
+
+                border-right: none;
+
+                border-top: 1px solid #252525;
+            }
+
+
+            .player-area {
+                min-height: 650px;
+
+                order: 1;
+            }
+
+
+            .cover-container {
+                width: min(80vw, 400px);
+            }
+
+
+            .player-content {
+                width: 90%;
+            }
+
+
+            #song-title {
+                font-size: 20px;
+            }
+
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="library-header">
+
+            <div class="library-title">
+                Library
+            </div>
+
+            <input
+                type="text"
+                id="search"
+                placeholder="Search title, artist, album, genre..."
+            >
+
+        </div>
+
+
+        <div id="library"></div>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         PLAYER
+         ===================================================== -->
+
+    <main class="player-area">
+
+
+        <!-- blurred background -->
+
+        <div
+            id="background"
+            class="background">
+        </div>
+
+        <div class="background-overlay"></div>
+
+
+
+        <!-- player content -->
+
+        <div class="player-content">
+
+
+            <!-- COVER -->
+
+            <div class="cover-container">
+
+                <img
+                    id="cover"
+                    src=""
+                    alt="Album cover"
+                >
+
+            </div>
+
+
+
+            <!-- INFORMATION -->
+
+            <div class="song-info">
+
+                <div id="song-title">
+                    Nothing playing
+                </div>
+
+                <div id="song-artist">
+                    —
+                </div>
+
+                <div id="song-album">
+                    —
+                </div>
+
+            </div>
+
+
+
+            <!-- PROGRESS -->
+
+            <div class="progress-container">
+
+                <input
+                    id="progress"
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="0"
+                >
+
+                <div class="time">
+
+                    <span id="currentTime">
+                        0:00
+                    </span>
+
+                    <span id="duration">
+                        0:00
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- MAIN CONTROLS -->
+
+            <div class="controls">
+
+                <button
+                    id="previousButton"
+                    class="control-button">
+                    ⏮
+                </button>
+
+
+                <button id="playButton" class="control-button">
+                     <span class="play-icon">▶</span>
+                </button>
+
+
+                <button
+                    id="nextButton"
+                    class="control-button">
+                    ⏭
+                </button>
+
+            </div>
+
+
+
+            <!-- EXTRA CONTROLS -->
+
+            <div class="extra-controls">
+
+
+                <div class="left-controls">
+
+    <button
+        id="shuffleButton"
+        class="toggle-button">
+        🔀
+        <span>Shuffle</span>
+    </button>
+
+    <button
+        id="repeatButton"
+        class="toggle-button">
+        🔁
+        <span>Repeat</span>
+    </button>
+
+</div>
+
+
+                <div class="right-controls">
+
+                    <span>
+                        🔊
+                    </span>
+
+                    <input
+                        id="volume"
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        value="1"
+                    >
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+
+<!-- =========================================================
+     ONE AUDIO ELEMENT
+     ========================================================= -->
+
+<audio id="player"></audio>
+
+
+
+<script>
+
+
+/* ============================================================
+   GLOBAL VARIABLES
+   ============================================================ */
+
+let songs = [];
+
+let library = {};
+
+let currentSong = -1;
+
+let albumSongs = [];
+
+let shuffle = false;
+
+let repeat = false;
+
+
+
+/* ============================================================
+   HTML ELEMENTS
+   ============================================================ */
+
+const player =
+    document.getElementById("player");
+
+const cover =
+    document.getElementById("cover");
+
+const background =
+    document.getElementById("background");
+
+const songTitle =
+    document.getElementById("song-title");
+
+const songArtist =
+    document.getElementById("song-artist");
+
+const songAlbum =
+    document.getElementById("song-album");
+
+const libraryElement =
+    document.getElementById("library");
+
+const search =
+    document.getElementById("search");
+
+const progress =
+    document.getElementById("progress");
+
+const currentTime =
+    document.getElementById("currentTime");
+
+const duration =
+    document.getElementById("duration");
+
+const playButton =
+    document.getElementById("playButton");
+
+const previousButton =
+    document.getElementById("previousButton");
+
+const nextButton =
+    document.getElementById("nextButton");
+
+const volume =
+    document.getElementById("volume");
+
+const shuffleButton =
+    document.getElementById("shuffleButton");
+
+const repeatButton =
+    document.getElementById("repeatButton");
+
+
+
+/* ============================================================
+   LOAD MUSIC.JSON
+   ============================================================ */
+
+fetch("songs/music.json")
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        songs = data;
+
+        buildLibrary();
+
+        renderLibrary();
+
+    })
+
+    .catch(error => {
+
+        console.error(
+            "Could not load music.json:",
+            error
+        );
+
+    });
+
+
+
+/* ============================================================
+   BUILD ARTIST → ALBUM → SONG STRUCTURE
+   ============================================================ */
+
+function buildLibrary() {
+
+    library = {};
+
+    songs.forEach((song, index) => {
+
+        const albumArtist =
+            song.albumartist || "Unknown Album Artist";
+
+        const album =
+            song.album || "Unknown Album";
+
+        if (!library[albumArtist]) {
+            library[albumArtist] = {};
+        }
+
+        if (!library[albumArtist][album]) {
+            library[albumArtist][album] = [];
+        }
+
+        library[albumArtist][album].push({
+            ...song,
+            index: index
+        });
+    });
+}
+
+
+
+/* ============================================================
+   RENDER LIBRARY
+   ============================================================ */
+
+function renderLibrary(filter = "") {
+
+    libraryElement.innerHTML = "";
+
+    const query =
+        filter.toLowerCase().trim();
+
+    const albumArtists =
+        Object.keys(library).sort(
+            (a, b) => a.localeCompare(b)
+        );
+
+    albumArtists.forEach(albumArtist => {
+
+        const artistElement =
+            document.createElement("div");
+
+        artistElement.className = "artist";
+
+
+        // ============================
+        // ALBUM ARTIST HEADER
+        // ============================
+
+        const artistHeader =
+            document.createElement("div");
+
+        artistHeader.className =
+            "artist-header";
+
+        artistHeader.innerHTML =
+            `<span class="artist-arrow">▶</span>
+             ${escapeHTML(albumArtist)}`;
+
+        artistElement.appendChild(
+            artistHeader
+        );
+
+
+        // ============================
+        // ALBUMS
+        // ============================
+
+        const albumsElement =
+            document.createElement("div");
+
+        albumsElement.className =
+            "albums";
+
+        const albums =
+            Object.keys(library[albumArtist]).sort(
+                (a, b) => a.localeCompare(b)
+            );
+
+
+        albums.forEach(album => {
+
+            const albumSongsList =
+                library[albumArtist][album];
+
+
+            // Search filtering
+            const matchingSongs =
+                albumSongsList.filter(song => {
+
+                    return matchesSearch(
+                        song,
+                        query
+                    );
+                });
+
+            if (
+                query &&
+                matchingSongs.length === 0
+            ) {
+                return;
+            }
+
+
+            const albumElement =
+                document.createElement("div");
+
+            albumElement.className =
+                "album";
+
+
+            // ============================
+            // ALBUM HEADER
+            // ============================
+
+            const albumHeader =
+                document.createElement("div");
+
+            albumHeader.className =
+                "album-header";
+
+            albumHeader.innerHTML =
+                `<span class="album-arrow">▶</span>
+                 ${escapeHTML(album)}`;
+
+            albumElement.appendChild(
+                albumHeader
+            );
+
+
+            // ============================
+            // SONGS
+            // ============================
+
+            const songsElement =
+                document.createElement("div");
+
+            songsElement.className =
+                "songs";
+
+
+            const visibleSongs =
+                query
+                    ? matchingSongs
+                    : albumSongsList;
+
+
+            visibleSongs.forEach(song => {
+
+                const songElement =
+                    document.createElement("div");
+
+                songElement.className =
+                    "song";
+
+
+                // Track title
+                const titleElement =
+                    document.createElement("span");
+
+                titleElement.className =
+                    "song-title";
+
+                titleElement.textContent =
+                    song.title ||
+                    "Unknown Title";
+
+
+                // Track artist
+                const artistElement =
+                    document.createElement("span");
+
+                artistElement.className =
+                    "song-artist";
+
+                artistElement.textContent =
+                    song.artist ||
+                    "Unknown Artist";
+
+
+                songElement.appendChild(
+                    titleElement
+                );
+
+                songElement.appendChild(
+                    artistElement
+                );
+
+
+                songElement.dataset.index =
+                    song.index;
+
+
+                songElement.addEventListener(
+                    "click",
+                    event => {
+
+                        event.stopPropagation();
+
+                        playSong(song.index);
+                    }
+                );
+
+
+                songsElement.appendChild(
+                    songElement
+                );
+            });
+
+
+            albumElement.appendChild(
+                songsElement
+            );
+
+
+            // Album open/close
+            albumHeader.addEventListener(
+                "click",
+                event => {
+
+                    event.stopPropagation();
+
+                    albumElement.classList.toggle(
+                        "open"
+                    );
+                }
+            );
+
+
+            albumsElement.appendChild(
+                albumElement
+            );
+        });
+
+
+        artistElement.appendChild(
+            albumsElement
+        );
+
+
+        // Album artist open/close
+        artistHeader.addEventListener(
+            "click",
+            () => {
+
+                artistElement.classList.toggle(
+                    "open"
+                );
+            }
+        );
+
+
+        // Only show album artists
+        // containing search results
+        if (
+            !query ||
+            albumsElement.children.length > 0
+        ) {
+
+            libraryElement.appendChild(
+                artistElement
+            );
+        }
+    });
+
+
+    updateSongList();
+}
+
+
+
+/* ============================================================
+   SEARCH MATCHING
+   ============================================================ */
+
+function matchesSearch(song, query) {
+
+    if (!query) {
+
+        return true;
+
+    }
+
+
+    const title =
+        song.title || "";
+
+    const artist =
+        song.artist || "";
+
+    const album =
+        song.album || "";
+
+    const genre =
+        song.genre || "";
+
+
+    const text =
+        (
+            title +
+            " " +
+            artist +
+            " " +
+            album +
+            " " +
+            genre
+        ).toLowerCase();
+
+
+    return text.includes(query);
+
+}
+
+
+
+/* ============================================================
+   SEARCH EVENT
+   ============================================================ */
+
+search.addEventListener(
+    "input",
+    () => {
+
+        renderLibrary(
+            search.value
+        );
+
+    }
+);
+
+
+
+/* ============================================================
+   PLAY SONG
+   ============================================================ */
+
+function playSong(index) {
+
+    if (index < 0 || index >= songs.length) {
+
+        return;
+
+    }
+
+
+    currentSong = index;
+
+
+    const song =
+        songs[currentSong];
+
+
+    /*
+     * Set audio source
+     */
+
+    player.src =
+        encodeURI(song.file);
+
+
+    /*
+     * Update text
+     */
+
+    songTitle.textContent =
+        song.title || "Unknown Title";
+
+    songArtist.textContent =
+        song.artist || "Unknown Artist";
+
+    const albumName =
+    song.album || "Unknown Album";
+
+const albumYear =
+    song.year || "";
+
+songAlbum.textContent =
+    albumYear
+        ? `${albumName} (${albumYear})`
+        : albumName;
+
+
+    /*
+     * Update cover
+     */
+
+    if (song.cover) {
+
+        const coverURL =
+            encodeURI(song.cover);
+
+
+        cover.src =
+            coverURL;
+
+
+        background.style.backgroundImage =
+            `url("${coverURL}")`;
+
+    }
+    else {
+
+        cover.removeAttribute("src");
+
+        background.style.backgroundImage =
+            "none";
+
+    }
+
+
+    /*
+     * Update player
+     */
+
+    player.load();
+
+    player.play();
+
+
+    /*
+     * Highlight song
+     */
+
+    updateSongList();
+
+}
+
+
+
+/* ============================================================
+   PLAY / PAUSE
+   ============================================================ */
+
+playButton.addEventListener(
+    "click",
+    () => {
+
+        if (!player.src) {
+
+            /*
+             * If nothing has been selected,
+             * play first song.
+             */
+
+            if (songs.length > 0) {
+
+                playSong(0);
+
+            }
+
+            return;
+
+        }
+
+
+        if (player.paused) {
+
+            player.play();
+
+        }
+        else {
+
+            player.pause();
+
+        }
+
+    }
+);
+
+
+
+/* ============================================================
+   PLAY BUTTON ICON
+   ============================================================ */
+
+player.addEventListener(
+    "play",
+    () => {
+
+        playButton.textContent = "⏸";
+
+    }
+);
+
+
+player.addEventListener(
+    "pause",
+    () => {
+
+        playButton.textContent = "▶";
+
+    }
+);
+
+
+
+/* ============================================================
+   NEXT
+   ============================================================ */
+
+nextButton.addEventListener(
+    "click",
+    () => {
+
+        nextSong();
+
+    }
+);
+
+
+
+function nextSong() {
+
+    if (songs.length === 0) {
+        return;
+    }
+
+    // Repeat current song
+    if (repeat) {
+        playSong(currentSong);
+        return;
+    }
+
+    // Shuffle
+    if (shuffle) {
+
+        let nextIndex;
+
+        do {
+            nextIndex =
+                Math.floor(
+                    Math.random() * songs.length
+                );
+
+        } while (
+            songs.length > 1 &&
+            nextIndex === currentSong
+        );
+
+        playSong(nextIndex);
+        return;
+    }
+
+
+    // =========================================
+    // NORMAL PLAYBACK
+    // Follow:
+    // Album Artist → Album → Track
+    // =========================================
+
+    const albumArtists =
+        Object.keys(library).sort(
+            (a, b) => a.localeCompare(b)
+        );
+
+
+    // Find current song's album artist and album
+    const current =
+        songs[currentSong];
+
+    const currentAlbumArtist =
+        current.albumartist ||
+        "Unknown Album Artist";
+
+    const currentAlbum =
+        current.album ||
+        "Unknown Album";
+
+
+    const artistIndex =
+        albumArtists.indexOf(
+            currentAlbumArtist
+        );
+
+
+    if (artistIndex === -1) {
+        return;
+    }
+
+
+    const albums =
+        Object.keys(
+            library[currentAlbumArtist]
+        ).sort(
+            (a, b) => a.localeCompare(b)
+        );
+
+
+    const albumIndex =
+        albums.indexOf(currentAlbum);
+
+
+    if (albumIndex === -1) {
+        return;
+    }
+
+
+    const currentAlbumSongs =
+        library[currentAlbumArtist][currentAlbum];
+
+
+    // Find current track inside its album
+    const trackIndex =
+        currentAlbumSongs.findIndex(
+            song =>
+                song.index === currentSong
+        );
+
+
+    // =========================================
+    // NEXT TRACK IN SAME ALBUM
+    // =========================================
+
+    if (
+        trackIndex !== -1 &&
+        trackIndex < currentAlbumSongs.length - 1
+    ) {
+
+        playSong(
+            currentAlbumSongs[
+                trackIndex + 1
+            ].index
+        );
+
+        return;
+    }
+
+
+    // =========================================
+    // LAST TRACK OF ALBUM
+    // → NEXT ALBUM
+    // =========================================
+
+    if (
+        albumIndex <
+        albums.length - 1
+    ) {
+
+        const nextAlbum =
+            albums[albumIndex + 1];
+
+        const nextAlbumSongs =
+            library[currentAlbumArtist][
+                nextAlbum
+            ];
+
+        playSong(
+            nextAlbumSongs[0].index
+        );
+
+        return;
+    }
+
+
+    // =========================================
+    // LAST ALBUM OF ALBUM ARTIST
+    // → NEXT ALBUM ARTIST
+    // =========================================
+
+    if (
+        artistIndex <
+        albumArtists.length - 1
+    ) {
+
+        const nextArtist =
+            albumArtists[
+                artistIndex + 1
+            ];
+
+        const nextArtistAlbums =
+            Object.keys(
+                library[nextArtist]
+            ).sort(
+                (a, b) => a.localeCompare(b)
+            );
+
+        const firstAlbum =
+            nextArtistAlbums[0];
+
+        const firstAlbumSongs =
+            library[nextArtist][
+                firstAlbum
+            ];
+
+        playSong(
+            firstAlbumSongs[0].index
+        );
+
+        return;
+    }
+
+
+    // =========================================
+    // END OF ENTIRE LIBRARY
+    // → START FROM FIRST SONG
+    // =========================================
+
+    const firstArtist =
+        albumArtists[0];
+
+    const firstArtistAlbums =
+        Object.keys(
+            library[firstArtist]
+        ).sort(
+            (a, b) => a.localeCompare(b)
+        );
+
+    const firstAlbum =
+        firstArtistAlbums[0];
+
+    const firstAlbumSongs =
+        library[firstArtist][
+            firstAlbum
+        ];
+
+    playSong(
+        firstAlbumSongs[0].index
+    );
+}
+
+
+
+/* ============================================================
+   PREVIOUS
+   ============================================================ */
+
+previousButton.addEventListener(
+    "click",
+    () => {
+
+        if (songs.length === 0) {
+
+            return;
+
+        }
+
+
+        let previousIndex =
+            currentSong - 1;
+
+
+        if (previousIndex < 0) {
+
+            previousIndex =
+                songs.length - 1;
+
+        }
+
+
+        playSong(previousIndex);
+
+    }
+);
+
+
+
+/* ============================================================
+   WHEN SONG ENDS
+   ============================================================ */
+
+player.addEventListener(
+    "ended",
+    () => {
+
+        nextSong();
+
+    }
+);
+
+
+
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+
+player.addEventListener(
+    "timeupdate",
+    () => {
+
+        if (!player.duration) {
+
+            return;
+
+        }
+
+
+        progress.value =
+            (player.currentTime /
+             player.duration) * 100;
+
+
+        currentTime.textContent =
+            formatTime(
+                player.currentTime
+            );
+
+    }
+);
+
+
+
+player.addEventListener(
+    "loadedmetadata",
+    () => {
+
+        duration.textContent =
+            formatTime(
+                player.duration
+            );
+
+    }
+);
+
+
+
+progress.addEventListener(
+    "input",
+    () => {
+
+        if (!player.duration) {
+
+            return;
+
+        }
+
+
+        player.currentTime =
+            (progress.value / 100) *
+            player.duration;
+
+    }
+);
+
+
+
+/* ============================================================
+   VOLUME
+   ============================================================ */
+
+volume.addEventListener(
+    "input",
+    () => {
+
+        player.volume =
+            volume.value;
+
+    }
+);
+
+
+
+/* ============================================================
+   SHUFFLE
+   ============================================================ */
+
+shuffleButton.addEventListener(
+    "click",
+    () => {
+
+        shuffle =
+            !shuffle;
+
+
+        shuffleButton.classList.toggle(
+            "active",
+            shuffle
+        );
+
+    }
+);
+
+
+
+/* ============================================================
+   REPEAT
+   ============================================================ */
+
+repeatButton.addEventListener(
+    "click",
+    () => {
+
+        repeat =
+            !repeat;
+
+
+        repeatButton.classList.toggle(
+            "active",
+            repeat
+        );
+
+    }
+);
+
+
+
+/* ============================================================
+   UPDATE ACTIVE SONG
+   ============================================================ */
+
+function updateSongList() {
+
+    document
+        .querySelectorAll(".song")
+        .forEach(element => {
+
+            const index =
+                Number(
+                    element.dataset.index
+                );
+
+
+            element.classList.toggle(
+                "active",
+                index === currentSong
+            );
+
+        });
+
+}
+
+
+
+/* ============================================================
+   FORMAT TIME
+   ============================================================ */
+
+function formatTime(seconds) {
+
+    if (!Number.isFinite(seconds)) {
+
+        return "0:00";
+
+    }
+
+
+    const minutes =
+        Math.floor(seconds / 60);
+
+
+    const secs =
+        Math.floor(seconds % 60);
+
+
+    return (
+        minutes +
+        ":" +
+        secs.toString().padStart(2, "0")
+    );
+
+}
+
+
+
+/* ============================================================
+   HTML ESCAPING
+   ============================================================ */
+
+function escapeHTML(text) {
+
+    return String(text)
+
+        .replaceAll("&", "&amp;")
+
+        .replaceAll("<", "&lt;")
+
+        .replaceAll(">", "&gt;")
+
+        .replaceAll('"', "&quot;")
+
+        .replaceAll("'", "&#039;");
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>

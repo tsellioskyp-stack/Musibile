@@ -1,43 +1,23 @@
 [
     {
-        "title": "Take Me Away (Into the Night)",
-        "artist": "4 Strings",
-        "albumartist": "4 Strings",
-        "album": "Believe",
-        "year": "2003",
-        "genre": "Trance",
-        "cover": "songs/4 Strings/Believe.jpg",
-        "file": "songs/4 Strings/1-02 Take Me Away (Into the Night).flac"
-    },
-    {
-        "title": "Intro",
-        "artist": "50 Cent",
-        "albumartist": "50 Cent",
-        "album": "Curtis",
-        "year": "2007",
-        "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
-        "cover": "songs/50 Cent/Curtis.jpg",
-        "file": "songs/50 Cent/1-01 Intro.flac"
-    },
-    {
         "title": "My Gun Go Off",
         "artist": "50 Cent",
         "albumartist": "50 Cent",
         "album": "Curtis",
         "year": "2007",
         "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
-        "cover": "songs/50 Cent/Curtis.jpg",
-        "file": "songs/50 Cent/1-02 My Gun Go Off.flac"
+        "cover": "/songs/2 Pac/Curtis.jpg",
+        "file": "/songs/2 Pac/1-02 My Gun Go Off.flac"
     },
     {
-        "title": "21 Questions (Live From New York)",
-        "artist": "50 Cent, Nate Dogg",
-        "albumartist": "50 Cent",
-        "album": "21 Questions (Single)",
+        "title": "Take Me Away (Into the Night)",
+        "artist": "4 Strings",
+        "albumartist": "4 Strings",
+        "album": "Believe",
         "year": "2003",
-        "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
-        "cover": null,
-        "file": "songs/50 Cent/1-03 21 Questions (Live From New York).flac"
+        "genre": "Trance",
+        "cover": "/songs/2 Pac/Believe.jpg",
+        "file": "/songs/2 Pac/1-02 Take Me Away (Into the Night).flac"
     },
     {
         "title": "Man Down (Censored)",
@@ -46,7 +26,87 @@
         "album": "Curtis",
         "year": "2007",
         "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
-        "cover": "songs/50 Cent/Curtis.jpg",
-        "file": "songs/50 Cent/1-03 Man Down (Censored).flac"
+        "cover": "/songs/2 Pac/Curtis.jpg",
+        "file": "/songs/2 Pac/1-03 Man Down (Censored).flac"
+    },
+    {
+        "title": "Take Me Away (Into the Night)",
+        "artist": "4 Strings",
+        "albumartist": "4 Strings",
+        "album": "Believe",
+        "year": "2003",
+        "genre": "Trance",
+        "cover": "/songs/4 Strings/Believe/Believe.jpg",
+        "file": "/songs/4 Strings/Believe/1-02 Take Me Away (Into the Night).flac"
+    },
+    {
+        "title": "Intro",
+        "artist": "50 Cent",
+        "albumartist": "50 Cent",
+        "album": "Curtis",
+        "year": "2007",
+        "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
+        "cover": "/songs/50 Cent/Curtis/Curtis.jpg",
+        "file": "/songs/50 Cent/Curtis/1-01 Intro.flac"
+    },
+    {
+        "title": "My Gun Go Off",
+        "artist": "50 Cent",
+        "albumartist": "50 Cent",
+        "album": "Curtis",
+        "year": "2007",
+        "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
+        "cover": "/songs/50 Cent/Curtis/Curtis.jpg",
+        "file": "/songs/50 Cent/Curtis/1-02 My Gun Go Off.flac"
+    },
+    {
+        "title": "Man Down (Censored)",
+        "artist": "50 Cent",
+        "albumartist": "50 Cent",
+        "album": "Curtis",
+        "year": "2007",
+        "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
+        "cover": "/songs/50 Cent/Curtis/Curtis.jpg",
+        "file": "/songs/50 Cent/Curtis/1-03 Man Down (Censored).flac"
+    },
+    {
+        "title": "Take Me Away (Into the Night)",
+        "artist": "4 Strings",
+        "albumartist": "4 Strings",
+        "album": "Believe",
+        "year": "2003",
+        "genre": "Trance",
+        "cover": "/songs/Eminem/Slim/Believe.jpg",
+        "file": "/songs/Eminem/Slim/1-02 Take Me Away (Into the Night).flac"
+    },
+    {
+        "title": "Intro",
+        "artist": "50 Cent",
+        "albumartist": "50 Cent",
+        "album": "Curtis",
+        "year": "2007",
+        "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
+        "cover": "/songs/Wakako/Albumara/Curtis.jpg",
+        "file": "/songs/Wakako/Albumara/1-01 Intro.flac"
+    },
+    {
+        "title": "My Gun Go Off",
+        "artist": "50 Cent",
+        "albumartist": "50 Cent",
+        "album": "Curtis",
+        "year": "2007",
+        "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
+        "cover": "/songs/Wakako/Albumara/Curtis.jpg",
+        "file": "/songs/Wakako/Albumara/1-02 My Gun Go Off.flac"
+    },
+    {
+        "title": "Take Me Away (Into the Night)",
+        "artist": "4 Strings",
+        "albumartist": "4 Strings",
+        "album": "Believe",
+        "year": "2003",
+        "genre": "Trance",
+        "cover": "/songs/Wakako/Albumara/Believe.jpg",
+        "file": "/songs/Wakako/Albumara/1-02 Take Me Away (Into the Night).flac"
     }
 ]
