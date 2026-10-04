@@ -7,7 +7,8 @@
         "year": "2007",
         "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
         "cover": "/songs/2 Pac/Curtis.jpg",
-        "file": "/songs/2 Pac/1-02 My Gun Go Off.flac"
+        "file": "/songs/2 Pac/1-02 My Gun Go Off.flac",
+        "size": 21694349
     },
     {
         "title": "Take Me Away (Into the Night)",
@@ -17,7 +18,8 @@
         "year": "2003",
         "genre": "Trance",
         "cover": "/songs/2 Pac/Believe.jpg",
-        "file": "/songs/2 Pac/1-02 Take Me Away (Into the Night).flac"
+        "file": "/songs/2 Pac/1-02 Take Me Away (Into the Night).flac",
+        "size": 22173657
     },
     {
         "title": "Man Down (Censored)",
@@ -27,7 +29,8 @@
         "year": "2007",
         "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
         "cover": "/songs/2 Pac/Curtis.jpg",
-        "file": "/songs/2 Pac/1-03 Man Down (Censored).flac"
+        "file": "/songs/2 Pac/1-03 Man Down (Censored).flac",
+        "size": 19931440
     },
     {
         "title": "Take Me Away (Into the Night)",
@@ -37,7 +40,8 @@
         "year": "2003",
         "genre": "Trance",
         "cover": "/songs/4 Strings/Believe/Believe.jpg",
-        "file": "/songs/4 Strings/Believe/1-02 Take Me Away (Into the Night).flac"
+        "file": "/songs/4 Strings/Believe/1-02 Take Me Away (Into the Night).flac",
+        "size": 22173657
     },
     {
         "title": "Intro",
@@ -47,7 +51,8 @@
         "year": "2007",
         "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
         "cover": "/songs/50 Cent/Curtis/Curtis.jpg",
-        "file": "/songs/50 Cent/Curtis/1-01 Intro.flac"
+        "file": "/songs/50 Cent/Curtis/1-01 Intro.flac",
+        "size": 4044603
     },
     {
         "title": "My Gun Go Off",
@@ -57,7 +62,19 @@
         "year": "2007",
         "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
         "cover": "/songs/50 Cent/Curtis/Curtis.jpg",
-        "file": "/songs/50 Cent/Curtis/1-02 My Gun Go Off.flac"
+        "file": "/songs/50 Cent/Curtis/1-02 My Gun Go Off.flac",
+        "size": 21694349
+    },
+    {
+        "title": "My Gun Go Off",
+        "artist": "50 Cent",
+        "albumartist": "50 Cent",
+        "album": "Curtis",
+        "year": "2007",
+        "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
+        "cover": "/songs/50 Cent/Curtis/Curtis.jpg",
+        "file": "/songs/50 Cent/Curtis/1-02 My Johhn.opus",
+        "size": 11728734
     },
     {
         "title": "Man Down (Censored)",
@@ -67,7 +84,8 @@
         "year": "2007",
         "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
         "cover": "/songs/50 Cent/Curtis/Curtis.jpg",
-        "file": "/songs/50 Cent/Curtis/1-03 Man Down (Censored).flac"
+        "file": "/songs/50 Cent/Curtis/1-03 Man Down (Censored).flac",
+        "size": 19931440
     },
     {
         "title": "Take Me Away (Into the Night)",
@@ -77,7 +95,8 @@
         "year": "2003",
         "genre": "Trance",
         "cover": "/songs/Eminem/Slim/Believe.jpg",
-        "file": "/songs/Eminem/Slim/1-02 Take Me Away (Into the Night).flac"
+        "file": "/songs/Eminem/Slim/1-02 Take Me Away (Into the Night).flac",
+        "size": 22173657
     },
     {
         "title": "Intro",
@@ -87,7 +106,8 @@
         "year": "2007",
         "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
         "cover": "/songs/Wakako/Albumara/Curtis.jpg",
-        "file": "/songs/Wakako/Albumara/1-01 Intro.flac"
+        "file": "/songs/Wakako/Albumara/1-01 Intro.flac",
+        "size": 4044603
     },
     {
         "title": "My Gun Go Off",
@@ -97,7 +117,8 @@
         "year": "2007",
         "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
         "cover": "/songs/Wakako/Albumara/Curtis.jpg",
-        "file": "/songs/Wakako/Albumara/1-02 My Gun Go Off.flac"
+        "file": "/songs/Wakako/Albumara/1-02 My Gun Go Off.flac",
+        "size": 21694349
     },
     {
         "title": "Take Me Away (Into the Night)",
@@ -107,6 +128,7 @@
         "year": "2003",
         "genre": "Trance",
         "cover": "/songs/Wakako/Albumara/Believe.jpg",
-        "file": "/songs/Wakako/Albumara/1-02 Take Me Away (Into the Night).flac"
+        "file": "/songs/Wakako/Albumara/1-02 Take Me Away (Into the Night).flac",
+        "size": 22173657
     }
 ]

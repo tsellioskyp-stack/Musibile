@@ -397,10 +397,37 @@
            ========================================================= */
 
         .progress-container {
-            width: 100%;
+    position: relative;
+    width: 100%;
+    height: 20px;
+    margin-top: 25px;
+}
 
-            margin-top: 25px;
-        }
+/* Buffered portion */
+#bufferBar {
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 0%;
+    height: 4px;
+    border-radius: 2px;
+    background: #555;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Playback slider */
+#progress {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 20px;
+    margin: 0;
+    z-index: 2;
+    background: transparent;
+    cursor: pointer;
+}
 
 
         #progress {
@@ -439,6 +466,12 @@
             margin-top: 20px;
         }
 
+        .network-info {
+            text-align: center;
+            margin-top: 6px;
+            color: #666;
+            font-size: 11px;
+        }
 
         .control-button {
             border: none;
@@ -747,27 +780,26 @@
 
             <div class="progress-container">
 
-                <input
-                    id="progress"
-                    type="range"
-                    min="0"
-                    max="100"
-                    value="0"
-                >
+    <div id="bufferBar"></div>
 
-                <div class="time">
+    <input
+        id="progress"
+        type="range"
+        min="0"
+        max="100"
+        value="0"
+    >
 
-                    <span id="currentTime">
-                        0:00
-                    </span>
+</div>
 
-                    <span id="duration">
-                        0:00
-                    </span>
+<div class="time">
+    <span id="currentTime">0:00</span>
+    <span id="duration">0:00</span>
+</div>
 
-                </div>
-
-            </div>
+<div class="network-info">
+    <span id="downloadSpeed">Network: -- MB/s</span>
+</div>
 
 
 
@@ -935,7 +967,8 @@ const shuffleButton =
 const repeatButton =
     document.getElementById("repeatButton");
 
-
+const downloadSpeed =
+    document.getElementById("downloadSpeed");
 
 /* ============================================================
    LOAD MUSIC.JSON
@@ -1328,7 +1361,12 @@ function playSong(index) {
 
     const song =
         songs[currentSong];
+    currentSongSize = song.size || 0;
 
+    lastBufferedEnd = 0;
+    lastSpeedTime = performance.now();
+
+downloadSpeed.textContent = "Network: measuring...";
 
     /*
      * Set audio source
@@ -1402,6 +1440,7 @@ songAlbum.textContent =
      */
 
     updateSongList();
+    bufferBar.style.width = "0%";
 
 }
 
@@ -1779,17 +1818,10 @@ player.addEventListener(
 
 
 
-player.addEventListener(
-    "loadedmetadata",
-    () => {
-
-        duration.textContent =
-            formatTime(
-                player.duration
-            );
-
-    }
-);
+player.addEventListener("loadedmetadata", () => {
+    duration.textContent =
+        formatTime(player.duration);
+});
 
 
 
@@ -1897,8 +1929,283 @@ function updateSongList() {
         });
 
 }
+/* ============================================================
+   NETWORK SPEED
+   ============================================================ */
+let lastBufferedEnd = 0;
+let lastSpeedTime = performance.now();
+let currentSongSize = 0;
+
+function getBufferedEnd() {
+
+    if (player.buffered.length === 0) {
+        return 0;
+    }
+
+    for (let i = 0; i < player.buffered.length; i++) {
+
+        if (
+            player.currentTime >= player.buffered.start(i) &&
+            player.currentTime <= player.buffered.end(i)
+        ) {
+            return player.buffered.end(i);
+        }
+    }
+
+    return player.buffered.end(
+        player.buffered.length - 1
+    );
+}
+
+function updateBufferBar() {
+
+    if (
+        !player.duration ||
+        player.buffered.length === 0
+    ) {
+        bufferBar.style.width = "0%";
+        return;
+    }
+
+    let bufferedEnd = 0;
+
+    /*
+     * Find the buffered section containing
+     * the current playback position.
+     */
+    for (let i = 0; i < player.buffered.length; i++) {
+
+        if (
+            player.currentTime >=
+                player.buffered.start(i) &&
+            player.currentTime <=
+                player.buffered.end(i)
+        ) {
+            bufferedEnd =
+                player.buffered.end(i);
+
+            break;
+        }
+    }
+
+    if (bufferedEnd === 0) {
+        return;
+    }
+
+    const percentage =
+        (bufferedEnd / player.duration) * 100;
+
+    bufferBar.style.width =
+        Math.min(100, percentage) + "%";
+}
+
+setInterval(updateBufferBar, 250);
 
 
+// These can also go here
+player.addEventListener("progress", updateBufferBar);
+player.addEventListener("loadedmetadata", updateBufferBar);
+
+setInterval(() => {
+
+    if (
+        !player.duration ||
+        !currentSongSize ||
+        player.buffered.length === 0
+    ) {
+        downloadSpeed.textContent =
+            "Network: -- MB/s";
+
+        return;
+    }
+
+    const bufferedEnd =
+        getBufferedEnd();
+
+    const now =
+        performance.now();
+
+    const elapsed =
+        (now - lastSpeedTime) / 1000;
+
+    const bufferedGrowth =
+        bufferedEnd - lastBufferedEnd;
+
+    const bufferBar =
+    document.getElementById("bufferBar");
+
+    if (
+        elapsed > 0 &&
+        bufferedGrowth > 0
+    ) {
+
+        const bytesPerAudioSecond =
+            currentSongSize /
+            player.duration;
+
+        const audioSecondsPerSecond =
+            bufferedGrowth /
+            elapsed;
+
+        const bytesPerSecond =
+            bytesPerAudioSecond *
+            audioSecondsPerSecond;
+
+        const mbPerSecond =
+            bytesPerSecond /
+            (1024 * 1024);
+
+        downloadSpeed.textContent =
+            "Network: " +
+            mbPerSecond.toFixed(2) +
+            " MB/s";
+
+    }
+    else if (bufferedGrowth <= 0) {
+
+        downloadSpeed.textContent =
+            "Network: 0.00 MB/s";
+    }
+
+
+    lastBufferedEnd =
+        bufferedEnd;
+
+    lastSpeedTime =
+        now;
+
+}, 250);
+
+
+setInterval(() => {
+
+    if (
+        !player.duration ||
+        !currentSongSize ||
+        player.buffered.length === 0
+    ) {
+        downloadSpeed.textContent =
+            "Network: -- MB/s";
+
+        return;
+    }
+
+    const bufferedEnd =
+        getBufferedEnd();
+
+    const now =
+        performance.now();
+
+    const elapsed =
+        (now - lastSpeedTime) / 1000;
+
+    const bufferedGrowth =
+        bufferedEnd - lastBufferedEnd;
+
+
+    if (
+        elapsed > 0 &&
+        bufferedGrowth > 0
+    ) {
+
+        const bytesPerAudioSecond =
+            currentSongSize /
+            player.duration;
+
+        const audioSecondsPerSecond =
+            bufferedGrowth /
+            elapsed;
+
+        const bytesPerSecond =
+            bytesPerAudioSecond *
+            audioSecondsPerSecond;
+
+        const mbPerSecond =
+            bytesPerSecond /
+            (1024 * 1024);
+
+        downloadSpeed.textContent =
+            "Network: " +
+            mbPerSecond.toFixed(2) +
+            " MB/s";
+
+    }
+    else if (bufferedGrowth <= 0) {
+
+        downloadSpeed.textContent =
+            "Network: 0.00 MB/s";
+    }
+
+
+    lastBufferedEnd =
+        bufferedEnd;
+
+    lastSpeedTime =
+        now;
+
+}, 250);
+
+setInterval(() => {
+    if (
+        !currentSongSize ||
+        !currentSongDuration ||
+        !player.duration
+    ) {
+        downloadSpeed.textContent = "Network: -- MB/s";
+        return;
+    }
+
+    const bufferedEnd = getBufferedEnd();
+
+    if (!bufferedEnd) {
+        downloadSpeed.textContent = "Network: -- MB/s";
+        return;
+    }
+
+    const now = performance.now();
+
+    const elapsedSeconds =
+        (now - lastMeasureTime) / 1000;
+
+    const bufferedGrowth =
+        bufferedEnd - lastBufferTime;
+
+    if (
+        elapsedSeconds > 0 &&
+        bufferedGrowth > 0
+    ) {
+        /*
+         * Average bytes per second of the audio.
+         */
+        const bytesPerAudioSecond =
+            currentSongSize / currentSongDuration;
+
+        /*
+         * How many seconds of audio are being
+         * buffered per real-world second.
+         */
+        const bufferRate =
+            bufferedGrowth / elapsedSeconds;
+
+        /*
+         * Estimated network throughput.
+         */
+        const bytesPerSecond =
+            bytesPerAudioSecond * bufferRate;
+
+        const mbPerSecond =
+            bytesPerSecond / (1024 * 1024);
+
+        downloadSpeed.textContent =
+            "Network: " +
+            mbPerSecond.toFixed(2) +
+            " MB/s";
+    }
+
+    lastBufferTime = bufferedEnd;
+    lastMeasureTime = now;
+
+}, 1000);
 
 /* ============================================================
    FORMAT TIME
