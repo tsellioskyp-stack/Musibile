@@ -1,13 +1,18 @@
 import os
 import json
 import re
+import sys
 import mutagen
 
-# ============================================================
-# FUNCTIONS
-# ============================================================
+#### FUNCTIONS #######################################################################################################
 
-music_folder = r"C:\Users\mitsu\Musibile\MusicPlayer\songs"
+if len(sys.argv) == 1:
+    sys.exit('Usage: python tagscanner_v2.py "root\\...\\Music Library Folder"')
+if os.path.exists(sys.argv[1]):
+    music_folder = sys.argv[1]
+else:
+    sys.exit("Error: Folder not found")
+
 existing_songs_paths = set()
 # Main MusicPlayer project directory
 project_folder = os.path.dirname(music_folder)
@@ -43,9 +48,7 @@ def get_tag(audio, tag):
     return None
 
 
-# ============================================================
-# SCAN MUSIC
-# ============================================================
+#### SCAN MUSIC #######################################################################################################
 # ============================================================
 # SETTINGS
 # ============================================================
@@ -59,7 +62,7 @@ def main():
 
         for file in files:
 
-            if not file.lower().endswith((".flac", ".mp3", ".m4a")):
+            if not file.lower().endswith((".flac", ".mp3", ".m4a", ".opus")):
                 continue
 
             full_path = os.path.join(root, file)
@@ -188,6 +191,7 @@ def main():
                     "genre": genre,
                     "cover": relative_cover,
                     "file": relative_file,
+                    "size": os.path.getsize(full_path),
                 }
             )
 

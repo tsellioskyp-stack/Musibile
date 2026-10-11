@@ -966,7 +966,7 @@
             <div class="network-info">
 
                 <span id="downloadSpeed">
-                    Network: -- MB/s
+                    Buffering: -- MB/s
                 </span>
 
             </div>
@@ -1651,7 +1651,7 @@ function playSong(index) {
 
 
     downloadSpeed.textContent =
-        "Network: measuring...";
+        "Buffering: measuring...";
 
 
 
@@ -2496,7 +2496,7 @@ setInterval(
         ) {
 
             downloadSpeed.textContent =
-                "Network: -- MB/s";
+                "Buffering: -- MB/s";
 
             return;
 
@@ -2574,7 +2574,7 @@ setInterval(
 
 
             downloadSpeed.textContent =
-                "Network: " +
+                "Buffering: " +
                 mbPerSecond.toFixed(2) +
                 " MB/s";
 
@@ -2583,7 +2583,7 @@ setInterval(
         else {
 
             downloadSpeed.textContent =
-                "Network: 0.00 MB/s";
+                "Buffering: 0.00 MB/s";
 
         }
 

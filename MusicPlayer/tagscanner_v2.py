@@ -3,19 +3,9 @@ import json
 import re
 import sys
 import mutagen
-
-#### FUNCTIONS #######################################################################################################
-
-if len(sys.argv) == 1:
-    sys.exit('Usage: python tagscanner_v2.py "root\\...\\Music Library Folder"')
-if os.path.exists(sys.argv[1]):
-    music_folder = sys.argv[1]
-else:
-    sys.exit("Error: Folder not found")
-
-existing_songs_paths = set()
-# Main MusicPlayer project directory
-project_folder = os.path.dirname(music_folder)
+import argparse
+import shutil
+import time
 
 
 def safe_filename(name):
@@ -48,13 +38,93 @@ def get_tag(audio, tag):
     return None
 
 
-#### SCAN MUSIC #######################################################################################################
 # ============================================================
-# SETTINGS
+# MAIN
 # ============================================================
 
 
 def main():
+    terminal_width = shutil.get_terminal_size().columns
+
+    parser = argparse.ArgumentParser()
+
+    # Only one mode can be selected
+    mode = parser.add_mutually_exclusive_group(required=True)
+
+    mode.add_argument(
+        "-s",
+        "--scan",
+        action="store_true",
+        help="Scan the music library and generate music.json and existing_songs_paths.txt",
+    )
+
+    mode.add_argument(
+        "-u",
+        "--update",
+        nargs="+",
+        metavar="NEW_FOLDER",
+        help="Update the music library using one or more new music folders",
+    )
+
+    parser.add_argument(
+        "music_folder",
+        type=str,
+        help="Path to the root music library folder",
+    )
+
+    args = parser.parse_args()
+
+    # ======================================================================================================================
+    # ERROR HANDLING
+    # ======================================================================================================================
+
+    # Check the root music folder
+    music_folder = args.music_folder
+
+    if not os.path.isdir(music_folder):
+        sys.exit(f"Error: Root music folder not found: {music_folder}")
+
+    # Check the new music folders, if updating
+    if args.update:
+        for folder in args.update:
+            if not os.path.isdir(folder):
+                sys.exit(f"Error: New music folder not found: {folder}")
+
+    # ======================================================================================================================
+    # NORMAL OPERATIONS
+    # ======================================================================================================================
+
+    # SCANNING MODE
+
+    if args.scan:
+        print("=" * terminal_width)
+        print(f"Scanning music library at: {music_folder}")
+        print("=" * terminal_width)
+
+        time.sleep(2)
+
+        # Your full-scan functionality goes here
+
+    # UPDATE MODE
+
+    elif args.update:
+        new_music_folders = args.update
+
+        print("=" * terminal_width)
+        print(f"Updating music library at: {music_folder}")
+        print("=" * terminal_width)
+
+        print("New music folders:")
+        for folder in new_music_folders:
+            print(f"  {folder}")
+
+        time.sleep(2)
+
+        # Your update functionality goes here
+
+    existing_songs_paths = set()
+    # Main MusicPlayer project directory
+    project_folder = os.path.dirname(music_folder)
 
     songs = []
 

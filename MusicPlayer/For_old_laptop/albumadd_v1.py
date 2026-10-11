@@ -56,7 +56,7 @@ def metadata(paths: list):
 
             for file in files:
 
-                if file.lower().endswith((".flac", ".mp3", ".m4a")):
+                if file.lower().endswith((".flac", ".mp3", ".m4a", ".opus")):
 
                     full_path = os.path.join(root, file)
                     dir_path = os.path.dirname(full_path)

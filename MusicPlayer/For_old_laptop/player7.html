@@ -2,10 +2,14 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>Music Player</title>
+
 
     <style>
 
@@ -13,13 +17,18 @@
             box-sizing: border-box;
         }
 
+
         body {
             margin: 0;
+
             background: #0b0b0b;
             color: white;
+
             font-family: Arial, Helvetica, sans-serif;
+
             overflow: hidden;
         }
+
 
         /* =========================================================
            MAIN LAYOUT
@@ -27,13 +36,14 @@
 
         .app {
             display: flex;
+
             width: 100vw;
             height: 100vh;
         }
 
 
         /* =========================================================
-           LEFT LIBRARY
+           SIDEBAR
            ========================================================= */
 
         .sidebar {
@@ -41,6 +51,7 @@
             min-width: 320px;
 
             background: #111;
+
             border-right: 1px solid #252525;
 
             display: flex;
@@ -50,6 +61,7 @@
 
         .library-header {
             padding: 20px;
+
             border-bottom: 1px solid #252525;
         }
 
@@ -57,11 +69,10 @@
         .library-title {
             font-size: 22px;
             font-weight: bold;
+
             margin-bottom: 15px;
         }
 
-
-        /* SEARCH */
 
         #search {
             width: 100%;
@@ -85,8 +96,6 @@
         }
 
 
-        /* LIBRARY TREE */
-
         #library {
             flex: 1;
 
@@ -96,23 +105,26 @@
         }
 
 
-        /* Scrollbar */
-
         #library::-webkit-scrollbar {
             width: 8px;
         }
+
 
         #library::-webkit-scrollbar-track {
             background: #111;
         }
 
+
         #library::-webkit-scrollbar-thumb {
             background: #333;
+
             border-radius: 5px;
         }
 
 
-        /* ARTIST */
+        /* =========================================================
+           ARTIST
+           ========================================================= */
 
         .artist {
             margin-bottom: 3px;
@@ -151,7 +163,9 @@
         }
 
 
-        /* ALBUM */
+        /* =========================================================
+           ALBUM
+           ========================================================= */
 
         .albums {
             display: none;
@@ -202,7 +216,9 @@
         }
 
 
-        /* SONGS */
+        /* =========================================================
+           SONG
+           ========================================================= */
 
         .songs {
             display: none;
@@ -217,42 +233,62 @@
 
 
         .song {
-    padding: 7px 8px;
-    cursor: pointer;
-    border-radius: 5px;
-    color: #999;
-    font-size: 13px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+            padding: 7px 8px;
 
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+            cursor: pointer;
 
-.song:hover {
-    background: #1b1b1b;
-    color: white;
-}
+            border-radius: 5px;
 
-.song.active {
-    background: #292929;
-    color: white;
-    font-weight: bold;
-}
+            color: #999;
 
-.song-title {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+            font-size: 13px;
 
-.song-artist {
-    color: #666;
-    font-size: 12px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+        }
+
+
+        .song:hover {
+            background: #1b1b1b;
+
+            color: white;
+        }
+
+
+        .song.active {
+            background: #292929;
+
+            color: white;
+
+            font-weight: bold;
+        }
+
+
+        .song-title {
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+        }
+
+
+        .song-artist {
+            color: #666;
+
+            font-size: 12px;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+        }
 
 
         /* =========================================================
@@ -260,28 +296,28 @@
            ========================================================= */
 
         .player-area {
-    position: relative;
+            position: relative;
 
-    flex: 1;
+            flex: 1;
 
-    min-width: 0;
+            min-width: 0;
 
-    display: flex;
+            display: flex;
 
-    flex-direction: column;
+            flex-direction: column;
 
-    align-items: center;
+            align-items: center;
 
-    justify-content: center;
+            justify-content: center;
 
-    overflow: hidden;
+            overflow: hidden;
 
-    padding: 40px 0;
-}
+            padding: 40px 0;
+        }
 
 
         /* =========================================================
-           BLURRED BACKGROUND
+           BACKGROUND
            ========================================================= */
 
         .background {
@@ -290,6 +326,7 @@
             inset: -50px;
 
             background-position: center;
+
             background-size: cover;
 
             filter: blur(45px);
@@ -302,8 +339,6 @@
         }
 
 
-        /* Dark overlay */
-
         .background-overlay {
             position: absolute;
 
@@ -314,8 +349,6 @@
             z-index: 1;
         }
 
-
-        /* Everything above background */
 
         .player-content {
             position: relative;
@@ -337,18 +370,19 @@
            ========================================================= */
 
         .cover-container {
-    width: min(500px, 58vh);
-    aspect-ratio: 1 / 1;
+            width: min(500px, 58vh);
 
-    border-radius: 8px;
+            aspect-ratio: 1 / 1;
 
-    overflow: hidden;
+            border-radius: 8px;
 
-    background: #181818;
+            overflow: hidden;
 
-    box-shadow:
-        0 20px 60px rgba(0, 0, 0, 0.7);
-}
+            background: #181818;
+
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.7);
+        }
 
 
         #cover {
@@ -362,82 +396,206 @@
 
 
         /* =========================================================
-           SONG INFORMATION
+           SONG INFO
            ========================================================= */
 
         .song-info {
-    width: 100%;
-    margin-top: 20px;
-    text-align: center;
-}
+            width: 100%;
 
-#song-title {
-    font-size: 25px;
-    font-weight: bold;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+            margin-top: 20px;
 
-#song-artist {
-    margin-top: 7px;
-    color: #aaa;
-    font-size: 17px;
-}
+            text-align: center;
+        }
 
-#song-album {
-    margin-top: 4px;
-    color: #666;
-    font-size: 14px;
-}
+
+        #song-title {
+            font-size: 25px;
+
+            font-weight: bold;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+        }
+
+
+        #song-artist {
+            margin-top: 7px;
+
+            color: #aaa;
+
+            font-size: 17px;
+        }
+
+
+        #song-album {
+            margin-top: 4px;
+
+            color: #666;
+
+            font-size: 14px;
+        }
 
 
         /* =========================================================
-           PROGRESS BAR
+           PROGRESS AREA
            ========================================================= */
 
         .progress-container {
-    position: relative;
-    width: 100%;
-    height: 20px;
-    margin-top: 25px;
-}
+            position: relative;
 
-/* Buffered portion */
-#bufferBar {
-    position: absolute;
-    left: 0;
-    top: 8px;
-    width: 0%;
-    height: 4px;
-    border-radius: 2px;
-    background: #555;
-    pointer-events: none;
-    z-index: 1;
-}
+            width: 100%;
 
-/* Playback slider */
-#progress {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 20px;
-    margin: 0;
-    z-index: 2;
-    background: transparent;
-    cursor: pointer;
-}
+            height: 20px;
 
+            margin-top: 25px;
+        }
+
+
+        /* =========================================================
+           BUFFER BAR
+           ========================================================= */
+
+        #bufferBar {
+            position: absolute;
+
+            left: 0;
+            top: 8px;
+
+            width: 0%;
+            height: 4px;
+
+            border-radius: 2px;
+
+            background: #555;
+
+            pointer-events: none;
+
+            z-index: 1;
+        }
+
+
+        /* =========================================================
+           PLAYBACK SLIDER
+           ========================================================= */
 
         #progress {
+            position: absolute;
+
+            left: 0;
+            top: 0;
+
             width: 100%;
+            height: 20px;
+
+            margin: 0;
+
+            padding: 0;
+
+            background: transparent;
+
+            cursor: pointer;
+
+            z-index: 2;
+
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+
+        /* =========================================================
+           CHROME / EDGE SLIDER TRACK
+           ========================================================= */
+
+        #progress::-webkit-slider-runnable-track {
+            width: 100%;
+
+            height: 4px;
+
+            background: transparent;
+
+            border: none;
+
+            border-radius: 2px;
+        }
+
+
+        /* =========================================================
+           CHROME / EDGE SLIDER THUMB
+           ========================================================= */
+
+        #progress::-webkit-slider-thumb {
+            appearance: none;
+            -webkit-appearance: none;
+
+            width: 12px;
+            height: 12px;
+
+            margin-top: -4px;
+
+            border-radius: 50%;
+
+            border: none;
+
+            background: white;
 
             cursor: pointer;
         }
 
 
+        /* =========================================================
+           FIREFOX TRACK
+           ========================================================= */
+
+        #progress::-moz-range-track {
+            width: 100%;
+
+            height: 4px;
+
+            background: transparent;
+
+            border: none;
+
+            border-radius: 2px;
+        }
+
+
+        /* =========================================================
+           FIREFOX PROGRESS
+           ========================================================= */
+
+        #progress::-moz-range-progress {
+            background: transparent;
+        }
+
+
+        /* =========================================================
+           FIREFOX THUMB
+           ========================================================= */
+
+        #progress::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+
+            border-radius: 50%;
+
+            border: none;
+
+            background: white;
+
+            cursor: pointer;
+        }
+
+
+        /* =========================================================
+           TIME
+           ========================================================= */
+
         .time {
+            width: 100%;
+
             display: flex;
 
             justify-content: space-between;
@@ -451,7 +609,22 @@
 
 
         /* =========================================================
-           CONTROLS
+           NETWORK
+           ========================================================= */
+
+        .network-info {
+            text-align: center;
+
+            margin-top: 6px;
+
+            color: #666;
+
+            font-size: 11px;
+        }
+
+
+        /* =========================================================
+           MAIN CONTROLS
            ========================================================= */
 
         .controls {
@@ -466,12 +639,6 @@
             margin-top: 20px;
         }
 
-        .network-info {
-            text-align: center;
-            margin-top: 6px;
-            color: #666;
-            font-size: 11px;
-        }
 
         .control-button {
             border: none;
@@ -497,29 +664,34 @@
 
 
         #playButton {
-    width: 60px;
-    height: 60px;
+            width: 60px;
+            height: 60px;
 
-    background: white;
-    color: black;
+            background: white;
 
-    font-size: 25px;
+            color: black;
 
-    border: none;
-    border-radius: 50%;
+            font-size: 25px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+            border: none;
 
-    padding: 0;
+            border-radius: 50%;
 
-    cursor: pointer;
-}
+            display: flex;
 
-#playButton:hover {
-    background: #ddd;
-}
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 0;
+
+            cursor: pointer;
+        }
+
+
+        #playButton:hover {
+            background: #ddd;
+        }
 
 
         /* =========================================================
@@ -550,77 +722,51 @@
 
 
         .toggle-button {
-    display: flex;
-    align-items: center;
-    gap: 7px;
+            display: flex;
 
-    padding: 7px 11px;
+            align-items: center;
 
-    background: #171717;
-    color: #888;
+            gap: 7px;
 
-    border: 1px solid #333;
-    border-radius: 7px;
+            padding: 7px 11px;
 
-    cursor: pointer;
+            background: #171717;
 
-    font-size: 13px;
+            color: #888;
 
-    transition:
-        background 0.15s,
-        color 0.15s,
-        border-color 0.15s;
-}
+            border: 1px solid #333;
 
-.play-icon {
-    display: block;
-    transform: translateX(1px);
-}
-.toggle-button:hover {
-    background: #222;
-    color: white;
-}
+            border-radius: 7px;
 
-.toggle-button.active {
-    background: #303030;
-    color: white;
+            cursor: pointer;
 
-    border-color: #777;
+            font-size: 13px;
+        }
 
-    box-shadow:
-        inset 0 0 0 1px #555;
-}
 
-.toggle-button span {
-    font-size: 12px;
-}
+        .toggle-button:hover {
+            background: #222;
+
+            color: white;
+        }
+
+
+        .toggle-button.active {
+            background: #303030;
+
+            color: white;
+
+            border-color: #777;
+        }
+
+
+        .toggle-button span {
+            font-size: 12px;
+        }
 
 
         #volume {
             width: 100px;
-        }
-
-
-        /* =========================================================
-           ALBUM DROPDOWN
-           ========================================================= */
-
-        #albumSelect {
-            margin-top: 15px;
-
-            background: #171717;
-
-            color: white;
-
-            border: 1px solid #333;
-
-            padding: 8px 12px;
-
-            border-radius: 6px;
-
-            outline: none;
-
-            max-width: 250px;
         }
 
 
@@ -683,6 +829,7 @@
         }
 
     </style>
+
 </head>
 
 
@@ -698,11 +845,13 @@
 
     <aside class="sidebar">
 
+
         <div class="library-header">
 
             <div class="library-title">
                 Library
             </div>
+
 
             <input
                 type="text"
@@ -715,6 +864,7 @@
 
         <div id="library"></div>
 
+
     </aside>
 
 
@@ -726,18 +876,15 @@
     <main class="player-area">
 
 
-        <!-- blurred background -->
-
         <div
             id="background"
             class="background">
         </div>
 
+
         <div class="background-overlay"></div>
 
 
-
-        <!-- player content -->
 
         <div class="player-content">
 
@@ -756,7 +903,7 @@
 
 
 
-            <!-- INFORMATION -->
+            <!-- SONG INFORMATION -->
 
             <div class="song-info">
 
@@ -764,9 +911,11 @@
                     Nothing playing
                 </div>
 
+
                 <div id="song-artist">
                     —
                 </div>
+
 
                 <div id="song-album">
                     —
@@ -780,50 +929,83 @@
 
             <div class="progress-container">
 
-    <div id="bufferBar"></div>
+                <div id="bufferBar"></div>
 
-    <input
-        id="progress"
-        type="range"
-        min="0"
-        max="100"
-        value="0"
-    >
 
-</div>
+                <input
+                    id="progress"
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="0"
+                >
 
-<div class="time">
-    <span id="currentTime">0:00</span>
-    <span id="duration">0:00</span>
-</div>
-
-<div class="network-info">
-    <span id="downloadSpeed">Network: -- MB/s</span>
-</div>
+            </div>
 
 
 
-            <!-- MAIN CONTROLS -->
+            <!-- TIME -->
+
+            <div class="time">
+
+                <span id="currentTime">
+                    0:00
+                </span>
+
+
+                <span id="duration">
+                    0:00
+                </span>
+
+            </div>
+
+
+
+            <!-- NETWORK SPEED -->
+
+            <div class="network-info">
+
+                <span id="downloadSpeed">
+                    Network: -- MB/s
+                </span>
+
+            </div>
+
+
+
+            <!-- PLAYER CONTROLS -->
 
             <div class="controls">
+
 
                 <button
                     id="previousButton"
                     class="control-button">
+
                     ⏮
+
                 </button>
 
 
-                <button id="playButton" class="control-button">
-                     <span class="play-icon">▶</span>
+
+                <button
+                    id="playButton"
+                    class="control-button">
+
+                    ▶
+
                 </button>
+
 
 
                 <button
                     id="nextButton"
                     class="control-button">
+
                     ⏭
+
                 </button>
+
 
             </div>
 
@@ -836,21 +1018,36 @@
 
                 <div class="left-controls">
 
-    <button
-        id="shuffleButton"
-        class="toggle-button">
-        🔀
-        <span>Shuffle</span>
-    </button>
 
-    <button
-        id="repeatButton"
-        class="toggle-button">
-        🔁
-        <span>Repeat</span>
-    </button>
+                    <button
+                        id="shuffleButton"
+                        class="toggle-button">
 
-</div>
+                        🔀
+
+                        <span>
+                            Shuffle
+                        </span>
+
+                    </button>
+
+
+
+                    <button
+                        id="repeatButton"
+                        class="toggle-button">
+
+                        🔁
+
+                        <span>
+                            Repeat
+                        </span>
+
+                    </button>
+
+
+                </div>
+
 
 
                 <div class="right-controls">
@@ -858,6 +1055,7 @@
                     <span>
                         🔊
                     </span>
+
 
                     <input
                         id="volume"
@@ -869,6 +1067,7 @@
                     >
 
                 </div>
+
 
             </div>
 
@@ -884,7 +1083,7 @@
 
 
 <!-- =========================================================
-     ONE AUDIO ELEMENT
+     AUDIO ELEMENT
      ========================================================= -->
 
 <audio id="player"></audio>
@@ -895,7 +1094,7 @@
 
 
 /* ============================================================
-   GLOBAL VARIABLES
+   VARIABLES
    ============================================================ */
 
 let songs = [];
@@ -904,11 +1103,21 @@ let library = {};
 
 let currentSong = -1;
 
-let albumSongs = [];
-
 let shuffle = false;
 
 let repeat = false;
+
+
+/* ============================================================
+   NETWORK / BUFFER VARIABLES
+   ============================================================ */
+
+let currentSongSize = 0;
+
+let lastBufferedEnd = 0;
+
+let lastSpeedTime =
+    performance.now();
 
 
 
@@ -919,56 +1128,79 @@ let repeat = false;
 const player =
     document.getElementById("player");
 
+
 const cover =
     document.getElementById("cover");
+
 
 const background =
     document.getElementById("background");
 
+
 const songTitle =
     document.getElementById("song-title");
+
 
 const songArtist =
     document.getElementById("song-artist");
 
+
 const songAlbum =
     document.getElementById("song-album");
+
 
 const libraryElement =
     document.getElementById("library");
 
+
 const search =
     document.getElementById("search");
+
 
 const progress =
     document.getElementById("progress");
 
+
 const currentTime =
     document.getElementById("currentTime");
+
 
 const duration =
     document.getElementById("duration");
 
+
 const playButton =
     document.getElementById("playButton");
+
 
 const previousButton =
     document.getElementById("previousButton");
 
+
 const nextButton =
     document.getElementById("nextButton");
+
 
 const volume =
     document.getElementById("volume");
 
+
 const shuffleButton =
     document.getElementById("shuffleButton");
+
 
 const repeatButton =
     document.getElementById("repeatButton");
 
+
 const downloadSpeed =
     document.getElementById("downloadSpeed");
+
+
+const bufferBar =
+    document.getElementById("bufferBar");
+
+
 
 /* ============================================================
    LOAD MUSIC.JSON
@@ -976,7 +1208,19 @@ const downloadSpeed =
 
 fetch("songs/music.json")
 
-    .then(response => response.json())
+    .then(response => {
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Could not load music.json"
+            );
+
+        }
+
+        return response.json();
+
+    })
 
     .then(data => {
 
@@ -990,44 +1234,57 @@ fetch("songs/music.json")
 
     .catch(error => {
 
-        console.error(
-            "Could not load music.json:",
-            error
-        );
+        console.error(error);
 
     });
 
 
 
 /* ============================================================
-   BUILD ARTIST → ALBUM → SONG STRUCTURE
+   BUILD LIBRARY
    ============================================================ */
 
 function buildLibrary() {
 
     library = {};
 
+
     songs.forEach((song, index) => {
 
         const albumArtist =
-            song.albumartist || "Unknown Album Artist";
+            song.albumartist ||
+            "Unknown Album Artist";
+
 
         const album =
-            song.album || "Unknown Album";
+            song.album ||
+            "Unknown Album";
+
 
         if (!library[albumArtist]) {
+
             library[albumArtist] = {};
+
         }
+
 
         if (!library[albumArtist][album]) {
+
             library[albumArtist][album] = [];
+
         }
 
+
         library[albumArtist][album].push({
+
             ...song,
+
             index: index
+
         });
+
     });
+
 }
 
 
@@ -1040,25 +1297,29 @@ function renderLibrary(filter = "") {
 
     libraryElement.innerHTML = "";
 
+
     const query =
         filter.toLowerCase().trim();
 
+
     const albumArtists =
         Object.keys(library).sort(
-            (a, b) => a.localeCompare(b)
+            (a, b) =>
+                a.localeCompare(b)
         );
 
+
     albumArtists.forEach(albumArtist => {
+
 
         const artistElement =
             document.createElement("div");
 
-        artistElement.className = "artist";
+        artistElement.className =
+            "artist";
 
 
-        // ============================
-        // ALBUM ARTIST HEADER
-        // ============================
+        /* ARTIST HEADER */
 
         const artistHeader =
             document.createElement("div");
@@ -1066,18 +1327,19 @@ function renderLibrary(filter = "") {
         artistHeader.className =
             "artist-header";
 
+
         artistHeader.innerHTML =
             `<span class="artist-arrow">▶</span>
              ${escapeHTML(albumArtist)}`;
+
 
         artistElement.appendChild(
             artistHeader
         );
 
 
-        // ============================
-        // ALBUMS
-        // ============================
+
+        /* ALBUMS */
 
         const albumsElement =
             document.createElement("div");
@@ -1085,35 +1347,48 @@ function renderLibrary(filter = "") {
         albumsElement.className =
             "albums";
 
+
         const albums =
-            Object.keys(library[albumArtist]).sort(
-                (a, b) => a.localeCompare(b)
+            Object.keys(
+                library[albumArtist]
+            ).sort(
+                (a, b) =>
+                    a.localeCompare(b)
             );
 
 
         albums.forEach(album => {
 
-            const albumSongsList =
-                library[albumArtist][album];
+
+            const albumSongs =
+                library[
+                    albumArtist
+                ][
+                    album
+                ];
 
 
-            // Search filtering
             const matchingSongs =
-                albumSongsList.filter(song => {
-
-                    return matchesSearch(
+                albumSongs.filter(song =>
+                    matchesSearch(
                         song,
                         query
-                    );
-                });
+                    )
+                );
+
 
             if (
                 query &&
                 matchingSongs.length === 0
             ) {
+
                 return;
+
             }
 
+
+
+            /* ALBUM */
 
             const albumElement =
                 document.createElement("div");
@@ -1122,28 +1397,25 @@ function renderLibrary(filter = "") {
                 "album";
 
 
-            // ============================
-            // ALBUM HEADER
-            // ============================
-
             const albumHeader =
                 document.createElement("div");
 
             albumHeader.className =
                 "album-header";
 
+
             albumHeader.innerHTML =
                 `<span class="album-arrow">▶</span>
                  ${escapeHTML(album)}`;
+
 
             albumElement.appendChild(
                 albumHeader
             );
 
 
-            // ============================
-            // SONGS
-            // ============================
+
+            /* SONGS */
 
             const songsElement =
                 document.createElement("div");
@@ -1155,10 +1427,11 @@ function renderLibrary(filter = "") {
             const visibleSongs =
                 query
                     ? matchingSongs
-                    : albumSongsList;
+                    : albumSongs;
 
 
             visibleSongs.forEach(song => {
+
 
                 const songElement =
                     document.createElement("div");
@@ -1167,7 +1440,11 @@ function renderLibrary(filter = "") {
                     "song";
 
 
-                // Track title
+                songElement.dataset.index =
+                    song.index;
+
+
+
                 const titleElement =
                     document.createElement("span");
 
@@ -1179,7 +1456,7 @@ function renderLibrary(filter = "") {
                     "Unknown Title";
 
 
-                // Track artist
+
                 const artistElement =
                     document.createElement("span");
 
@@ -1191,17 +1468,16 @@ function renderLibrary(filter = "") {
                     "Unknown Artist";
 
 
+
                 songElement.appendChild(
                     titleElement
                 );
+
 
                 songElement.appendChild(
                     artistElement
                 );
 
-
-                songElement.dataset.index =
-                    song.index;
 
 
                 songElement.addEventListener(
@@ -1211,6 +1487,7 @@ function renderLibrary(filter = "") {
                         event.stopPropagation();
 
                         playSong(song.index);
+
                     }
                 );
 
@@ -1218,6 +1495,7 @@ function renderLibrary(filter = "") {
                 songsElement.appendChild(
                     songElement
                 );
+
             });
 
 
@@ -1226,7 +1504,9 @@ function renderLibrary(filter = "") {
             );
 
 
-            // Album open/close
+
+            /* ALBUM OPEN/CLOSE */
+
             albumHeader.addEventListener(
                 "click",
                 event => {
@@ -1236,6 +1516,7 @@ function renderLibrary(filter = "") {
                     albumElement.classList.toggle(
                         "open"
                     );
+
                 }
             );
 
@@ -1243,6 +1524,7 @@ function renderLibrary(filter = "") {
             albumsElement.appendChild(
                 albumElement
             );
+
         });
 
 
@@ -1251,7 +1533,9 @@ function renderLibrary(filter = "") {
         );
 
 
-        // Album artist open/close
+
+        /* ARTIST OPEN/CLOSE */
+
         artistHeader.addEventListener(
             "click",
             () => {
@@ -1259,12 +1543,11 @@ function renderLibrary(filter = "") {
                 artistElement.classList.toggle(
                     "open"
                 );
+
             }
         );
 
 
-        // Only show album artists
-        // containing search results
         if (
             !query ||
             albumsElement.children.length > 0
@@ -1273,17 +1556,20 @@ function renderLibrary(filter = "") {
             libraryElement.appendChild(
                 artistElement
             );
+
         }
+
     });
 
 
     updateSongList();
+
 }
 
 
 
 /* ============================================================
-   SEARCH MATCHING
+   SEARCH
    ============================================================ */
 
 function matchesSearch(song, query) {
@@ -1295,29 +1581,17 @@ function matchesSearch(song, query) {
     }
 
 
-    const title =
-        song.title || "";
+    const text = (
 
-    const artist =
-        song.artist || "";
+        (song.title || "") +
+        " " +
+        (song.artist || "") +
+        " " +
+        (song.album || "") +
+        " " +
+        (song.genre || "")
 
-    const album =
-        song.album || "";
-
-    const genre =
-        song.genre || "";
-
-
-    const text =
-        (
-            title +
-            " " +
-            artist +
-            " " +
-            album +
-            " " +
-            genre
-        ).toLowerCase();
+    ).toLowerCase();
 
 
     return text.includes(query);
@@ -1325,10 +1599,6 @@ function matchesSearch(song, query) {
 }
 
 
-
-/* ============================================================
-   SEARCH EVENT
-   ============================================================ */
 
 search.addEventListener(
     "input",
@@ -1349,7 +1619,10 @@ search.addEventListener(
 
 function playSong(index) {
 
-    if (index < 0 || index >= songs.length) {
+    if (
+        index < 0 ||
+        index >= songs.length
+    ) {
 
         return;
 
@@ -1361,46 +1634,82 @@ function playSong(index) {
 
     const song =
         songs[currentSong];
-    currentSongSize = song.size || 0;
+
+
+
+    /* RESET NETWORK MEASUREMENT */
+
+    currentSongSize =
+        song.size || 0;
+
 
     lastBufferedEnd = 0;
-    lastSpeedTime = performance.now();
 
-downloadSpeed.textContent = "Network: measuring...";
 
-    /*
-     * Set audio source
-     */
+    lastSpeedTime =
+        performance.now();
+
+
+    downloadSpeed.textContent =
+        "Network: measuring...";
+
+
+
+    /* RESET PROGRESS */
+
+    progress.value = 0;
+
+
+    currentTime.textContent =
+        "0:00";
+
+
+    duration.textContent =
+        "0:00";
+
+
+    bufferBar.style.width =
+        "0%";
+
+
+
+    /* AUDIO SOURCE */
 
     player.src =
         encodeURI(song.file);
 
 
-    /*
-     * Update text
-     */
+
+    /* SONG INFO */
 
     songTitle.textContent =
-        song.title || "Unknown Title";
+        song.title ||
+        "Unknown Title";
+
 
     songArtist.textContent =
-        song.artist || "Unknown Artist";
-
-    const albumName =
-    song.album || "Unknown Album";
-
-const albumYear =
-    song.year || "";
-
-songAlbum.textContent =
-    albumYear
-        ? `${albumName} (${albumYear})`
-        : albumName;
+        song.artist ||
+        "Unknown Artist";
 
 
-    /*
-     * Update cover
-     */
+    const album =
+        song.album ||
+        "Unknown Album";
+
+
+    const year =
+        song.year ||
+        "";
+
+
+    songAlbum.textContent =
+        year
+            ? `${album} (${year})`
+            : album;
+
+
+
+    /* COVER */
 
     if (song.cover) {
 
@@ -1426,21 +1735,16 @@ songAlbum.textContent =
     }
 
 
-    /*
-     * Update player
-     */
+
+    /* LOAD */
 
     player.load();
+
 
     player.play();
 
 
-    /*
-     * Highlight song
-     */
-
     updateSongList();
-    bufferBar.style.width = "0%";
 
 }
 
@@ -1454,12 +1758,8 @@ playButton.addEventListener(
     "click",
     () => {
 
-        if (!player.src) {
 
-            /*
-             * If nothing has been selected,
-             * play first song.
-             */
+        if (!player.src) {
 
             if (songs.length > 0) {
 
@@ -1496,7 +1796,8 @@ player.addEventListener(
     "play",
     () => {
 
-        playButton.textContent = "⏸";
+        playButton.textContent =
+            "⏸";
 
     }
 );
@@ -1506,7 +1807,8 @@ player.addEventListener(
     "pause",
     () => {
 
-        playButton.textContent = "▶";
+        playButton.textContent =
+            "▶";
 
     }
 );
@@ -1519,11 +1821,7 @@ player.addEventListener(
 
 nextButton.addEventListener(
     "click",
-    () => {
-
-        nextSong();
-
-    }
+    nextSong
 );
 
 
@@ -1531,55 +1829,72 @@ nextButton.addEventListener(
 function nextSong() {
 
     if (songs.length === 0) {
+
         return;
+
     }
 
-    // Repeat current song
+
+
+    /* REPEAT */
+
     if (repeat) {
+
         playSong(currentSong);
+
         return;
+
     }
 
-    // Shuffle
+
+
+    /* SHUFFLE */
+
     if (shuffle) {
 
         let nextIndex;
 
+
         do {
+
             nextIndex =
                 Math.floor(
-                    Math.random() * songs.length
+                    Math.random() *
+                    songs.length
                 );
 
-        } while (
+        }
+        while (
             songs.length > 1 &&
             nextIndex === currentSong
         );
 
+
         playSong(nextIndex);
+
         return;
+
     }
 
 
-    // =========================================
-    // NORMAL PLAYBACK
-    // Follow:
-    // Album Artist → Album → Track
-    // =========================================
+
+    /* NORMAL */
 
     const albumArtists =
         Object.keys(library).sort(
-            (a, b) => a.localeCompare(b)
+            (a, b) =>
+                a.localeCompare(b)
         );
 
 
-    // Find current song's album artist and album
     const current =
         songs[currentSong];
 
-    const currentAlbumArtist =
+
+    const currentArtist =
         current.albumartist ||
         "Unknown Album Artist";
+
 
     const currentAlbum =
         current.album ||
@@ -1588,37 +1903,47 @@ function nextSong() {
 
     const artistIndex =
         albumArtists.indexOf(
-            currentAlbumArtist
+            currentArtist
         );
 
 
     if (artistIndex === -1) {
+
         return;
+
     }
 
 
     const albums =
         Object.keys(
-            library[currentAlbumArtist]
+            library[currentArtist]
         ).sort(
-            (a, b) => a.localeCompare(b)
+            (a, b) =>
+                a.localeCompare(b)
         );
 
 
     const albumIndex =
-        albums.indexOf(currentAlbum);
+        albums.indexOf(
+            currentAlbum
+        );
 
 
     if (albumIndex === -1) {
+
         return;
+
     }
 
 
     const currentAlbumSongs =
-        library[currentAlbumArtist][currentAlbum];
+        library[
+            currentArtist
+        ][
+            currentAlbum
+        ];
 
 
-    // Find current track inside its album
     const trackIndex =
         currentAlbumSongs.findIndex(
             song =>
@@ -1626,13 +1951,13 @@ function nextSong() {
         );
 
 
-    // =========================================
-    // NEXT TRACK IN SAME ALBUM
-    // =========================================
+
+    /* NEXT TRACK */
 
     if (
         trackIndex !== -1 &&
-        trackIndex < currentAlbumSongs.length - 1
+        trackIndex <
+            currentAlbumSongs.length - 1
     ) {
 
         playSong(
@@ -1642,13 +1967,12 @@ function nextSong() {
         );
 
         return;
+
     }
 
 
-    // =========================================
-    // LAST TRACK OF ALBUM
-    // → NEXT ALBUM
-    // =========================================
+
+    /* NEXT ALBUM */
 
     if (
         albumIndex <
@@ -1656,25 +1980,30 @@ function nextSong() {
     ) {
 
         const nextAlbum =
-            albums[albumIndex + 1];
+            albums[
+                albumIndex + 1
+            ];
+
 
         const nextAlbumSongs =
-            library[currentAlbumArtist][
+            library[
+                currentArtist
+            ][
                 nextAlbum
             ];
+
 
         playSong(
             nextAlbumSongs[0].index
         );
 
         return;
+
     }
 
 
-    // =========================================
-    // LAST ALBUM OF ALBUM ARTIST
-    // → NEXT ALBUM ARTIST
-    // =========================================
+
+    /* NEXT ARTIST */
 
     if (
         artistIndex <
@@ -1686,55 +2015,65 @@ function nextSong() {
                 artistIndex + 1
             ];
 
+
         const nextArtistAlbums =
             Object.keys(
                 library[nextArtist]
             ).sort(
-                (a, b) => a.localeCompare(b)
+                (a, b) =>
+                    a.localeCompare(b)
             );
+
 
         const firstAlbum =
             nextArtistAlbums[0];
+
 
         const firstAlbumSongs =
             library[nextArtist][
                 firstAlbum
             ];
 
+
         playSong(
             firstAlbumSongs[0].index
         );
 
         return;
+
     }
 
 
-    // =========================================
-    // END OF ENTIRE LIBRARY
-    // → START FROM FIRST SONG
-    // =========================================
+
+    /* LOOP TO FIRST SONG */
 
     const firstArtist =
         albumArtists[0];
 
-    const firstArtistAlbums =
+
+    const firstAlbums =
         Object.keys(
             library[firstArtist]
         ).sort(
-            (a, b) => a.localeCompare(b)
+            (a, b) =>
+                a.localeCompare(b)
         );
 
-    const firstAlbum =
-        firstArtistAlbums[0];
 
-    const firstAlbumSongs =
+    const firstAlbum =
+        firstAlbums[0];
+
+
+    const firstSongs =
         library[firstArtist][
             firstAlbum
         ];
 
+
     playSong(
-        firstAlbumSongs[0].index
+        firstSongs[0].index
     );
+
 }
 
 
@@ -1774,7 +2113,7 @@ previousButton.addEventListener(
 
 
 /* ============================================================
-   WHEN SONG ENDS
+   SONG ENDED
    ============================================================ */
 
 player.addEventListener(
@@ -1789,14 +2128,19 @@ player.addEventListener(
 
 
 /* ============================================================
-   PROGRESS BAR
+   ELAPSED TIME
    ============================================================ */
 
 player.addEventListener(
     "timeupdate",
     () => {
 
-        if (!player.duration) {
+
+        if (
+            !Number.isFinite(
+                player.duration
+            )
+        ) {
 
             return;
 
@@ -1804,8 +2148,10 @@ player.addEventListener(
 
 
         progress.value =
-            (player.currentTime /
-             player.duration) * 100;
+            (
+                player.currentTime /
+                player.duration
+            ) * 100;
 
 
         currentTime.textContent =
@@ -1818,18 +2164,49 @@ player.addEventListener(
 
 
 
-player.addEventListener("loadedmetadata", () => {
-    duration.textContent =
-        formatTime(player.duration);
-});
+/* ============================================================
+   DURATION
+   ============================================================ */
+
+player.addEventListener(
+    "loadedmetadata",
+    () => {
+
+        if (
+            Number.isFinite(
+                player.duration
+            )
+        ) {
+
+            duration.textContent =
+                formatTime(
+                    player.duration
+                );
+
+        }
 
 
+        updateBufferBar();
+
+    }
+);
+
+
+
+/* ============================================================
+   SEEK
+   ============================================================ */
 
 progress.addEventListener(
     "input",
     () => {
 
-        if (!player.duration) {
+
+        if (
+            !Number.isFinite(
+                player.duration
+            )
+        ) {
 
             return;
 
@@ -1837,8 +2214,17 @@ progress.addEventListener(
 
 
         player.currentTime =
-            (progress.value / 100) *
+            (
+                progress.value /
+                100
+            ) *
             player.duration;
+
+
+        currentTime.textContent =
+            formatTime(
+                player.currentTime
+            );
 
     }
 );
@@ -1854,7 +2240,7 @@ volume.addEventListener(
     () => {
 
         player.volume =
-            volume.value;
+            Number(volume.value);
 
     }
 );
@@ -1915,6 +2301,7 @@ function updateSongList() {
         .querySelectorAll(".song")
         .forEach(element => {
 
+
             const index =
                 Number(
                     element.dataset.index
@@ -1929,283 +2316,296 @@ function updateSongList() {
         });
 
 }
+
+
+
 /* ============================================================
-   NETWORK SPEED
+   GET BUFFERED END
    ============================================================ */
-let lastBufferedEnd = 0;
-let lastSpeedTime = performance.now();
-let currentSongSize = 0;
 
 function getBufferedEnd() {
 
-    if (player.buffered.length === 0) {
+
+    if (
+        player.buffered.length === 0
+    ) {
+
         return 0;
+
     }
 
-    for (let i = 0; i < player.buffered.length; i++) {
+
+
+    /*
+     * Find the buffered range containing
+     * the current playback position.
+     */
+
+    for (
+        let i = 0;
+        i < player.buffered.length;
+        i++
+    ) {
+
 
         if (
-            player.currentTime >= player.buffered.start(i) &&
-            player.currentTime <= player.buffered.end(i)
+            player.currentTime >=
+                player.buffered.start(i)
+
+            &&
+
+            player.currentTime <=
+                player.buffered.end(i)
         ) {
+
             return player.buffered.end(i);
+
         }
+
     }
+
+
+
+    /*
+     * If current playback position isn't
+     * inside a buffered range, use the
+     * last buffered range.
+     */
 
     return player.buffered.end(
         player.buffered.length - 1
     );
+
 }
+
+
+
+/* ============================================================
+   UPDATE BUFFER BAR
+   ============================================================ */
 
 function updateBufferBar() {
 
+
     if (
-        !player.duration ||
+        !Number.isFinite(
+            player.duration
+        )
+
+        ||
+
+        player.duration <= 0
+
+        ||
+
         player.buffered.length === 0
     ) {
-        bufferBar.style.width = "0%";
+
+        bufferBar.style.width =
+            "0%";
+
         return;
+
     }
 
-    let bufferedEnd = 0;
 
-    /*
-     * Find the buffered section containing
-     * the current playback position.
-     */
-    for (let i = 0; i < player.buffered.length; i++) {
 
-        if (
-            player.currentTime >=
-                player.buffered.start(i) &&
-            player.currentTime <=
-                player.buffered.end(i)
-        ) {
-            bufferedEnd =
-                player.buffered.end(i);
+    const bufferedEnd =
+        getBufferedEnd();
 
-            break;
-        }
-    }
-
-    if (bufferedEnd === 0) {
-        return;
-    }
 
     const percentage =
-        (bufferedEnd / player.duration) * 100;
+        (
+            bufferedEnd /
+            player.duration
+        ) * 100;
+
 
     bufferBar.style.width =
-        Math.min(100, percentage) + "%";
+        Math.min(
+            100,
+            percentage
+        ) + "%";
+
 }
 
-setInterval(updateBufferBar, 250);
 
 
-// These can also go here
-player.addEventListener("progress", updateBufferBar);
-player.addEventListener("loadedmetadata", updateBufferBar);
+/* ============================================================
+   BUFFER EVENTS
+   ============================================================ */
 
-setInterval(() => {
-
-    if (
-        !player.duration ||
-        !currentSongSize ||
-        player.buffered.length === 0
-    ) {
-        downloadSpeed.textContent =
-            "Network: -- MB/s";
-
-        return;
-    }
-
-    const bufferedEnd =
-        getBufferedEnd();
-
-    const now =
-        performance.now();
-
-    const elapsed =
-        (now - lastSpeedTime) / 1000;
-
-    const bufferedGrowth =
-        bufferedEnd - lastBufferedEnd;
-
-    const bufferBar =
-    document.getElementById("bufferBar");
-
-    if (
-        elapsed > 0 &&
-        bufferedGrowth > 0
-    ) {
-
-        const bytesPerAudioSecond =
-            currentSongSize /
-            player.duration;
-
-        const audioSecondsPerSecond =
-            bufferedGrowth /
-            elapsed;
-
-        const bytesPerSecond =
-            bytesPerAudioSecond *
-            audioSecondsPerSecond;
-
-        const mbPerSecond =
-            bytesPerSecond /
-            (1024 * 1024);
-
-        downloadSpeed.textContent =
-            "Network: " +
-            mbPerSecond.toFixed(2) +
-            " MB/s";
-
-    }
-    else if (bufferedGrowth <= 0) {
-
-        downloadSpeed.textContent =
-            "Network: 0.00 MB/s";
-    }
+player.addEventListener(
+    "progress",
+    updateBufferBar
+);
 
 
-    lastBufferedEnd =
-        bufferedEnd;
-
-    lastSpeedTime =
-        now;
-
-}, 250);
+player.addEventListener(
+    "loadedmetadata",
+    updateBufferBar
+);
 
 
-setInterval(() => {
-
-    if (
-        !player.duration ||
-        !currentSongSize ||
-        player.buffered.length === 0
-    ) {
-        downloadSpeed.textContent =
-            "Network: -- MB/s";
-
-        return;
-    }
-
-    const bufferedEnd =
-        getBufferedEnd();
-
-    const now =
-        performance.now();
-
-    const elapsed =
-        (now - lastSpeedTime) / 1000;
-
-    const bufferedGrowth =
-        bufferedEnd - lastBufferedEnd;
+player.addEventListener(
+    "timeupdate",
+    updateBufferBar
+);
 
 
-    if (
-        elapsed > 0 &&
-        bufferedGrowth > 0
-    ) {
 
-        const bytesPerAudioSecond =
-            currentSongSize /
-            player.duration;
+/*
+ * Backup update every 250 ms.
+ */
 
-        const audioSecondsPerSecond =
-            bufferedGrowth /
-            elapsed;
-
-        const bytesPerSecond =
-            bytesPerAudioSecond *
-            audioSecondsPerSecond;
-
-        const mbPerSecond =
-            bytesPerSecond /
-            (1024 * 1024);
-
-        downloadSpeed.textContent =
-            "Network: " +
-            mbPerSecond.toFixed(2) +
-            " MB/s";
-
-    }
-    else if (bufferedGrowth <= 0) {
-
-        downloadSpeed.textContent =
-            "Network: 0.00 MB/s";
-    }
+setInterval(
+    updateBufferBar,
+    250
+);
 
 
-    lastBufferedEnd =
-        bufferedEnd;
 
-    lastSpeedTime =
-        now;
+/* ============================================================
+   NETWORK SPEED
+   ============================================================ */
 
-}, 250);
+setInterval(
+    () => {
 
-setInterval(() => {
-    if (
-        !currentSongSize ||
-        !currentSongDuration ||
-        !player.duration
-    ) {
-        downloadSpeed.textContent = "Network: -- MB/s";
-        return;
-    }
-
-    const bufferedEnd = getBufferedEnd();
-
-    if (!bufferedEnd) {
-        downloadSpeed.textContent = "Network: -- MB/s";
-        return;
-    }
-
-    const now = performance.now();
-
-    const elapsedSeconds =
-        (now - lastMeasureTime) / 1000;
-
-    const bufferedGrowth =
-        bufferedEnd - lastBufferTime;
-
-    if (
-        elapsedSeconds > 0 &&
-        bufferedGrowth > 0
-    ) {
-        /*
-         * Average bytes per second of the audio.
-         */
-        const bytesPerAudioSecond =
-            currentSongSize / currentSongDuration;
 
         /*
-         * How many seconds of audio are being
-         * buffered per real-world second.
+         * We need:
+         *
+         * 1. Song duration
+         * 2. Song file size
+         * 3. Some buffered data
          */
-        const bufferRate =
-            bufferedGrowth / elapsedSeconds;
+
+        if (
+            !Number.isFinite(
+                player.duration
+            )
+
+            ||
+
+            !currentSongSize
+
+            ||
+
+            player.buffered.length === 0
+        ) {
+
+            downloadSpeed.textContent =
+                "Network: -- MB/s";
+
+            return;
+
+        }
+
+
+
+        const bufferedEnd =
+            getBufferedEnd();
+
+
+        const now =
+            performance.now();
+
+
+        const elapsed =
+            (
+                now -
+                lastSpeedTime
+            ) / 1000;
+
+
+        const bufferedGrowth =
+            bufferedEnd -
+            lastBufferedEnd;
+
+
 
         /*
-         * Estimated network throughput.
+         * Buffer has grown.
          */
-        const bytesPerSecond =
-            bytesPerAudioSecond * bufferRate;
 
-        const mbPerSecond =
-            bytesPerSecond / (1024 * 1024);
+        if (
+            elapsed > 0 &&
+            bufferedGrowth > 0
+        ) {
 
-        downloadSpeed.textContent =
-            "Network: " +
-            mbPerSecond.toFixed(2) +
-            " MB/s";
-    }
 
-    lastBufferTime = bufferedEnd;
-    lastMeasureTime = now;
+            /*
+             * Estimate how many bytes
+             * one second of audio represents.
+             */
 
-}, 1000);
+            const bytesPerAudioSecond =
+                currentSongSize /
+                player.duration;
+
+
+
+            /*
+             * How many audio seconds are
+             * being buffered per real second.
+             */
+
+            const audioSecondsPerSecond =
+                bufferedGrowth /
+                elapsed;
+
+
+
+            /*
+             * Estimated bytes per second.
+             */
+
+            const bytesPerSecond =
+                bytesPerAudioSecond *
+                audioSecondsPerSecond;
+
+
+
+            const mbPerSecond =
+                bytesPerSecond /
+                (1024 * 1024);
+
+
+
+            downloadSpeed.textContent =
+                "Network: " +
+                mbPerSecond.toFixed(2) +
+                " MB/s";
+
+        }
+
+        else {
+
+            downloadSpeed.textContent =
+                "Network: 0.00 MB/s";
+
+        }
+
+
+
+        /*
+         * Save measurement.
+         */
+
+        lastBufferedEnd =
+            bufferedEnd;
+
+
+        lastSpeedTime =
+            now;
+
+
+    },
+    250
+);
+
+
 
 /* ============================================================
    FORMAT TIME
@@ -2213,7 +2613,10 @@ setInterval(() => {
 
 function formatTime(seconds) {
 
-    if (!Number.isFinite(seconds)) {
+
+    if (
+        !Number.isFinite(seconds)
+    ) {
 
         return "0:00";
 
@@ -2221,17 +2624,23 @@ function formatTime(seconds) {
 
 
     const minutes =
-        Math.floor(seconds / 60);
+        Math.floor(
+            seconds / 60
+        );
 
 
     const secs =
-        Math.floor(seconds % 60);
+        Math.floor(
+            seconds % 60
+        );
 
 
     return (
         minutes +
         ":" +
-        secs.toString().padStart(2, "0")
+        secs
+            .toString()
+            .padStart(2, "0")
     );
 
 }
@@ -2246,15 +2655,30 @@ function escapeHTML(text) {
 
     return String(text)
 
-        .replaceAll("&", "&amp;")
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
 
-        .replaceAll("<", "&lt;")
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
 
-        .replaceAll(">", "&gt;")
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
 
-        .replaceAll('"', "&quot;")
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
 
-        .replaceAll("'", "&#039;");
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
 
 }
 

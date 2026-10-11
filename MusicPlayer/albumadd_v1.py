@@ -2,15 +2,18 @@ import os
 import sys
 import json
 import mutagen
-from tagscanner_v2 import music_folder, project_folder
-
-json_path = os.path.join(music_folder, "music.json")
-existing_songs_paths_path = os.path.join(music_folder, "existing_songs_paths.txt")
 
 if len(sys.argv) == 1:
     sys.exit(
-        'Usage: python albumadd_v1.py "root\\subfolder\\album1" "root\\subfolder\\album2" ...'
+        'Usage: python albumadd_v1.py "root\\...\\Music Library Folder" "root\\subfolder\\added_album1" "root\\subfolder\\added_album2" ... The Music Library Folder comes first, then the directories of the added albums!!'
     )
+if os.path.exists(sys.argv[1]):
+    music_folder = sys.argv[1]
+    project_folder = os.path.dirname(music_folder)
+else:
+    sys.exit("Error: Library folder not found")
+json_path = os.path.join(music_folder, "music.json")
+existing_songs_paths_path = os.path.join(music_folder, "existing_songs_paths.txt")
 
 
 def cleanup_paths(paths: list):
@@ -23,9 +26,13 @@ def cleanup_paths(paths: list):
 
     for path in paths:
         if os.path.exists(path):
+            # Search within the provided path for subdirectories, and in that case, branch out and add those subdirectories to the cleaned_paths list instead of the provided path.
 
-            # Maybe reform the path into Windows format here
-            cleaned_paths.append(path)
+            for root, dirs, files in os.walk(path):
+                for dir in dirs:
+                    dir_path = os.path.join(root, dir)
+                    if os.path.exists(dir_path):
+                        cleaned_paths.append(dir_path)
 
         else:
 
@@ -112,6 +119,7 @@ def metadata(paths: list):
                             "genre": ", ".join(audio.get("genre", [])),
                             "cover": relative_cover,
                             "file": relative_file,
+                            "size": os.path.getsize(full_path),
                         }
                     )
 
@@ -136,8 +144,11 @@ def metadata(paths: list):
 
     # Append newly discovered album directories to existing_songs_paths.txt, avoiding duplicates
 
-    with open(existing_songs_paths_path, "r", encoding="utf-8") as f:
-        existing_paths = set(line.strip() for line in f if line.strip())
+    try:
+        with open(existing_songs_paths_path, "r", encoding="utf-8") as f:
+            existing_paths = set(line.strip() for line in f if line.strip())
+    except FileNotFoundError:
+        existing_paths = set()
 
     for path in paths:
         if path not in existing_paths:
@@ -153,9 +164,11 @@ def metadata(paths: list):
 # Main program
 
 
-paths = cleanup_paths(sys.argv[1:])
+paths = cleanup_paths(sys.argv[2:])
 
 metadata(paths)
 
 
 # Known bugs: It will add a duplicate .json insert if an existing track is re-added. This is because the program does not check for duplicates in the .json file, only in the existing_songs_paths.txt file. A future update will include a check for duplicates in the .json file before adding new entries.
+
+# Also, this script cannot understand if the provided sys.argv argument of a path of an added album is actually an album path, containing music files, or more folders within. The problem is in the re-writing of the existing_songs_path.txt file. For example, if the user provides a path to a folder that contains multiple albums, the script will add that path to the existing_songs_paths.txt file, but it will not add the individual album paths within that folder. This is because the script only adds the provided paths to the existing_songs_paths.txt file, and does not check for subfolders within those paths. A future update will include a check for subfolders within the provided paths, and will add those subfolder paths to the existing_songs_paths.txt file as well.
