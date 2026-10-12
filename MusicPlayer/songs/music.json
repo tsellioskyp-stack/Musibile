@@ -8,7 +8,11 @@
         "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
         "cover": "/songs/2 Pac/Curtis.jpg",
         "file": "/songs/2 Pac/1-02 My Gun Go Off.flac",
-        "size": 21694349
+        "size": "21.69 MB",
+        "bitrate": "900.1kbps",
+        "sample_rate": "44.1kHz",
+        "length": "192.08s",
+        "file_type": ".flac"
     },
     {
         "title": "Take Me Away (Into the Night)",
@@ -19,7 +23,11 @@
         "genre": "Trance",
         "cover": "/songs/2 Pac/Believe.jpg",
         "file": "/songs/2 Pac/1-02 Take Me Away (Into the Night).flac",
-        "size": 22173657
+        "size": "22.17 MB",
+        "bitrate": "925.9kbps",
+        "sample_rate": "44.1kHz",
+        "length": "190.43s",
+        "file_type": ".flac"
     },
     {
         "title": "Man Down (Censored)",
@@ -30,7 +38,11 @@
         "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
         "cover": "/songs/2 Pac/Curtis.jpg",
         "file": "/songs/2 Pac/1-03 Man Down (Censored).flac",
-        "size": 19931440
+        "size": "19.93 MB",
+        "bitrate": "937.1kbps",
+        "sample_rate": "44.1kHz",
+        "length": "169.45s",
+        "file_type": ".flac"
     },
     {
         "title": "Take Me Away (Into the Night)",
@@ -41,7 +53,11 @@
         "genre": "Trance",
         "cover": "/songs/4 Strings/Believe/Believe.jpg",
         "file": "/songs/4 Strings/Believe/1-02 Take Me Away (Into the Night).flac",
-        "size": 22173657
+        "size": "22.17 MB",
+        "bitrate": "925.9kbps",
+        "sample_rate": "44.1kHz",
+        "length": "190.43s",
+        "file_type": ".flac"
     },
     {
         "title": "Intro",
@@ -52,7 +68,11 @@
         "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
         "cover": "/songs/50 Cent/Curtis/Curtis.jpg",
         "file": "/songs/50 Cent/Curtis/1-01 Intro.flac",
-        "size": 4044603
+        "size": "4.04 MB",
+        "bitrate": "628.3kbps",
+        "sample_rate": "44.1kHz",
+        "length": "50.45s",
+        "file_type": ".flac"
     },
     {
         "title": "My Gun Go Off",
@@ -63,7 +83,11 @@
         "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
         "cover": "/songs/50 Cent/Curtis/Curtis.jpg",
         "file": "/songs/50 Cent/Curtis/1-02 My Gun Go Off.flac",
-        "size": 21694349
+        "size": "21.69 MB",
+        "bitrate": "900.1kbps",
+        "sample_rate": "44.1kHz",
+        "length": "192.08s",
+        "file_type": ".flac"
     },
     {
         "title": "My Gun Go Off",
@@ -74,7 +98,11 @@
         "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
         "cover": "/songs/50 Cent/Curtis/Curtis.jpg",
         "file": "/songs/50 Cent/Curtis/1-02 My Johhn.opus",
-        "size": 11728734
+        "size": "11.73 MB",
+        "bitrate": "484.3kbps",
+        "sample_rate": null,
+        "length": "192.08s",
+        "file_type": ".opus"
     },
     {
         "title": "Man Down (Censored)",
@@ -85,7 +113,11 @@
         "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
         "cover": "/songs/50 Cent/Curtis/Curtis.jpg",
         "file": "/songs/50 Cent/Curtis/1-03 Man Down (Censored).flac",
-        "size": 19931440
+        "size": "19.93 MB",
+        "bitrate": "937.1kbps",
+        "sample_rate": "44.1kHz",
+        "length": "169.45s",
+        "file_type": ".flac"
     },
     {
         "title": "Take Me Away (Into the Night)",
@@ -96,7 +128,26 @@
         "genre": "Trance",
         "cover": "/songs/Eminem/Slim/Believe.jpg",
         "file": "/songs/Eminem/Slim/1-02 Take Me Away (Into the Night).flac",
-        "size": 22173657
+        "size": "22.17 MB",
+        "bitrate": "925.9kbps",
+        "sample_rate": "44.1kHz",
+        "length": "190.43s",
+        "file_type": ".flac"
+    },
+    {
+        "title": null,
+        "artist": null,
+        "albumartist": null,
+        "album": "ramm",
+        "year": null,
+        "genre": "",
+        "cover": null,
+        "file": "/songs/Ramm/Rammstein - Rammlied (Live from Madison Square Garden).mp3",
+        "size": "8.06 MB",
+        "bitrate": "192.0kbps",
+        "sample_rate": "44.1kHz",
+        "length": "325.64s",
+        "file_type": ".mp3"
     },
     {
         "title": "Take Me Away (Into the Night)",
@@ -107,7 +158,11 @@
         "genre": "Trance",
         "cover": "/songs/Rem/Alb/Believe.jpg",
         "file": "/songs/Rem/Alb/1-02 Take Me Away (Into the Night).flac",
-        "size": 22173657
+        "size": "22.17 MB",
+        "bitrate": "925.9kbps",
+        "sample_rate": "44.1kHz",
+        "length": "190.43s",
+        "file_type": ".flac"
     },
     {
         "title": "Intro",
@@ -118,7 +173,11 @@
         "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
         "cover": "/songs/Wakako/Albumara/Curtis.jpg",
         "file": "/songs/Wakako/Albumara/1-01 Intro.flac",
-        "size": 4044603
+        "size": "4.04 MB",
+        "bitrate": "628.3kbps",
+        "sample_rate": "44.1kHz",
+        "length": "50.45s",
+        "file_type": ".flac"
     },
     {
         "title": "My Gun Go Off",
@@ -129,7 +188,11 @@
         "genre": "East Coast Hip-Hop/Rap, Hip-Hop/Rap",
         "cover": "/songs/Wakako/Albumara/Curtis.jpg",
         "file": "/songs/Wakako/Albumara/1-02 My Gun Go Off.flac",
-        "size": 21694349
+        "size": "21.69 MB",
+        "bitrate": "900.1kbps",
+        "sample_rate": "44.1kHz",
+        "length": "192.08s",
+        "file_type": ".flac"
     },
     {
         "title": "Take Me Away (Into the Night)",
@@ -140,6 +203,10 @@
         "genre": "Trance",
         "cover": "/songs/Wakako/Albumara/Believe.jpg",
         "file": "/songs/Wakako/Albumara/1-02 Take Me Away (Into the Night).flac",
-        "size": 22173657
+        "size": "22.17 MB",
+        "bitrate": "925.9kbps",
+        "sample_rate": "44.1kHz",
+        "length": "190.43s",
+        "file_type": ".flac"
     }
 ]

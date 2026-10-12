@@ -6,6 +6,7 @@ import mutagen
 import argparse
 import shutil
 import time
+import pathlib
 
 
 def safe_filename(name: str) -> str:
@@ -115,6 +116,22 @@ def scan_library(music_folder: str) -> None:
             albumartist = get_tag(audio, "albumartist")
             album = get_tag(audio, "album")
             year = get_tag(audio, "date")
+            bitrate = (
+                f"{((audio.info.bitrate) / 1000):.1f}" + "kbps"
+                if getattr(audio.info, "bitrate", None) is not None
+                else None
+            )
+            sample_rate = (
+                f"{((audio.info.sample_rate) / 1000):.1f}" + "kHz"
+                if getattr(audio.info, "sample_rate", None) is not None
+                else None
+            )
+            length = (
+                f"{(audio.info.length):.2f}" + "s"
+                if getattr(audio.info, "length", None) is not None
+                else None
+            )
+            file_type: str = pathlib.Path(full_path).suffix
 
             genres = audio.get("genre", [])
 
@@ -210,7 +227,15 @@ def scan_library(music_folder: str) -> None:
                     "genre": genre,
                     "cover": relative_cover,
                     "file": relative_file,
-                    "size": os.path.getsize(full_path),
+                    "size": (
+                        f"{(os.path.getsize(full_path) / 1000000):.2f}" + " MB"
+                        if os.path.exists(full_path)
+                        else None
+                    ),
+                    "bitrate": bitrate,
+                    "sample_rate": sample_rate,
+                    "length": length,
+                    "file_type": file_type,
                 }
             )
 
