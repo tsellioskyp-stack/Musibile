@@ -328,4 +328,23 @@ These limitations should be addressed before using incremental imports as a full
 
 Musibile's library scanner is designed to support large personal music collections by separating initial library generation from incremental imports. A full scan builds the database from the files on disk, while the update mode is intended to add selected folders to an existing library.
 
+## HTML Music Player
+
+Musibile includes a custom-built, browser-based music player designed to provide a clean, immersive way to browse and listen to a personal music library. Built with **HTML, CSS, and JavaScript**, the player runs directly in the browser without requiring a dedicated desktop application.
+
+The interface features a **dark theme**, album artwork, a blurred artwork background, and a collapsible music library organized by **album artist → album → track**. Search functionality makes it easy to find songs by title, artist, album, or genre.
+
+### Features
+
+- **Music Library Browser** — Browse albums and tracks through a collapsible library tree.
+- **Album Artwork** — Display album covers with animated transitions and surrounding artwork previews.
+- **Playback Controls** — Play, pause, skip tracks, adjust volume, and monitor playback progress.
+- **Playback Modes** — Switch between sequential playback, shuffle, and repeat-current-track modes.
+- **Album Navigation** — Scroll or swipe vertically through albums, with animated cover transitions and previews of neighboring albums.
+- **Track Navigation** — Move between tracks using playback controls, with horizontal album artwork previews.
+- **Visual Effects** — Real-time audio spectrum visualization and a blurred album-art background.
+- **Buffering Information** — Monitor playback buffering and network transfer activity.
+- **Responsive Interface** — A mobile-friendly layout with touch gestures and adapted controls for smaller screens.
+- **Local Music Streaming** — Stream music hosted on a personal computer over the home network, with remote access possible through a private network connection.
+
 Enjoy!
