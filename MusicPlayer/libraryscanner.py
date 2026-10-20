@@ -296,8 +296,8 @@ def update_library(music_folder: str, valid_folders: list) -> None:
                     cover_file = None
 
                     if album:
-
-                        cover_file = os.path.join(dir_path, album + ".jpg")
+                        safe_album = safe_filename(album)
+                        cover_file = os.path.join(dir_path, safe_album + ".jpg")
 
                     # Album exists, but cover has not been
                     # created as a file yet
@@ -334,7 +334,27 @@ def update_library(music_folder: str, valid_folders: list) -> None:
                             "genre": ", ".join(audio.get("genre", [])),
                             "cover": relative_cover,
                             "file": relative_file,
-                            "size": os.path.getsize(full_path),
+                            "size": (
+                                f"{(os.path.getsize(full_path) / 1000000):.2f}" + " MB"
+                                if os.path.exists(full_path)
+                                else None
+                            ),
+                            "bitrate": (
+                                f"{((audio.info.bitrate) / 1000):.1f}" + "kbps"
+                                if getattr(audio.info, "bitrate", None) is not None
+                                else None
+                            ),
+                            "sample_rate": (
+                                f"{((audio.info.sample_rate) / 1000):.1f}" + "kHz"
+                                if getattr(audio.info, "sample_rate", None) is not None
+                                else None
+                            ),
+                            "length": (
+                                f"{(audio.info.length):.2f}" + "s"
+                                if getattr(audio.info, "length", None) is not None
+                                else None
+                            ),
+                            "file_type": pathlib.Path(full_path).suffix,
                         }
                     )
 
