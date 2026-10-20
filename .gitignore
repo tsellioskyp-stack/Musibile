@@ -1,1 +1,7 @@
+Backups/*
 MusicPlayer/songs/*
+MusicPlayer/For_old_laptop/*
+MusicPlayer\albumadd_v1.py
+MusicPlayer\check_for_image.py
+MusicPlayer\tagscanner.py
+MusicPlayer\tagscanner_v2.py
