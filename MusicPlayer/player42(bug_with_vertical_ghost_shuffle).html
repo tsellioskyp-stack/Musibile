@@ -383,8 +383,56 @@
     flex-shrink: 0;
     perspective: 1000px;
     touch-action: none;
+    overflow: visible !important;
 }
 
+/* ALBUM COVER FLOOR REFLECTION */
+
+.cover-reflection {
+    position: absolute;
+
+    left: 50%;
+    top: calc(50% + min(170px, 25vh));
+
+    width: min(500px, 58vh);
+    aspect-ratio: 1 / 1;
+
+    object-fit: cover;
+    display: block;
+
+    /* Flip the artwork vertically */
+    transform: translateX(-50%) perspective(700px) rotateX(15deg) scaleY(-1);
+    transform-origin: center;
+
+    /* Very faint reflection */
+    opacity: 0.75;
+    filter: blur(1.5px) brightness(0.65);
+
+    /* Fade out as the reflection extends downward */
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.35) 0%,
+        rgba(0, 0, 0, 0.12) 35%,
+        transparent 75%
+    );
+
+    mask-image: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.35) 0%,
+        rgba(0, 0, 0, 0.12) 35%,
+        transparent 75%
+    );
+
+    pointer-events: none;
+    z-index: 1;
+}
+
+@media (max-width: 700px) {
+    .cover-reflection {
+        top: calc(50% + min(32vw, 100px));
+        width: min(80vw, 400px);
+    }
+}
 
 /* SIDE COVERS */
 
@@ -468,6 +516,87 @@ transform-origin: center center;
     transform-origin: left center;
 }
 
+    
+/* SECOND-DEGREE HORIZONTAL GHOSTS */
+
+.horizontal-ghost {
+    position: absolute;
+    top: 50%;
+
+    width: min(270px, 38%);
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+
+    border-radius: 8px;
+
+    opacity: 0.18;
+    filter: brightness(0.45) saturate(0.8);
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+
+    z-index: 0;
+    pointer-events: none;
+    backface-visibility: hidden;
+
+    transition:
+        left 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        right 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.45s ease,
+        filter 0.45s ease;
+}
+
+/* Far-left cover: subtle perspective */
+.previous-ghost {
+    left: -90px;
+
+    transform:
+        translateY(-50%)
+        rotateY(35deg)
+        scale(0.9);
+
+    transform-origin: right center;
+}
+
+/* Far-right cover: mirrored perspective */
+.next-ghost {
+    right: -90px;
+
+    transform:
+        translateY(-50%)
+        rotateY(-35deg)
+        scale(0.9);
+
+    transform-origin: left center;
+}
+
+/* Mobile adjustments */
+@media (max-width: 700px) {
+    .horizontal-ghost {
+        width: 35%;
+        opacity: 0.15;
+    }
+
+    .previous-ghost {
+        left: -65px;
+
+        transform:
+            translateY(-50%)
+            rotateY(8deg)
+            scale(0.55);
+    }
+
+    .next-ghost {
+        right: -65px;
+
+        transform:
+            translateY(-50%)
+            rotateY(-8deg)
+            scale(0.55);
+    }
+}
+
+
 /* MAIN COVER */
 .cover-stage,
 .cover-container {
@@ -484,7 +613,7 @@ transform-origin: center center;
 
     border-radius: 8px;
 
-    overflow: hidden;
+    overflow: visible;
 
     background: #181818;
 
@@ -494,7 +623,6 @@ transform-origin: center center;
 
     flex-shrink: 0;
 }
-
 
 /* MOBILE */
 
@@ -525,6 +653,7 @@ transform-origin: center center;
             object-fit: cover;
 
             display: block;
+            border-radius: 8px;
         }
 
 
@@ -659,30 +788,53 @@ transform-origin: center center;
             border-radius: 2px;
         }
 
-        /* =========================================================
-           TITLE SCROLL
-           ========================================================= */
         
-#song-title {
+/* =========================================================
+   TEXT SCROLL — TITLE, ARTIST, ALBUM
+   ========================================================= */
+
+#song-title,
+#song-artist,
+#song-album {
     width: 100%;
     overflow: hidden;
-    font-size: 25px;
-    font-weight: bold;
     white-space: nowrap;
     text-align: center;
 }
 
-#song-title .title-scroll {
+#song-title {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+#song-artist {
+    margin-top: 7px;
+    color: #aaa;
+    font-size: 17px;
+}
+
+#song-album {
+    margin-top: 4px;
+    color: #666;
+    font-size: 14px;
+}
+
+/* Apply the same scrolling animation to all three lines. */
+#song-title .title-scroll,
+#song-artist .title-scroll,
+#song-album .title-scroll {
     display: inline-block;
     white-space: nowrap;
     will-change: transform;
-    animation: title-marquee var(--scroll-duration, 8s) linear infinite alternate;
+    animation: title-marquee var(--scroll-duration, 8s)
+               linear infinite alternate;
 }
 
 @keyframes title-marquee {
     from {
         transform: translateX(0);
     }
+
     to {
         transform: translateX(var(--scroll-distance));
     }
@@ -949,7 +1101,7 @@ transform-origin: center center;
     border-color: #777;
 }
 
-/* PREVIOUS, PLAY, NEXT — CENTER */
+/* PREVIOUS, PLAY, NEXT — CENTER, VOLUME */
 
 .main-controls {
     display: flex;
@@ -957,6 +1109,18 @@ transform-origin: center center;
     justify-content: center;
     gap: 12px;
 }
+
+.volume-icon {
+    width: 21px;
+    height: 21px;
+    flex-shrink: 0;
+    fill: none;
+    stroke: #b8b8b8;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
 
 .control-button {
     width: 45px;
@@ -973,20 +1137,101 @@ transform-origin: center center;
     background: rgba(255, 255, 255, 0.1);
 }
 
-#playButton {
-    width: 60px;
-    height: 60px;
+.main-controls {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 22px;
+}
+
+.control-button {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     padding: 0;
-    border: none;
+    border: 1px solid #303030;
     border-radius: 50%;
-    background: white;
-    color: black;
-    font-size: 25px;
+
+    background: #171717;
+    color: #b8b8b8;
+
     cursor: pointer;
     flex-shrink: 0;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease,
+        box-shadow 0.2s ease;
+}
+
+.control-button svg {
+    width: 21px;
+    height: 21px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+#previousButton svg path,
+#nextButton svg path {
+    fill: currentColor;
+    stroke: none;
+}
+
+.control-button:hover {
+    background: #292929;
+    color: #ffffff;
+    border-color: #505050;
+}
+
+.control-button:active {
+    transform: scale(0.92);
+}
+
+/* Main play/pause button */
+#playButton {
+    width: 62px;
+    height: 62px;
+
+    background: #e8e8e8;
+    color: #111111;
+    border: none;
+
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+}
+
+#playButton:hover {
+    background: #ffffff;
+    color: #000000;
+    box-shadow: 0 0 22px rgba(255, 255, 255, 0.12);
+}
+
+#playButton svg {
+    width: 25px;
+    height: 25px;
+    fill: currentColor;
+    stroke: none;
+}
+
+#playButton .pause-icon {
+    display: none;
+}
+
+#playButton.is-playing .play-icon {
+    display: none;
+}
+
+#playButton.is-playing .pause-icon {
+    display: block;
 }
 
 #playButton:hover {
@@ -1002,9 +1247,50 @@ transform-origin: center center;
     gap: 8px;
 }
 
+/* Dark-themed volume slider */
 #volume {
-    width: 100px;
+    appearance: none;
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 999px;
+    background: #3a3a3a;
+    outline: none;
     cursor: pointer;
+    accent-color: #b8b8b8;
+}
+
+/* Chrome, Edge, Safari */
+#volume::-webkit-slider-runnable-track {
+    height: 4px;
+    background: #3a3a3a;
+    border-radius: 999px;
+}
+
+#volume::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    margin-top: -4px;
+    border-radius: 50%;
+    background: #d0d0d0;
+    border: none;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Firefox */
+#volume::-moz-range-track {
+    height: 4px;
+    background: #3a3a3a;
+    border-radius: 999px;
+}
+
+#volume::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #d0d0d0;
+    border: none;
 }
 
 /* EXTRA CONTROLS */
@@ -1468,27 +1754,38 @@ transform-origin: center center;
 }
 
 @media (max-width: 700px) {
-    .library-toggle {
-        display: flex;
-        position: fixed;
-        top: 14px;
-        left: 14px;
-        z-index: 1002;
+    
 
-        width: 44px;
-        height: 44px;
-        align-items: center;
-        justify-content: center;
+.library-toggle {
+    display: flex;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 1002;
 
-        background: rgba(25, 25, 25, 0.92);
-        color: white;
-        border: 1px solid #383838;
-        border-radius: 10px;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
 
-        font-size: 23px;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-    }
+    background: rgba(25, 25, 25, 0.92);
+    color: white;
+    border: 1px solid #383838;
+    border-radius: 10px;
+
+    font-size: 23px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    transition: left 0.3s ease;
+}
+
+/* Move the X to the top-right of the open sidebar. */
+.library-toggle.library-toggle-open {
+    left: min(266px, calc(85vw - 54px));
+}
+
+
 
     .sidebar {
         position: fixed;
@@ -1553,6 +1850,12 @@ transform-origin: center center;
     }
 }
 
+    
+    @media (max-width: 700px) {
+        .right-controls {
+            display: none;
+        }
+    }
 
     </style>
 
@@ -1632,6 +1935,21 @@ transform-origin: center center;
 
 <div class="cover-stage">
 
+    
+    <!-- SECOND-DEGREE HORIZONTAL GHOSTS -->
+    <img
+        id="previousGhost"
+        class="horizontal-ghost previous-ghost"
+        alt="Track two positions back"
+    >
+
+    <img
+        id="nextGhost"
+        class="horizontal-ghost next-ghost"
+        alt="Track two positions ahead"
+    >
+
+
     <img
         id="previousCover"
         class="side-cover previous-cover"
@@ -1660,6 +1978,13 @@ transform-origin: center center;
         <canvas id="spectrumCanvas"></canvas>
 
     </div>
+
+    <img
+    id="coverReflection"
+    class="cover-reflection"
+    alt=""
+    aria-hidden="true"
+    >
 
 </div>
 
@@ -1776,23 +2101,51 @@ transform-origin: center center;
 <div class="controls">
 
     <div class="left-controls">
-        <button id="shuffleButton" class="toggle-button">
-            🔀 <span>Shuffle</span>
-        </button>
-
-        <button id="repeatButton" class="toggle-button">
-            🔁 <span>Repeat</span>
-        </button>
+        <button id="playbackModeButton"
+        class="control-button"
+        aria-label="Playback mode: sequential"
+        title="Sequential play">
+    <svg id="playbackModeIcon"
+         viewBox="0 0 24 24"
+         aria-hidden="true">
+        <path d="M4 6h2.5a4 4 0 0 1 3.2 1.6L15 14.4a4 4 0 0 0 3.2 1.6H20
+                 M17 13l3 3-3 3
+                 M4 18h2.5a4 4 0 0 0 2.5-1"/>
+    </svg>
+</button>
     </div>
 
-    <div class="main-controls">
-        <button id="previousButton" class="control-button">⏮</button>
-        <button id="playButton" class="control-button">▶</button>
-        <button id="nextButton" class="control-button">⏭</button>
-    </div>
+
+<div class="main-controls">
+    <button id="previousButton" class="control-button" aria-label="Previous track">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M6 5h2v14H6z M19 5v14L9 12z"/>
+    </svg>
+</button>
+
+    <button id="playButton" class="control-button" aria-label="Play">
+        <svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 5l12 7-12 7z"/>
+        </svg>
+        <svg class="pause-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 5h3v14H8zM15 5h3v14h-3z"/>
+        </svg>
+    </button>
+
+    <button id="nextButton" class="control-button" aria-label="Next track">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M16 5h2v14h-2z M5 5v14l10-7z"/>
+    </svg>
+</button>
+</div>
+
 
     <div class="right-controls">
-        <span>🔊</span>
+        <span><svg class="volume-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M11 5 6 9H3v6h3l5 4V5Z"/>
+    <path d="M15.5 8.5a5 5 0 0 1 0 7"/>
+    <path d="M18.5 5.5a9 9 0 0 1 0 13"/>
+</svg></span>
         <input
             id="volume"
             type="range"
@@ -1826,9 +2179,62 @@ let library = {};
 
 let currentSong = -1;
 
-let shuffle = false;
+let playbackMode = "sequential";
 
-let repeat = false;
+const playbackModeButton = document.getElementById("playbackModeButton");
+const playbackModeIcon = document.getElementById("playbackModeIcon");
+
+const playbackModeIcons = {
+    sequential: `
+    <path d="M4 12h15
+             M14 7l5 5-5 5"/>
+`,
+    shuffle: `
+        <path d="M16 3h5v5
+                 M4 20L21 3
+                 M21 16v5h-5
+                 M15 15l6 6
+                 M4 4l5 5"/>
+    `,
+    repeat: `
+        <path d="M17 2l4 4-4 4
+                 M3 11V8a2 2 0 0 1 2-2h16
+                 M7 22l-4-4 4-4
+                 M21 13v3a2 2 0 0 1-2 2H3"/>
+    `
+};
+
+function updatePlaybackModeUI() {
+    playbackModeIcon.innerHTML = playbackModeIcons[playbackMode];
+
+    const labels = {
+        sequential: "Sequential play",
+        shuffle: "Shuffle",
+        repeat: "Repeat current track"
+    };
+
+    playbackModeButton.title = labels[playbackMode];
+    playbackModeButton.setAttribute(
+        "aria-label",
+        `Playback mode: ${labels[playbackMode]}`
+    );
+
+    playbackModeButton.classList.toggle(
+        "active",
+        playbackMode !== "sequential"
+    );
+}
+
+playbackModeButton.addEventListener("click", () => {
+    const modes = ["sequential", "shuffle", "repeat"];
+    const currentIndex = modes.indexOf(playbackMode);
+
+    playbackMode = modes[(currentIndex + 1) % modes.length];
+
+    updatePlaybackModeUI();
+});
+
+updatePlaybackModeUI();
 
 
 /* ============================================================
@@ -1851,6 +2257,70 @@ let lastSpeedTime =
 const player =
     document.getElementById("player");
 
+/* ============================================================
+   ANDROID LOCK-SCREEN MEDIA CONTROLS
+   ============================================================ */
+
+function updateMediaSession(song) {
+    if (!("mediaSession" in navigator)) return;
+
+    const artwork = song.cover
+        ? new URL(encodeURI(song.cover), document.baseURI).href
+        : null;
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+        title: song.title || "Unknown Title",
+        artist: song.artist || "Unknown Artist",
+        album: song.album || "Unknown Album",
+        artwork: artwork
+            ? [
+                {
+                    src: artwork,
+                    sizes: "512x512",
+                    type: "image/jpeg"
+                }
+            ]
+            : []
+    });
+}
+
+if ("mediaSession" in navigator) {
+    navigator.mediaSession.setActionHandler("play", () => {
+        player.play().catch(console.warn);
+    });
+
+    navigator.mediaSession.setActionHandler("pause", () => {
+    player.pause();
+
+    navigator.mediaSession.playbackState = "paused";
+    });
+
+    navigator.mediaSession.setActionHandler("nexttrack", () => {
+        nextSong();
+    });
+
+    navigator.mediaSession.setActionHandler("previoustrack", () => {
+        const sequence = getPlaybackSequence();
+        const position = sequence.indexOf(currentSong);
+
+        if (position === -1 || sequence.length === 0) return;
+
+        const previousPosition =
+            (position - 1 + sequence.length) % sequence.length;
+
+        playSong(sequence[previousPosition]);
+    });
+}
+
+player.addEventListener("play", () => {
+    playButton.classList.add("is-playing");
+    playButton.setAttribute("aria-label", "Pause");
+});
+
+player.addEventListener("pause", () => {
+    playButton.classList.remove("is-playing");
+    playButton.setAttribute("aria-label", "Play");
+});
 
 const cover =
     document.getElementById("cover");
@@ -1928,11 +2398,21 @@ const previousCover =
 const nextCover =
     document.getElementById("nextCover");
 
+const previousGhost =
+    document.getElementById("previousGhost");
+
+const nextGhost =
+    document.getElementById("nextGhost");
+
+
 const coverStage =
     document.querySelector(".cover-stage");
 
 const verticalGhost =
     document.getElementById("verticalGhost");
+
+const coverReflection =
+    document.getElementById("coverReflection");
 
 
 /* =========================================================
@@ -1948,23 +2428,29 @@ const libraryBackdrop =
 const sidebar =
     document.querySelector(".sidebar");
 
+
 function openLibraryDrawer() {
     sidebar.classList.add("library-open");
     libraryBackdrop.classList.add("backdrop-visible");
+    libraryToggle.classList.add("library-toggle-open");
 
     libraryToggle.setAttribute("aria-expanded", "true");
     libraryToggle.setAttribute("aria-label", "Close music library");
     libraryToggle.textContent = "✕";
 }
 
+
+
 function closeLibraryDrawer() {
     sidebar.classList.remove("library-open");
     libraryBackdrop.classList.remove("backdrop-visible");
+    libraryToggle.classList.remove("library-toggle-open");
 
     libraryToggle.setAttribute("aria-expanded", "false");
     libraryToggle.setAttribute("aria-label", "Open music library");
     libraryToggle.textContent = "☰";
 }
+
 
 libraryToggle.addEventListener("click", () => {
     if (sidebar.classList.contains("library-open")) {
@@ -2465,8 +2951,8 @@ function getAdjacentAlbumTrack(direction) {
     return albums[targetPosition].songs[0] || null;
 }
 
-function showAlbumGhost(direction) {
-    const targetTrack = getAdjacentAlbumTrack(direction);
+function showAlbumGhost(direction, targetTrack = null) {
+    targetTrack ??= getAdjacentAlbumTrack(direction);
 
     if (targetTrack?.cover) {
         verticalGhost.src = encodeURI(targetTrack.cover);
@@ -2476,7 +2962,23 @@ function showAlbumGhost(direction) {
 }
 
 function updateVerticalGhost() {
-    const targetTrack = getAdjacentAlbumTrack(-1);
+    let targetTrack;
+
+    if (playbackMode === "shuffle") {
+        const albums = getAlbumSequence();
+
+        if (albums.length === 0) {
+            verticalGhost.removeAttribute("src");
+            return;
+        }
+
+        const randomAlbum =
+            albums[Math.floor(Math.random() * albums.length)];
+
+        targetTrack = randomAlbum.songs[0] || null;
+    } else {
+        targetTrack = getAdjacentAlbumTrack(-1);
+    }
 
     if (targetTrack?.cover) {
         verticalGhost.src = encodeURI(targetTrack.cover);
@@ -2485,37 +2987,38 @@ function updateVerticalGhost() {
     }
 }
 
-
 function changeAlbum(direction) {
     const albums = getAlbumSequence();
     const currentTrack = songs[currentSong];
-    const targetTrack = getAdjacentAlbumTrack(direction);
 
-    console.log("===== ALBUM SWIPE DEBUG =====");
-    console.log("Direction:", direction, direction < 0 ? "PREVIOUS" : "NEXT");
-    console.log("Current album:", currentTrack?.albumartist, "-", currentTrack?.album);
-    console.log("Target album:", targetTrack?.albumartist, "-", targetTrack?.album);
-    console.log("Target cover:", targetTrack?.cover);
-    console.log("Ghost before:", verticalGhost.src);
+    if (albums.length === 0 || !currentTrack) return;
 
-    if (!targetTrack) {
-        console.log("No target track found.");
-        return;
+    let targetTrack;
+
+    if (playbackMode === "shuffle") {
+        // Select a random album.
+        const randomAlbumIndex = Math.floor(
+            Math.random() * albums.length
+        );
+
+        const randomAlbum = albums[randomAlbumIndex];
+
+        // Select the first track of that album.
+        targetTrack = randomAlbum.songs[0] || null;
+    } else {
+        // Preserve sequential album navigation.
+        targetTrack = getAdjacentAlbumTrack(direction);
     }
 
-    showAlbumGhost(direction);
+    if (!targetTrack) return;
 
-    console.log("Ghost after:", verticalGhost.src);
-    console.log("Ghost CSS classes:", verticalGhost.className);
-    console.log("Animation direction:", direction > 0 ? "up" : "down");
+    showAlbumGhost(direction, targetTrack);
 
     animateCover(
         direction > 0 ? "up" : "down",
         () => playSong(targetTrack.index)
     );
 }
-
-
 
 function nextAlbum() {
     changeAlbum(1);
@@ -2561,60 +3064,107 @@ function getPlaybackSequence() {
    UPDATE SIDE COVERS
    ============================================================ */
 
+
 function updateSideCovers() {
-
     const sequence = getPlaybackSequence();
-
     const position = sequence.indexOf(currentSong);
+    const total = sequence.length;
 
-    if (position === -1 || sequence.length < 2) {
+    if (position === -1 || total < 2) {
         previousCover.removeAttribute("src");
         nextCover.removeAttribute("src");
+        previousGhost.removeAttribute("src");
+        nextGhost.removeAttribute("src");
+
+        shuffleNextIndex = null;
+        shufflePreviousIndex = null;
         return;
     }
 
-    const previousPosition =
-        (position - 1 + sequence.length) % sequence.length;
-
-    const nextPosition =
-        (position + 1) % sequence.length;
-
-    const previousSong =
-        songs[sequence[previousPosition]];
-
-    const nextSong =
-        songs[sequence[nextPosition]];
-
-
-    if (previousSong.cover) {
-        previousCover.src = encodeURI(previousSong.cover);
-    } else {
-        previousCover.removeAttribute("src");
+    function setCoverImage(element, song) {
+        if (song?.cover) {
+            element.src = encodeURI(song.cover);
+        } else {
+            element.removeAttribute("src");
+        }
     }
 
-    if (nextSong.cover) {
-        nextCover.src = encodeURI(nextSong.cover);
-    } else {
-        nextCover.removeAttribute("src");
+    // SHUFFLE: randomize the side covers and ghosts.
+    if (playbackMode === "shuffle") {
+        shufflePreviousIndex = randomTrackIndex(currentSong);
+        shuffleNextIndex = randomTrackIndex(currentSong);
+
+        setCoverImage(previousCover, songs[shufflePreviousIndex]);
+        setCoverImage(nextCover, songs[shuffleNextIndex]);
+
+        setCoverImage(
+            previousGhost,
+            songs[randomTrackIndex(currentSong)]
+        );
+
+        setCoverImage(
+            nextGhost,
+            songs[randomTrackIndex(currentSong)]
+        );
+
+        return;
     }
 
+    // SEQUENTIAL / REPEAT: preserve existing artwork order.
+    shuffleNextIndex = null;
+    shufflePreviousIndex = null;
+
+    const previousPosition = (position - 1 + total) % total;
+    const nextPosition = (position + 1) % total;
+
+    const previousSong = songs[sequence[previousPosition]];
+    const nextSong = songs[sequence[nextPosition]];
+
+    const previousGhostPosition = (position - 2 + total) % total;
+    const nextGhostPosition = (position + 2) % total;
+
+    const previousGhostSong = songs[sequence[previousGhostPosition]];
+    const nextGhostSong = songs[sequence[nextGhostPosition]];
+
+    setCoverImage(previousCover, previousSong);
+    setCoverImage(nextCover, nextSong);
+
+    if (total >= 4) {
+        setCoverImage(previousGhost, previousGhostSong);
+        setCoverImage(nextGhost, nextGhostSong);
+    } else {
+        previousGhost.removeAttribute("src");
+        nextGhost.removeAttribute("src");
+    }
 }
-/* ============================================================
-   TITLE SCROLL
-   ============================================================ */
-    
 
-function updateScrollingTitle(title) {
-    songTitle.replaceChildren();
+    function randomTrackIndex(excludeIndex = -1) {
+    if (songs.length <= 1) return 0;
+
+    let index;
+
+    do {
+        index = Math.floor(Math.random() * songs.length);
+    } while (index === excludeIndex);
+
+    return index;
+}
+
+/* =========================================================
+   SCROLLING TEXT
+   ========================================================= */
+
+function updateScrollingText(element, content) {
+    element.replaceChildren();
 
     const text = document.createElement("span");
-    text.textContent = title;
-    songTitle.appendChild(text);
+    text.textContent = content;
+    element.appendChild(text);
 
     requestAnimationFrame(() => {
-        const availableWidth = songTitle.clientWidth;
-        const titleWidth = text.getBoundingClientRect().width;
-        const overflow = titleWidth - availableWidth;
+        const availableWidth = element.clientWidth;
+        const textWidth = text.getBoundingClientRect().width;
+        const overflow = textWidth - availableWidth;
 
         if (overflow > 2) {
             text.classList.add("title-scroll");
@@ -2624,7 +3174,7 @@ function updateScrollingTitle(title) {
                 `-${overflow}px`
             );
 
-            // Longer titles scroll more slowly.
+            // Longer text scrolls more slowly.
             text.style.setProperty(
                 "--scroll-duration",
                 `${Math.max(6, overflow / 15)}s`
@@ -2639,6 +3189,8 @@ function updateScrollingTitle(title) {
    ============================================================ */
 let coverAnimationTimer;
 let coverAnimating = false;
+let shuffleNextIndex = null;
+let shufflePreviousIndex = null;
 
 function animateCover(direction, callback) {
     const stage = coverStage;
@@ -2728,6 +3280,7 @@ function playSong(index) {
 
     const song =
         songs[currentSong];
+    updateMediaSession(song);
 
 
 
@@ -2771,36 +3324,26 @@ function playSong(index) {
 
     player.src =
         encodeURI(song.file);
+    
+/* SONG INFO */
 
-
-
-    /* SONG INFO */
-
-    updateScrollingTitle(
+updateScrollingText(
+    songTitle,
     song.title || "Unknown Title"
-    );
+);
 
+updateScrollingText(
+    songArtist,
+    song.artist || "Unknown Artist"
+);
 
-    songArtist.textContent =
-        song.artist ||
-        "Unknown Artist";
+const album = song.album || "Unknown Album";
+const year = song.year || "";
 
-
-    const album =
-        song.album ||
-        "Unknown Album";
-
-
-    const year =
-        song.year ||
-        "";
-
-
-    songAlbum.textContent =
-        year
-            ? `${album} (${year})`
-            : album;
-
+updateScrollingText(
+    songAlbum,
+    year ? `${album} (${year})` : album
+);
 
 
     /* COVER */
@@ -2809,14 +3352,11 @@ function playSong(index) {
 
         const coverURL =
             encodeURI(song.cover);
-
-
         cover.src =
             coverURL;
-
-
         background.style.backgroundImage =
             `url("${coverURL}")`;
+        coverReflection.src = encodeURI(song.cover);
 
     }
     else {
@@ -2825,6 +3365,7 @@ function playSong(index) {
 
         background.style.backgroundImage =
             "none";
+        coverReflection.removeAttribute("src");
 
     }
 
@@ -2875,39 +3416,14 @@ playButton.addEventListener(
 
             player.pause();
 
+            if ("mediaSession" in navigator) {
+                navigator.mediaSession.playbackState = "paused";
+            }
+
         }
 
     }
 );
-
-
-
-/* ============================================================
-   PLAY BUTTON ICON
-   ============================================================ */
-
-player.addEventListener(
-    "play",
-    () => {
-
-        playButton.textContent =
-            "⏸";
-
-    }
-);
-
-
-player.addEventListener(
-    "pause",
-    () => {
-
-        playButton.textContent =
-            "▶";
-
-    }
-);
-
-
 
 /* ============================================================
    NEXT
@@ -2922,23 +3438,21 @@ nextButton.addEventListener("click", () => {
 function nextSong() {
     if (songs.length === 0) return;
 
-    if (repeat) {
-        playSong(currentSong);
-        return;
-    }
+    if (playbackMode === "repeat") {
+    playSong(currentSong);
+    return;
+}
 
-    if (shuffle) {
-        let nextIndex;
+    if (playbackMode === "shuffle") {
+    const nextIndex =
+        shuffleNextIndex ?? randomTrackIndex(currentSong);
 
-        do {
-            nextIndex = Math.floor(Math.random() * songs.length);
-        } while (songs.length > 1 && nextIndex === currentSong);
-
-        playSong(nextIndex);
-        return;
-    }
-
-    const sequence = getPlaybackSequence();
+    playSong(nextIndex);
+    return;
+}
+    else
+    {
+        const sequence = getPlaybackSequence();
     const currentPosition = sequence.indexOf(currentSong);
 
     if (currentPosition === -1) return;
@@ -2946,6 +3460,7 @@ function nextSong() {
     const nextPosition = (currentPosition + 1) % sequence.length;
 
     playSong(sequence[nextPosition]);
+    }   
 }
 
 
@@ -2956,6 +3471,22 @@ function nextSong() {
 
 previousButton.addEventListener("click", () => {
     if (songs.length === 0) return;
+
+    if (playbackMode === "repeat") {
+        playSong(currentSong);
+        return;
+    }
+
+    if (playbackMode === "shuffle") {
+    const previousIndex =
+        shufflePreviousIndex ?? randomTrackIndex(currentSong);
+
+    animateCover("previous", () => {
+        playSong(previousIndex);
+    });
+
+    return;
+}
 
     const sequence = getPlaybackSequence();
     const currentPosition = sequence.indexOf(currentSong);
@@ -3271,46 +3802,8 @@ volume.addEventListener(
 
 
 /* ============================================================
-   SHUFFLE
+   SHUFFLE & REPEAT & SEQUENCIAL
    ============================================================ */
-
-shuffleButton.addEventListener(
-    "click",
-    () => {
-
-        shuffle =
-            !shuffle;
-
-
-        shuffleButton.classList.toggle(
-            "active",
-            shuffle
-        );
-
-    }
-);
-
-
-
-/* ============================================================
-   REPEAT
-   ============================================================ */
-
-repeatButton.addEventListener(
-    "click",
-    () => {
-
-        repeat =
-            !repeat;
-
-
-        repeatButton.classList.toggle(
-            "active",
-            repeat
-        );
-
-    }
-);
 
 
 

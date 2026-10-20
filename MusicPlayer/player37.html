@@ -383,8 +383,56 @@
     flex-shrink: 0;
     perspective: 1000px;
     touch-action: none;
+    overflow: visible !important;
 }
 
+/* ALBUM COVER FLOOR REFLECTION */
+
+.cover-reflection {
+    position: absolute;
+
+    left: 50%;
+    top: calc(50% + min(170px, 25vh));
+
+    width: min(500px, 58vh);
+    aspect-ratio: 1 / 1;
+
+    object-fit: cover;
+    display: block;
+
+    /* Flip the artwork vertically */
+    transform: translateX(-50%) perspective(700px) rotateX(15deg) scaleY(-1);
+    transform-origin: center;
+
+    /* Very faint reflection */
+    opacity: 0.75;
+    filter: blur(1.5px) brightness(0.65);
+
+    /* Fade out as the reflection extends downward */
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.35) 0%,
+        rgba(0, 0, 0, 0.12) 35%,
+        transparent 75%
+    );
+
+    mask-image: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.35) 0%,
+        rgba(0, 0, 0, 0.12) 35%,
+        transparent 75%
+    );
+
+    pointer-events: none;
+    z-index: 1;
+}
+
+@media (max-width: 700px) {
+    .cover-reflection {
+        top: calc(50% + min(32vw, 100px));
+        width: min(80vw, 400px);
+    }
+}
 
 /* SIDE COVERS */
 
@@ -413,6 +461,36 @@
     transform-style: preserve-3d;
 }
 
+/* VERTICAL ALBUM GHOST — SINGLE COVER */
+
+.vertical-ghost {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+
+    width: min(380px, 55%);
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 8px;
+
+    /* Protrude above the main cover */
+    transform:
+        translate(-50%, -120%)
+        rotateX(0deg)
+        rotateY(0deg)
+        rotateZ(0deg)
+        scale(0.68);
+
+transform-origin: center center;
+
+    opacity: 0.32;
+    filter: brightness(0.6);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+
+    z-index: 1;
+    pointer-events: none;
+    backface-visibility: hidden;
+}
 
 .previous-cover {
     left: -80px;
@@ -433,54 +511,99 @@
         translateY(-50%)
         rotateY(-36deg)
         scale(0.68);
+    object-fit: cover;
 
     transform-origin: left center;
 }
 
+    
+/* SECOND-DEGREE HORIZONTAL GHOSTS */
 
-/* Vertical ghost-cover preview */
-.cover-stage.vertical-drag-up .next-cover,
-.cover-stage.vertical-drag-down .previous-cover {
-    left: 50%;
-    right: auto;
+.horizontal-ghost {
+    position: absolute;
     top: 50%;
-    z-index: 3;
 
-    opacity: var(--ghost-opacity, 0);
-    filter: brightness(0.8);
+    width: min(270px, 38%);
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
 
-    transition: none;
+    border-radius: 8px;
+
+    opacity: 0.18;
+    filter: brightness(0.45) saturate(0.8);
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+
+    z-index: 0;
     pointer-events: none;
+    backface-visibility: hidden;
+
+    transition:
+        left 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        right 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.45s ease,
+        filter 0.45s ease;
 }
 
+/* Far-left cover: subtle perspective */
+.previous-ghost {
+    left: -90px;
 
-/* Next album enters from below */
-.cover-stage.vertical-drag-up .next-cover {
     transform:
-        translate(
-            -50%,
-            calc(-50% + var(--drag-y, 0px) + 100%)
-        )
-        perspective(800px)
-        rotateX(-12deg)
-        scale(0.78);
+        translateY(-50%)
+        rotateY(35deg)
+        scale(0.9);
+
+    transform-origin: right center;
 }
 
-/* Previous album enters from above */
-.cover-stage.vertical-drag-down .previous-cover {
+/* Far-right cover: mirrored perspective */
+.next-ghost {
+    right: -90px;
+
     transform:
-        translate(
-            -50%,
-            calc(-50% + var(--drag-y, 0px) - 100%)
-        )
-        perspective(800px)
-        rotateX(12deg)
-        scale(0.78);
+        translateY(-50%)
+        rotateY(-35deg)
+        scale(0.9);
+
+    transform-origin: left center;
 }
 
+/* Mobile adjustments */
+@media (max-width: 700px) {
+    .horizontal-ghost {
+        width: 35%;
+        opacity: 0.15;
+    }
+
+    .previous-ghost {
+        left: -65px;
+
+        transform:
+            translateY(-50%)
+            rotateY(8deg)
+            scale(0.55);
+    }
+
+    .next-ghost {
+        right: -65px;
+
+        transform:
+            translateY(-50%)
+            rotateY(-8deg)
+            scale(0.55);
+    }
+}
 
 
 /* MAIN COVER */
+.cover-stage,
+.cover-container {
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
 
 .cover-container {
     position: relative;
@@ -490,7 +613,7 @@
 
     border-radius: 8px;
 
-    overflow: hidden;
+    overflow: visible;
 
     background: #181818;
 
@@ -500,7 +623,6 @@
 
     flex-shrink: 0;
 }
-
 
 /* MOBILE */
 
@@ -531,6 +653,7 @@
             object-fit: cover;
 
             display: block;
+            border-radius: 8px;
         }
 
 
@@ -665,30 +788,53 @@
             border-radius: 2px;
         }
 
-        /* =========================================================
-           TITLE SCROLL
-           ========================================================= */
         
-#song-title {
+/* =========================================================
+   TEXT SCROLL — TITLE, ARTIST, ALBUM
+   ========================================================= */
+
+#song-title,
+#song-artist,
+#song-album {
     width: 100%;
     overflow: hidden;
-    font-size: 25px;
-    font-weight: bold;
     white-space: nowrap;
     text-align: center;
 }
 
-#song-title .title-scroll {
+#song-title {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+#song-artist {
+    margin-top: 7px;
+    color: #aaa;
+    font-size: 17px;
+}
+
+#song-album {
+    margin-top: 4px;
+    color: #666;
+    font-size: 14px;
+}
+
+/* Apply the same scrolling animation to all three lines. */
+#song-title .title-scroll,
+#song-artist .title-scroll,
+#song-album .title-scroll {
     display: inline-block;
     white-space: nowrap;
     will-change: transform;
-    animation: title-marquee var(--scroll-duration, 8s) linear infinite alternate;
+    animation: title-marquee var(--scroll-duration, 8s)
+               linear infinite alternate;
 }
 
 @keyframes title-marquee {
     from {
         transform: translateX(0);
     }
+
     to {
         transform: translateX(var(--scroll-distance));
     }
@@ -979,20 +1125,101 @@
     background: rgba(255, 255, 255, 0.1);
 }
 
-#playButton {
-    width: 60px;
-    height: 60px;
+.main-controls {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 22px;
+}
+
+.control-button {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     padding: 0;
-    border: none;
+    border: 1px solid #303030;
     border-radius: 50%;
-    background: white;
-    color: black;
-    font-size: 25px;
+
+    background: #171717;
+    color: #b8b8b8;
+
     cursor: pointer;
     flex-shrink: 0;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease,
+        box-shadow 0.2s ease;
+}
+
+.control-button svg {
+    width: 21px;
+    height: 21px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+#previousButton svg path,
+#nextButton svg path {
+    fill: currentColor;
+    stroke: none;
+}
+
+.control-button:hover {
+    background: #292929;
+    color: #ffffff;
+    border-color: #505050;
+}
+
+.control-button:active {
+    transform: scale(0.92);
+}
+
+/* Main play/pause button */
+#playButton {
+    width: 62px;
+    height: 62px;
+
+    background: #e8e8e8;
+    color: #111111;
+    border: none;
+
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+}
+
+#playButton:hover {
+    background: #ffffff;
+    color: #000000;
+    box-shadow: 0 0 22px rgba(255, 255, 255, 0.12);
+}
+
+#playButton svg {
+    width: 25px;
+    height: 25px;
+    fill: currentColor;
+    stroke: none;
+}
+
+#playButton .pause-icon {
+    display: none;
+}
+
+#playButton.is-playing .play-icon {
+    display: none;
+}
+
+#playButton.is-playing .pause-icon {
+    display: block;
 }
 
 #playButton:hover {
@@ -1155,10 +1382,10 @@
         }
 
         /* Moving to the next track */
-
         .cover-stage.animating-next .cover-container {
-            animation: cover-out-left 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-        }
+        animation: cover-out-left
+        0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
 
         .cover-stage.animating-next .next-cover {
             animation: cover-in-from-right 0.7s
@@ -1172,8 +1399,9 @@
         /* Moving to the previous track */
 
         .cover-stage.animating-previous .cover-container {
-            animation: cover-out-right 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-        }
+        animation: cover-out-right
+        0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
 
         .cover-stage.animating-previous .previous-cover {
             animation: cover-in-from-left 0.45s
@@ -1313,6 +1541,269 @@
             from { transform: translateY(-50%) scale(0.78); opacity: 0.38; }
             to   { transform: translate(80px, -50%) scale(0.65); opacity: 0; }
 }
+
+    
+/* =========================================================
+   VERTICAL ALBUM TRANSITIONS
+   Horizontal track transitions remain unchanged.
+   ========================================================= */
+
+/* Incoming vertical ghost */
+.cover-stage.animating-up .vertical-ghost,
+.cover-stage.animating-down .vertical-ghost {
+    z-index: 4;
+
+    animation-duration: 700ms;
+    animation-timing-function:
+        cubic-bezier(0.22, 1, 0.36, 1);
+    animation-fill-mode: both;
+}
+
+/* Current cover exits vertically */
+.cover-stage.animating-up .cover-container {
+    animation: album-current-up
+        700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.cover-stage.animating-down .cover-container {
+    animation: album-current-down
+        700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Next album: ghost enters from below */
+.cover-stage.animating-up .vertical-ghost {
+    animation-name: album-next-up;
+}
+
+/* Previous album: ghost enters from above */
+.cover-stage.animating-down .vertical-ghost {
+    animation-name: album-previous-down;
+}
+
+/* Current cover leaves upward */
+@keyframes album-current-up {
+    from {
+        transform: translate3d(0, 0, 0) scale(1);
+        opacity: 1;
+    }
+
+    to {
+        transform: translate3d(0, -110%, 0) scale(0.88);
+        opacity: 0;
+    }
+}
+
+/* Current cover leaves downward */
+@keyframes album-current-down {
+    from {
+        transform: translate3d(0, 0, 0) scale(1);
+        opacity: 1;
+    }
+
+    to {
+        transform: translate3d(0, 110%, 0) scale(0.88);
+        opacity: 0;
+    }
+}
+
+/* Next album rises into the center */
+@keyframes album-next-up {
+    from {
+        transform:
+            perspective(450px)
+            translate3d(-50%, 100%, 0)
+            rotateX(-40deg)
+            scale(0.85, 1.15);
+        opacity: 0.32;
+        filter: brightness(0.6);
+    }
+
+    to {
+        transform:
+            perspective(450px)
+            translate3d(-50%, -50%, 0)
+            rotateX(0deg)
+            scale(1, 1);
+        opacity: 1;
+        filter: brightness(1);
+    }
+}
+
+@keyframes album-previous-down {
+    from {
+        transform:
+            perspective(450px)
+            translate3d(-50%, -150%, 0)
+            rotateX(40deg)
+            scale(0.85, 1.15);
+        opacity: 0.32;
+        filter: brightness(0.6);
+    }
+
+    to {
+        transform:
+            perspective(450px)
+            translate3d(-50%, -50%, 0)
+            rotateX(0deg)
+            scale(1);
+        opacity: 1;
+        filter: brightness(1);
+    }
+}
+
+/* Mobile sizing */
+@media (max-width: 700px) {
+    .vertical-ghost {
+        width: 52%;
+    }
+
+    @keyframes album-next-up {
+        from {
+            width: 52%;
+            transform: translate3d(-50%, 100%, 0) scale(0.68);
+            opacity: 0.32;
+            filter: brightness(0.6);
+        }
+
+        to {
+            width: min(80vw, 400px);
+            transform: translate3d(-50%, -50%, 0) scale(1);
+            opacity: 1;
+            filter: brightness(1);
+        }
+    }
+
+    @keyframes album-previous-down {
+        from {
+            width: 52%;
+            transform: translate3d(-50%, -150%, 0) scale(0.68);
+            opacity: 0.32;
+            filter: brightness(0.6);
+        }
+
+        to {
+            width: min(80vw, 400px);
+            transform: translate3d(-50%, -50%, 0) scale(1);
+            opacity: 1;
+            filter: brightness(1);
+        }
+    }
+}     
+
+
+/* =========================================================
+   MOBILE SLIDE-OUT LIBRARY
+   ========================================================= */
+
+.library-toggle,
+.library-backdrop {
+    display: none;
+}
+
+@media (max-width: 700px) {
+    
+
+.library-toggle {
+    display: flex;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 1002;
+
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(25, 25, 25, 0.92);
+    color: white;
+    border: 1px solid #383838;
+    border-radius: 10px;
+
+    font-size: 23px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    transition: left 0.3s ease;
+}
+
+/* Move the X to the top-right of the open sidebar. */
+.library-toggle.library-toggle-open {
+    left: min(266px, calc(85vw - 54px));
+}
+
+
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 1001;
+
+        width: min(320px, 85vw);
+        min-width: 0;
+        height: 100vh;
+        height: 100dvh;
+
+        order: initial;
+        border: none;
+        border-right: 1px solid #333;
+
+        transform: translateX(-100%);
+        visibility: hidden;
+
+        transition:
+            transform 0.3s ease,
+            visibility 0.3s ease;
+    }
+
+    .sidebar.library-open {
+        transform: translateX(0);
+        visibility: visible;
+    }
+
+    .library-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+
+        background: rgba(0, 0, 0, 0.6);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+
+        transition:
+            opacity 0.3s ease,
+            visibility 0.3s ease;
+    }
+
+    .library-backdrop.backdrop-visible {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    /* Keep the player layout unchanged on mobile. */
+    .app {
+        min-height: 100vh;
+        min-height: 100dvh;
+        flex-direction: column;
+    }
+
+    .sidebar {
+        order: initial;
+    }
+}
+
+    
+    @media (max-width: 700px) {
+        .right-controls {
+            display: none;
+        }
+    }
+
     </style>
 
 </head>
@@ -1320,10 +1811,22 @@
 
 <body>
 
-
 <div class="app">
 
+<button
+    id="libraryToggle"
+    class="library-toggle"
+    type="button"
+    aria-label="Open music library"
+    aria-expanded="false"
+>
+    ☰
+</button>
 
+<div
+    id="libraryBackdrop"
+    class="library-backdrop"
+></div>
     <!-- =====================================================
          SIDEBAR
          ===================================================== -->
@@ -1379,6 +1882,21 @@
 
 <div class="cover-stage">
 
+    
+    <!-- SECOND-DEGREE HORIZONTAL GHOSTS -->
+    <img
+        id="previousGhost"
+        class="horizontal-ghost previous-ghost"
+        alt="Track two positions back"
+    >
+
+    <img
+        id="nextGhost"
+        class="horizontal-ghost next-ghost"
+        alt="Track two positions ahead"
+    >
+
+
     <img
         id="previousCover"
         class="side-cover previous-cover"
@@ -1391,6 +1909,12 @@
         alt="Next track cover"
     >
 
+    <img
+    id="verticalGhost"
+    class="vertical-ghost"
+    alt="Adjacent album cover"
+>
+
     <div class="cover-container">
 
         <img
@@ -1401,6 +1925,13 @@
         <canvas id="spectrumCanvas"></canvas>
 
     </div>
+
+    <img
+    id="coverReflection"
+    class="cover-reflection"
+    alt=""
+    aria-hidden="true"
+    >
 
 </div>
 
@@ -1526,11 +2057,30 @@
         </button>
     </div>
 
-    <div class="main-controls">
-        <button id="previousButton" class="control-button">⏮</button>
-        <button id="playButton" class="control-button">▶</button>
-        <button id="nextButton" class="control-button">⏭</button>
-    </div>
+
+<div class="main-controls">
+    <button id="previousButton" class="control-button" aria-label="Previous track">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M6 5h2v14H6z M19 5v14L9 12z"/>
+    </svg>
+</button>
+
+    <button id="playButton" class="control-button" aria-label="Play">
+        <svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 5l12 7-12 7z"/>
+        </svg>
+        <svg class="pause-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 5h3v14H8zM15 5h3v14h-3z"/>
+        </svg>
+    </button>
+
+    <button id="nextButton" class="control-button" aria-label="Next track">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M16 5h2v14h-2z M5 5v14l10-7z"/>
+    </svg>
+</button>
+</div>
+
 
     <div class="right-controls">
         <span>🔊</span>
@@ -1592,6 +2142,70 @@ let lastSpeedTime =
 const player =
     document.getElementById("player");
 
+/* ============================================================
+   ANDROID LOCK-SCREEN MEDIA CONTROLS
+   ============================================================ */
+
+function updateMediaSession(song) {
+    if (!("mediaSession" in navigator)) return;
+
+    const artwork = song.cover
+        ? new URL(encodeURI(song.cover), document.baseURI).href
+        : null;
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+        title: song.title || "Unknown Title",
+        artist: song.artist || "Unknown Artist",
+        album: song.album || "Unknown Album",
+        artwork: artwork
+            ? [
+                {
+                    src: artwork,
+                    sizes: "512x512",
+                    type: "image/jpeg"
+                }
+            ]
+            : []
+    });
+}
+
+if ("mediaSession" in navigator) {
+    navigator.mediaSession.setActionHandler("play", () => {
+        player.play().catch(console.warn);
+    });
+
+    navigator.mediaSession.setActionHandler("pause", () => {
+    player.pause();
+
+    navigator.mediaSession.playbackState = "paused";
+    });
+
+    navigator.mediaSession.setActionHandler("nexttrack", () => {
+        nextSong();
+    });
+
+    navigator.mediaSession.setActionHandler("previoustrack", () => {
+        const sequence = getPlaybackSequence();
+        const position = sequence.indexOf(currentSong);
+
+        if (position === -1 || sequence.length === 0) return;
+
+        const previousPosition =
+            (position - 1 + sequence.length) % sequence.length;
+
+        playSong(sequence[previousPosition]);
+    });
+}
+
+player.addEventListener("play", () => {
+    playButton.classList.add("is-playing");
+    playButton.setAttribute("aria-label", "Pause");
+});
+
+player.addEventListener("pause", () => {
+    playButton.classList.remove("is-playing");
+    playButton.setAttribute("aria-label", "Play");
+});
 
 const cover =
     document.getElementById("cover");
@@ -1669,9 +2283,85 @@ const previousCover =
 const nextCover =
     document.getElementById("nextCover");
 
+const previousGhost =
+    document.getElementById("previousGhost");
+
+const nextGhost =
+    document.getElementById("nextGhost");
+
+
 const coverStage =
     document.querySelector(".cover-stage");
 
+const verticalGhost =
+    document.getElementById("verticalGhost");
+
+const coverReflection =
+    document.getElementById("coverReflection");
+
+
+/* =========================================================
+   MOBILE LIBRARY DRAWER
+   ========================================================= */
+
+const libraryToggle =
+    document.getElementById("libraryToggle");
+
+const libraryBackdrop =
+    document.getElementById("libraryBackdrop");
+
+const sidebar =
+    document.querySelector(".sidebar");
+
+
+function openLibraryDrawer() {
+    sidebar.classList.add("library-open");
+    libraryBackdrop.classList.add("backdrop-visible");
+    libraryToggle.classList.add("library-toggle-open");
+
+    libraryToggle.setAttribute("aria-expanded", "true");
+    libraryToggle.setAttribute("aria-label", "Close music library");
+    libraryToggle.textContent = "✕";
+}
+
+
+
+function closeLibraryDrawer() {
+    sidebar.classList.remove("library-open");
+    libraryBackdrop.classList.remove("backdrop-visible");
+    libraryToggle.classList.remove("library-toggle-open");
+
+    libraryToggle.setAttribute("aria-expanded", "false");
+    libraryToggle.setAttribute("aria-label", "Open music library");
+    libraryToggle.textContent = "☰";
+}
+
+
+libraryToggle.addEventListener("click", () => {
+    if (sidebar.classList.contains("library-open")) {
+        closeLibraryDrawer();
+    } else {
+        openLibraryDrawer();
+    }
+});
+
+libraryBackdrop.addEventListener(
+    "click",
+    closeLibraryDrawer
+);
+
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+        closeLibraryDrawer();
+    }
+});
+
+/* Close the drawer after choosing a song. */
+libraryElement.addEventListener("click", event => {
+    if (event.target.closest(".song")) {
+        closeLibraryDrawer();
+    }
+});
 
 
 /* ============================================================
@@ -2119,11 +2809,11 @@ function getAlbumSequence() {
 }
 
 
-function changeAlbum(direction) {
-    if (currentSong < 0 || songs.length === 0) return;
+function getAdjacentAlbumTrack(direction) {
+    if (currentSong < 0 || songs.length === 0) return null;
 
     const albums = getAlbumSequence();
-    if (albums.length < 2) return;
+    if (albums.length < 2) return null;
 
     const currentTrack = songs[currentSong];
 
@@ -2138,24 +2828,64 @@ function changeAlbum(direction) {
         album.album === currentAlbum
     );
 
-    if (currentPosition === -1) return;
+    if (currentPosition === -1) return null;
 
-    const nextPosition =
-        (currentPosition + direction + albums.length) %
-        albums.length;
+    const targetPosition =
+        (currentPosition + direction + albums.length) % albums.length;
 
-    const targetAlbum = albums[nextPosition];
+    return albums[targetPosition].songs[0] || null;
+}
 
-    // Play the first track in the selected album.
-    const firstTrack = targetAlbum.songs[0];
+function showAlbumGhost(direction) {
+    const targetTrack = getAdjacentAlbumTrack(direction);
 
-    if (!firstTrack) return;
+    if (targetTrack?.cover) {
+        verticalGhost.src = encodeURI(targetTrack.cover);
+    } else {
+        verticalGhost.removeAttribute("src");
+    }
+}
+
+function updateVerticalGhost() {
+    const targetTrack = getAdjacentAlbumTrack(-1);
+
+    if (targetTrack?.cover) {
+        verticalGhost.src = encodeURI(targetTrack.cover);
+    } else {
+        verticalGhost.removeAttribute("src");
+    }
+}
+
+
+function changeAlbum(direction) {
+    const albums = getAlbumSequence();
+    const currentTrack = songs[currentSong];
+    const targetTrack = getAdjacentAlbumTrack(direction);
+
+    console.log("===== ALBUM SWIPE DEBUG =====");
+    console.log("Direction:", direction, direction < 0 ? "PREVIOUS" : "NEXT");
+    console.log("Current album:", currentTrack?.albumartist, "-", currentTrack?.album);
+    console.log("Target album:", targetTrack?.albumartist, "-", targetTrack?.album);
+    console.log("Target cover:", targetTrack?.cover);
+    console.log("Ghost before:", verticalGhost.src);
+
+    if (!targetTrack) {
+        console.log("No target track found.");
+        return;
+    }
+
+    showAlbumGhost(direction);
+
+    console.log("Ghost after:", verticalGhost.src);
+    console.log("Ghost CSS classes:", verticalGhost.className);
+    console.log("Animation direction:", direction > 0 ? "up" : "down");
 
     animateCover(
-        direction > 0 ? "next" : "previous",
-        () => playSong(firstTrack.index)
+        direction > 0 ? "up" : "down",
+        () => playSong(targetTrack.index)
     );
 }
+
 
 
 function nextAlbum() {
@@ -2202,23 +2932,26 @@ function getPlaybackSequence() {
    UPDATE SIDE COVERS
    ============================================================ */
 
+
 function updateSideCovers() {
-
     const sequence = getPlaybackSequence();
-
     const position = sequence.indexOf(currentSong);
+    const total = sequence.length;
 
-    if (position === -1 || sequence.length < 2) {
+    if (position === -1 || total < 2) {
         previousCover.removeAttribute("src");
         nextCover.removeAttribute("src");
+        previousGhost.removeAttribute("src");
+        nextGhost.removeAttribute("src");
         return;
     }
 
+    // First-degree neighbors: existing side covers.
     const previousPosition =
-        (position - 1 + sequence.length) % sequence.length;
+        (position - 1 + total) % total;
 
     const nextPosition =
-        (position + 1) % sequence.length;
+        (position + 1) % total;
 
     const previousSong =
         songs[sequence[previousPosition]];
@@ -2226,36 +2959,57 @@ function updateSideCovers() {
     const nextSong =
         songs[sequence[nextPosition]];
 
+    // Second-degree neighbors: new ghost covers.
+    const previousGhostPosition =
+        (position - 2 + total) % total;
 
-    if (previousSong.cover) {
-        previousCover.src = encodeURI(previousSong.cover);
-    } else {
-        previousCover.removeAttribute("src");
+    const nextGhostPosition =
+        (position + 2) % total;
+
+    const previousGhostSong =
+        songs[sequence[previousGhostPosition]];
+
+    const nextGhostSong =
+        songs[sequence[nextGhostPosition]];
+
+    // Helper to update artwork safely.
+    function setCoverImage(element, song) {
+        if (song?.cover) {
+            element.src = encodeURI(song.cover);
+        } else {
+            element.removeAttribute("src");
+        }
     }
 
-    if (nextSong.cover) {
-        nextCover.src = encodeURI(nextSong.cover);
-    } else {
-        nextCover.removeAttribute("src");
-    }
+    setCoverImage(previousCover, previousSong);
+    setCoverImage(nextCover, nextSong);
 
+    // Avoid showing duplicate tracks as second-degree ghosts.
+    if (total >= 4) {
+        setCoverImage(previousGhost, previousGhostSong);
+        setCoverImage(nextGhost, nextGhostSong);
+    } else {
+        previousGhost.removeAttribute("src");
+        nextGhost.removeAttribute("src");
+    }
 }
-/* ============================================================
-   TITLE SCROLL
-   ============================================================ */
-    
 
-function updateScrollingTitle(title) {
-    songTitle.replaceChildren();
+
+/* =========================================================
+   SCROLLING TEXT
+   ========================================================= */
+
+function updateScrollingText(element, content) {
+    element.replaceChildren();
 
     const text = document.createElement("span");
-    text.textContent = title;
-    songTitle.appendChild(text);
+    text.textContent = content;
+    element.appendChild(text);
 
     requestAnimationFrame(() => {
-        const availableWidth = songTitle.clientWidth;
-        const titleWidth = text.getBoundingClientRect().width;
-        const overflow = titleWidth - availableWidth;
+        const availableWidth = element.clientWidth;
+        const textWidth = text.getBoundingClientRect().width;
+        const overflow = textWidth - availableWidth;
 
         if (overflow > 2) {
             text.classList.add("title-scroll");
@@ -2265,7 +3019,7 @@ function updateScrollingTitle(title) {
                 `-${overflow}px`
             );
 
-            // Longer titles scroll more slowly.
+            // Longer text scrolls more slowly.
             text.style.setProperty(
                 "--scroll-duration",
                 `${Math.max(6, overflow / 15)}s`
@@ -2278,36 +3032,77 @@ function updateScrollingTitle(title) {
 /* ============================================================
    PLAY SONG
    ============================================================ */
-
 let coverAnimationTimer;
+let coverAnimating = false;
 
 function animateCover(direction, callback) {
+    const stage = coverStage;
+
+    if (!stage || coverAnimating) {
+        return;
+    }
+
+    coverAnimating = true;
+
     clearTimeout(coverAnimationTimer);
 
-    coverStage.classList.remove(
+    stage.classList.remove(
         "animating-next",
-        "animating-previous"
+        "animating-previous",
+        "animating-up",
+        "animating-down",
+        "vertical-drag-up",
+        "vertical-drag-down"
     );
 
-    // Restart the animation cleanly.
-    void coverStage.offsetWidth;
+// Preserve the released horizontal drag position.
+// Vertical album animations start from their own positions.
+dragCover.style.transition = "";
 
-    coverStage.classList.add(
-        direction === "next"
-            ? "animating-next"
-            : "animating-previous"
-    );
+if (direction === "up" || direction === "down") {
+    dragCover.style.transform = "";
+    dragCover.style.removeProperty("--drag-offset");
+}
+
+    stage.style.removeProperty("--ghost-opacity");
+    stage.style.removeProperty("--drag-y");
+
+    // Reset the previous animation before starting another.
+    void stage.offsetWidth;
+
+    if (direction === "up") {
+        stage.classList.add("animating-up");
+    } else if (direction === "down") {
+        stage.classList.add("animating-down");
+    } else if (direction === "next") {
+        stage.classList.add("animating-next");
+    } else if (direction === "previous") {
+        stage.classList.add("animating-previous");
+    } else {
+        coverAnimating = false;
+        return;
+    }
 
     coverAnimationTimer = setTimeout(() => {
-        // Remove the animation before updating the cover,
-        // preventing the old cover from flashing in the center.
-        coverStage.classList.remove(
+        stage.classList.remove(
             "animating-next",
-            "animating-previous"
+            "animating-previous",
+            "animating-up",
+            "animating-down"
         );
 
-        callback();
-    }, 450);
+        // Remove animation styles before updating the artwork.
+        dragCover.style.animation = "";
+        dragCover.style.transform = "";
+        dragCover.style.transition = "";
+        dragCover.style.removeProperty("--drag-offset");
+
+        coverAnimating = false;
+
+        if (callback) {
+            callback();
+        }
+    }, 700);
 }
 
 function playSong(index) {
@@ -2324,9 +3119,11 @@ function playSong(index) {
 
     currentSong = index;
     updateSideCovers();
+    updateVerticalGhost();
 
     const song =
         songs[currentSong];
+    updateMediaSession(song);
 
 
 
@@ -2370,36 +3167,26 @@ function playSong(index) {
 
     player.src =
         encodeURI(song.file);
+    
+/* SONG INFO */
 
-
-
-    /* SONG INFO */
-
-    updateScrollingTitle(
+updateScrollingText(
+    songTitle,
     song.title || "Unknown Title"
-    );
+);
 
+updateScrollingText(
+    songArtist,
+    song.artist || "Unknown Artist"
+);
 
-    songArtist.textContent =
-        song.artist ||
-        "Unknown Artist";
+const album = song.album || "Unknown Album";
+const year = song.year || "";
 
-
-    const album =
-        song.album ||
-        "Unknown Album";
-
-
-    const year =
-        song.year ||
-        "";
-
-
-    songAlbum.textContent =
-        year
-            ? `${album} (${year})`
-            : album;
-
+updateScrollingText(
+    songAlbum,
+    year ? `${album} (${year})` : album
+);
 
 
     /* COVER */
@@ -2408,14 +3195,11 @@ function playSong(index) {
 
         const coverURL =
             encodeURI(song.cover);
-
-
         cover.src =
             coverURL;
-
-
         background.style.backgroundImage =
             `url("${coverURL}")`;
+        coverReflection.src = encodeURI(song.cover);
 
     }
     else {
@@ -2424,6 +3208,7 @@ function playSong(index) {
 
         background.style.backgroundImage =
             "none";
+        coverReflection.removeAttribute("src");
 
     }
 
@@ -2474,39 +3259,14 @@ playButton.addEventListener(
 
             player.pause();
 
+            if ("mediaSession" in navigator) {
+                navigator.mediaSession.playbackState = "paused";
+            }
+
         }
 
     }
 );
-
-
-
-/* ============================================================
-   PLAY BUTTON ICON
-   ============================================================ */
-
-player.addEventListener(
-    "play",
-    () => {
-
-        playButton.textContent =
-            "⏸";
-
-    }
-);
-
-
-player.addEventListener(
-    "pause",
-    () => {
-
-        playButton.textContent =
-            "▶";
-
-    }
-);
-
-
 
 /* ============================================================
    NEXT
@@ -2569,250 +3329,169 @@ previousButton.addEventListener("click", () => {
     });
 });
 
+
 /* ============================================================
-   MOBILE SWIPE CONTROLS
+   MOUSE DRAG + MOBILE SWIPE CONTROLS
    ============================================================ */
 
 const dragCover = document.querySelector(".cover-container");
 
-let dragStartX = 0;
-let dragStartY = 0;
-let dragDistance = 0;
+let swipeStartX = 0;
+let swipeStartY = 0;
+let swipePointerId = null;
+
+let dragDistanceX = 0;
 let dragDistanceY = 0;
-let isDraggingCover = false;
-let horizontalDrag = false;
-let verticalDrag = false;
+let swipeAxis = null;
 
-const DRAG_THRESHOLD = 0.25;
-const VERTICAL_SWIPE_THRESHOLD = 50;
+const SWIPE_THRESHOLD = 50;
 const DIRECTION_THRESHOLD = 8;
+const DRAG_THRESHOLD = 0.25;
 
-dragCover.addEventListener("pointerdown", (event) => {
-    if (event.pointerType !== "touch") return;
-
-    // Do not interrupt an existing cover animation.
-    if (
-        coverStage.classList.contains("animating-next") ||
-        coverStage.classList.contains("animating-previous")
-    ) {
+coverStage.addEventListener("pointerdown", (event) => {
+    // Keep the existing mobile behavior.
+    // Add mouse dragging on desktop.
+    if (event.pointerType === "touch") {
+        if (coverAnimating || currentSong < 0) return;
+    } else if (event.pointerType === "mouse") {
+        if (event.button !== 0 || coverAnimating || currentSong < 0) return;
+    } else {
         return;
     }
 
-    dragStartX = event.clientX;
-    dragStartY = event.clientY;
+    swipeStartX = event.clientX;
+    swipeStartY = event.clientY;
 
-    dragDistance = 0;
+    dragDistanceX = 0;
     dragDistanceY = 0;
-
-    isDraggingCover = true;
-    horizontalDrag = false;
-    verticalDrag = false;
+    swipeAxis = null;
+    swipePointerId = event.pointerId;
 
     dragCover.style.transition = "none";
-    dragCover.setPointerCapture(event.pointerId);
+
+    coverStage.setPointerCapture(event.pointerId);
+    event.preventDefault();
 });
 
-dragCover.addEventListener("pointermove", (event) => {
-    if (!isDraggingCover) return;
+coverStage.addEventListener("pointermove", (event) => {
+    if (event.pointerId !== swipePointerId) return;
 
-    const deltaX = event.clientX - dragStartX;
-    const deltaY = event.clientY - dragStartY;
+    const dx = event.clientX - swipeStartX;
+    const dy = event.clientY - swipeStartY;
 
-    // Determine the intended gesture direction once.
-    if (!horizontalDrag && !verticalDrag) {
-        if (
-            Math.max(Math.abs(deltaX), Math.abs(deltaY)) <
-            DIRECTION_THRESHOLD
-        ) {
-            return;
-        }
+    dragDistanceX = dx;
+    dragDistanceY = dy;
 
-        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-            horizontalDrag = true;
-        } else {
-            verticalDrag = true;
-        }
+    if (
+        swipeAxis === null &&
+        Math.max(Math.abs(dx), Math.abs(dy)) >= DIRECTION_THRESHOLD
+    ) {
+        swipeAxis =
+            Math.abs(dx) > Math.abs(dy)
+                ? "horizontal"
+                : "vertical";
     }
 
-    
-        /* Vertical drag: move the cover with the finger. */
-        
-if (verticalDrag) {
-    dragDistanceY = deltaY;
+    if (swipeAxis === "horizontal") {
+        const width = dragCover.getBoundingClientRect().width;
+        const rotation = dx * -0.06;
+        const scale = 1 - Math.min(
+            Math.abs(dx) / width * 0.08,
+            0.08
+        );
 
-    const coverHeight = dragCover.getBoundingClientRect().height;
+        dragCover.style.transform =
+            `translate(${dx}px, 0px) rotateY(${rotation}deg) scale(${scale})`;
+    } else if (swipeAxis === "vertical") {
+        const height = dragCover.getBoundingClientRect().height;
+        const rotation = dy * 0.04;
+        const scale = 1 - Math.min(
+            Math.abs(dy) / height * 0.08,
+            0.08
+        );
 
-    // Move the main cover with the finger.
-    const rotation = deltaY * 0.06;
-    const scale = 1 - Math.min(
-        Math.abs(deltaY) / coverHeight * 0.08,
-        0.08
-    );
-
-    dragCover.style.transform =
-        `translateY(${deltaY}px) rotateX(${rotation}deg) scale(${scale})`;
-
-    // Choose which ghost cover to reveal.
-    const draggingUp = deltaY < 0;
-
-    coverStage.classList.toggle("vertical-drag-up", draggingUp);
-    coverStage.classList.toggle("vertical-drag-down", !draggingUp);
-
-    // Make the ghost more visible as the drag progresses.
-    const opacity = Math.min(
-        Math.abs(deltaY) / VERTICAL_SWIPE_THRESHOLD,
-        1
-    );
-
-    coverStage.style.setProperty("--ghost-opacity", opacity);
-    coverStage.style.setProperty("--drag-y", `${deltaY}px`);
-
-    return;
-}
-
-
-
-    // Horizontal gestures drag the cover to change tracks.
-    dragDistance = deltaX;
-
-    const coverWidth = dragCover.getBoundingClientRect().width;
-    const rotation = deltaX * -0.06;
-    const scale = 1 - Math.min(
-        Math.abs(deltaX) / coverWidth * 0.08,
-        0.08
-    );
-
-    dragCover.style.transform =
-        `translateX(${deltaX}px) rotateY(${rotation}deg) scale(${scale})`;
+        dragCover.style.transform =
+            `translate(0px, ${dy}px) rotateX(${rotation}deg) scale(${scale})`;
+    }
 });
 
-function clearVerticalPreview() {
-    coverStage.classList.remove(
-        "vertical-drag-up",
-        "vertical-drag-down"
-    );
-
-    coverStage.style.removeProperty("--ghost-opacity");
-    coverStage.style.removeProperty("--drag-y");
+function resetCoverDrag() {
+    dragCover.style.transition = "";
+    dragCover.style.transform = "";
+    dragCover.style.removeProperty("--drag-offset");
 }
 
-function finishCoverDrag() {
-    if (!isDraggingCover) return;
+function finishCoverSwipe(event) {
+    if (event.pointerId !== swipePointerId) return;
 
-    isDraggingCover = false;
+    const dx = dragDistanceX;
+    const dy = dragDistanceY;
+    const axis = swipeAxis;
 
-    // VERTICAL DRAG: Drag albums.
-    
+    swipePointerId = null;
 
-    // VERTICAL SWIPE: change albums.
-    if (verticalDrag) {
-        const shouldChangeAlbum =
-            Math.abs(dragDistanceY) >= VERTICAL_SWIPE_THRESHOLD;
+    if (!axis) {
+        resetCoverDrag();
+        return;
+    }
 
-        clearVerticalPreview();
+    if (axis === "vertical") {
+        if (Math.abs(dy) >= SWIPE_THRESHOLD) {
+            // Reset the temporary drag before the album animation.
+            resetCoverDrag();
 
-        if (shouldChangeAlbum) {
-            dragCover.style.transition = "";
-            dragCover.style.transform = "";
-            dragCover.style.removeProperty("--drag-offset");
-
-            if (dragDistanceY < 0) {
+            if (dy < 0) {
                 nextAlbum();
             } else {
                 previousAlbum();
             }
         } else {
-            // Return to the original position.
-            dragCover.style.transition =
-                "transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)";
-
-            dragCover.style.transform =
-                "translateY(0) rotateX(0deg) scale(1)";
-
-            dragCover.addEventListener(
-                "transitionend",
-                function resetVerticalDrag() {
-                    dragCover.removeEventListener(
-                        "transitionend",
-                        resetVerticalDrag
-                    );
-
-                    dragCover.style.transition = "";
-                    dragCover.style.transform = "";
-                    dragCover.style.removeProperty("--drag-offset");
-                }
-            );
+            resetCoverDrag();
         }
 
         return;
     }
 
-
-
-    // No clear horizontal gesture.
-    if (!horizontalDrag) {
-        dragCover.style.transition = "";
-        dragCover.style.transform = "";
-        return;
-    }
-
-    // HORIZONTAL SWIPE: change tracks.
-    const coverWidth = dragCover.getBoundingClientRect().width;
-    const threshold = coverWidth * DRAG_THRESHOLD;
-
-    if (Math.abs(dragDistance) >= threshold) {
-        // Preserve the dragged position for the exit animation.
-        dragCover.style.setProperty(
-            "--drag-offset",
-            `${dragDistance}px`
+    if (axis === "horizontal") {
+        const width = dragCover.getBoundingClientRect().width;
+        const threshold = Math.max(
+            SWIPE_THRESHOLD,
+            width * DRAG_THRESHOLD
         );
 
-        // Let the CSS animation take over.
-        dragCover.style.transform = "";
+        if (Math.abs(dx) >= threshold) {
+            // Preserve the released position for the existing animation.
+            dragCover.style.setProperty("--drag-offset", `${dx}px`);
 
-        if (dragDistance < 0) {
-            nextButton.click();
+            if (dx < 0) {
+                nextButton.click();
+            } else {
+                previousButton.click();
+            }
         } else {
-            previousButton.click();
+            dragCover.style.transition =
+                "transform 0.25s cubic-bezier(0.22, 1, 0.36, 1)";
+
+            dragCover.style.transform =
+                "translate(0px, 0px) rotateY(0deg) scale(1)";
+
+            dragCover.addEventListener("transitionend", function resetDrag() {
+                dragCover.removeEventListener("transitionend", resetDrag);
+                resetCoverDrag();
+            }, { once: true });
         }
-
-        return;
     }
-
-    // The horizontal swipe was too short: return the cover.
-    dragCover.style.transition =
-        "transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)";
-
-    dragCover.style.transform =
-        "translateX(0) rotateY(0deg) scale(1)";
-
-    dragCover.addEventListener("transitionend", function resetDrag() {
-        dragCover.removeEventListener("transitionend", resetDrag);
-        dragCover.style.transition = "";
-        dragCover.style.transform = "";
-        dragCover.style.removeProperty("--drag-offset");
-    });
 }
 
-dragCover.addEventListener("pointerup", finishCoverDrag);
+coverStage.addEventListener("pointerup", finishCoverSwipe);
 
+coverStage.addEventListener("pointercancel", (event) => {
+    if (event.pointerId !== swipePointerId) return;
 
-dragCover.addEventListener("pointercancel", () => {
-    isDraggingCover = false;
-    horizontalDrag = false;
-    verticalDrag = false;
-
-    clearVerticalPreview();
-
-    dragCover.style.transition =
-        "transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)";
-
-    dragCover.style.transform = "";
-    dragCover.style.removeProperty("--drag-offset");
+    swipePointerId = null;
+    swipeAxis = null;
+    resetCoverDrag();
 });
-
-
-
 
 
 /* ============================================================
