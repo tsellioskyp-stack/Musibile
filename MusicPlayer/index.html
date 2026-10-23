@@ -1101,6 +1101,39 @@ transform-origin: center center;
     border-color: #777;
 }
 
+/* FAVORITE BUTTON */
+#favoriteButton.active {
+    color: #999;
+    background: #303030;
+    border-color: #777;
+}
+
+#favoriteButton.active svg {
+    fill: currentColor;
+}
+
+#favoriteButton:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+
+/* Spin the artwork independently of the cover-carousel transforms. */
+#cover.favorite-spin {
+    animation: favorite-cover-spin 700ms ease-in-out;
+    backface-visibility: visible;
+}
+
+@keyframes favorite-cover-spin {
+    from { transform: rotateY(0deg); }
+    to   { transform: rotateY(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #cover.favorite-spin {
+        animation-duration: 1ms;
+    }
+}
+
 /* PREVIOUS, PLAY, NEXT — CENTER, VOLUME */
 
 .main-controls {
@@ -1872,6 +1905,38 @@ button:focus-visible {
         }
     }
 
+    /* Mobile: position favorite button opposite playback mode */
+@media (max-width: 700px) {
+    .controls {
+        grid-template-columns: 46px minmax(0, 1fr) 46px;
+        gap: 4px;
+        align-items: center;
+    }
+
+    .left-controls {
+        display: contents;
+    }
+
+    #playbackModeButton {
+        grid-column: 1;
+        grid-row: 1;
+        justify-self: start;
+    }
+
+    .main-controls {
+        grid-column: 2;
+        grid-row: 1;
+        justify-self: center;
+        gap: 8px;
+    }
+
+    #favoriteButton {
+        grid-column: 3;
+        grid-row: 1;
+        justify-self: end;
+    }
+}
+
     </style>
 
 </head>
@@ -2128,10 +2193,23 @@ button:focus-visible {
                  M4 18h2.5a4 4 0 0 0 2.5-1"/>
     </svg>
 </button>
+        <button
+            id="favoriteButton"
+            class="control-button"
+            type="button"
+            aria-label="Like this song"
+            aria-pressed="false"
+            title="Like this song"
+            disabled
+        >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
+            </svg>
+        </button>
     </div>
 
 
-<div class="main-controls">
+ <div class="main-controls">
     <button id="previousButton" class="control-button" aria-label="Previous track">
     <svg viewBox="0 0 24 24" aria-hidden="true">
         <path fill="currentColor" d="M6 5h2v14H6z M19 5v14L9 12z"/>
@@ -2198,6 +2276,11 @@ let playbackMode = "sequential";
 
 const playbackModeButton = document.getElementById("playbackModeButton");
 const playbackModeIcon = document.getElementById("playbackModeIcon");
+const favoriteButton = document.getElementById("favoriteButton");
+
+// Flask runs separately from the static HTML server, on port 5000.
+const favoritesApiUrl =
+    `${window.location.protocol}//${window.location.hostname}:5000/api/favorites`;
 
 const playbackModeIcons = {
     sequential: `
@@ -3306,6 +3389,7 @@ function playSong(index) {
 
     const song =
         songs[currentSong];
+    updateFavoriteButton();
     updateMediaSession(song);
 
 
@@ -3374,6 +3458,7 @@ updateScrollingText(
 
     /* COVER */
 
+    cover.classList.remove("favorite-spin");
     if (song.cover) {
 
         const coverURL =
@@ -3410,6 +3495,84 @@ updateScrollingText(
 }
 
 
+
+/* ============================================================
+   FAVORITES
+   ============================================================ */
+
+let favoriteRequestInProgress = false;
+let lastCoverTapTime = 0;
+let coverTapStartedOnArtwork = false;
+
+function updateFavoriteButton() {
+    const song = songs[currentSong];
+    const isFavorite = Boolean(song && song.favorite);
+
+    favoriteButton.classList.toggle("active", isFavorite);
+    favoriteButton.setAttribute("aria-pressed", String(isFavorite));
+    favoriteButton.setAttribute(
+        "aria-label",
+        isFavorite ? "Unlike this song" : "Like this song"
+    );
+    favoriteButton.title = isFavorite ? "Unlike this song" : "Like this song";
+    favoriteButton.disabled = currentSong < 0 || favoriteRequestInProgress;
+}
+
+function spinAlbumCover() {
+    // Restart the animation even if the user likes another song quickly.
+    cover.classList.remove("favorite-spin");
+    void cover.offsetWidth;
+    cover.classList.add("favorite-spin");
+}
+
+cover.addEventListener("animationend", (event) => {
+    if (event.animationName === "favorite-cover-spin") {
+        cover.classList.remove("favorite-spin");
+    }
+});
+
+async function toggleFavorite() {
+    const song = songs[currentSong];
+
+    if (!song || !song.file || favoriteRequestInProgress) return;
+
+    const nextFavorite = !Boolean(song.favorite);
+    favoriteRequestInProgress = true;
+    updateFavoriteButton();
+
+    try {
+        const response = await fetch(favoritesApiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                file: song.file,
+                favorite: nextFavorite
+            })
+        });
+
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok || result.success !== true) {
+            throw new Error(result.error || `HTTP ${response.status}`);
+        }
+
+        // Update the in-memory library only after Flask confirms the save.
+        song.favorite = nextFavorite;
+        updateFavoriteButton();
+
+        if (nextFavorite) {
+            spinAlbumCover();
+        }
+    } catch (error) {
+        console.error("Could not update favorite status:", error);
+        favoriteButton.title = "Could not save favorite — check that favorites_api.py is running";
+    } finally {
+        favoriteRequestInProgress = false;
+        updateFavoriteButton();
+    }
+}
+
+favoriteButton.addEventListener("click", toggleFavorite);
 
 /* ============================================================
    PLAY / PAUSE
@@ -3541,6 +3704,7 @@ let swipePointerId = null;
 let dragDistanceX = 0;
 let dragDistanceY = 0;
 let swipeAxis = null;
+let tapStartedOnArtwork = false;
 
 const SWIPE_THRESHOLD = 50;
 const DIRECTION_THRESHOLD = 8;
@@ -3559,6 +3723,7 @@ coverStage.addEventListener("pointerdown", (event) => {
 
     swipeStartX = event.clientX;
     swipeStartY = event.clientY;
+    tapStartedOnArtwork = event.target === cover;
 
     dragDistanceX = 0;
     dragDistanceY = 0;
@@ -3630,8 +3795,23 @@ function finishCoverSwipe(event) {
 
     if (!axis) {
         resetCoverDrag();
+
+        // Two quick taps/clicks directly on the artwork toggle its favorite state.
+        if (tapStartedOnArtwork && event.pointerType !== "pen") {
+            const now = performance.now();
+            if (now - lastCoverTapTime <= 320) {
+                lastCoverTapTime = 0;
+                toggleFavorite();
+            } else {
+                lastCoverTapTime = now;
+            }
+        }
+
+        tapStartedOnArtwork = false;
         return;
     }
+
+    tapStartedOnArtwork = false;
 
     if (axis === "vertical") {
         if (Math.abs(dy) >= SWIPE_THRESHOLD) {
