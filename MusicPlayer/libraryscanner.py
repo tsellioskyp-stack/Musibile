@@ -236,6 +236,7 @@ def scan_library(music_folder: str) -> None:
                     "sample_rate": sample_rate,
                     "length": length,
                     "file_type": file_type,
+                    "favorite": False,
                 }
             )
 
@@ -355,6 +356,7 @@ def update_library(music_folder: str, valid_folders: list) -> None:
                                 else None
                             ),
                             "file_type": pathlib.Path(full_path).suffix,
+                            "favorite": False,
                         }
                     )
 
