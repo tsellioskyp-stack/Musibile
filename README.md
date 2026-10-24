@@ -341,7 +341,7 @@ The interface features a **dark theme**, album artwork, a blurred artwork backgr
 - **Album Artwork** — Display album covers with animated transitions and surrounding artwork previews.
 - **Playback Controls** — Play, pause, skip tracks, adjust volume, and monitor playback progress.
 - **Playback Modes** — Switch between sequential playback, shuffle, and repeat-current-track modes.
-- **Favorites - Liked SOngs** - Like / Un-like a track and update it's metadata in music.json file in real time
+- **Favorites - Liked Songs** - Like / Un-like a track and update it's metadata in the music.json file in real time
 - **Album Navigation** — Scroll or swipe vertically through albums, with animated cover transitions and previews of neighboring albums.
 - **Track Navigation** — Move between tracks using playback controls, with horizontal album artwork previews.
 - **Visual Effects** — Real-time audio spectrum visualization and a blurred album-art background.
@@ -354,7 +354,7 @@ The interface features a **dark theme**, album artwork, a blurred artwork backgr
 **Musibile** can be set up using nothing more than a directory containing your music library. You do not need an existing `music.json` file or a preconfigured database to begin.
 
 1. **Prepare your music library:** Place your music files in a directory, preferably organized into folders by artist and album. Musibile supports `.FLAC`, `.MP3`, and `.M4A` files.
-2. **Configure and scan your library:** Set the music directory in the scanner's configuration (as in-line arhuments) so it points to your collection. Run the library scanner to discover your tracks, extract their metadata and embedded artwork, and generate the initial `music.json` file. This step can be performed to UPDATE your `music.json`, after having it already created. This is to append new insertions in the `music.json` for newly added albums, without having to re-parse the whole music library!
+2. **Configure and scan your library:** Set the music directory in the scanner's configuration (as in-line arguments) so it points to your collection. Run the library scanner to discover your tracks, extract their metadata and embedded artwork, and generate the initial `music.json` file. This step can be performed to UPDATE your `music.json`, after having it already created. This is to append new insertions in the `music.json` for newly added albums, without having to re-parse the whole music library!
 3. **Initialize the database:** Run `setupdb.py` to create the database required by Musibile.
 4. **Start the server:** Run `start_server.py` to launch the backend and make your library available to the web player.
 5. **Open the player:** Navigate to the player in your browser and start browsing, searching, and playing your music.
