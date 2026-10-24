@@ -5,7 +5,19 @@ import time
 
 BASE_DIR = Path(__file__).resolve().parent
 API_SCRIPT = BASE_DIR / "favorites.py"
-LIBRARY_DIR = BASE_DIR / "songs"
+if len(sys.argv) != 2:
+    sys.exit(
+        "Please specify the path to your music library directory.\n"
+        "The database directory must be the same as your music library directory.\n"
+        "Usage: python start_server.py 'C:/Users/.../MusicLibraryFolder'"
+    )
+
+LIBRARY_DIR = Path(sys.argv[1]).resolve()
+
+if not LIBRARY_DIR.is_dir():
+    sys.exit(
+        f"Error: Music library directory / Music Library DB directory does not exist: {LIBRARY_DIR}"
+    )
 
 processes = []
 

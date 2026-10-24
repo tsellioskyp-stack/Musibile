@@ -43,13 +43,13 @@ HTML, CSS, and JavaScript — Frontend interface and playback logic.
 
 Python — Music metadata scanning, artwork extraction, and album importing.
 
+Flask (Python) - Backend that handles POST requests from the browser player, updating the favorite status of a track
+
 Mutagen — Reading audio metadata and embedded artwork.
 
 JSON — Storing and exchanging music library metadata.
 
 HTTP server — Hosting the web interface and music files.
-
-Tailscale — Optional private-network connectivity for accessing the server remotely.
 
 ## == Library Management ==
 
@@ -333,6 +333,53 @@ Musibile's library scanner is designed to support large personal music collectio
 Musibile includes a custom-built, browser-based music player designed to provide a clean, immersive way to browse and listen to a personal music library. Built with **HTML, CSS, and JavaScript**, the player runs directly in the browser without requiring a dedicated desktop application.
 
 The interface features a **dark theme**, album artwork, a blurred artwork background, and a collapsible music library organized by **album artist → album → track**. Search functionality makes it easy to find songs by title, artist, album, or genre.
+
+---
+
+## Backend API & Favorites
+
+Musibile includes a **Python-powered backend built with Flask** to handle requests from the web-based music player. This allows the frontend to interact with the music library and persist changes directly to `music.json`.
+
+### Features
+
+- **Flask API** — Provides backend endpoints for communication between the HTML player and the Python server.
+- **POST Requests** — Accepts requests from the player to update music library data.
+- **Favorite Tracks** — Like and unlike individual tracks directly from the player interface.
+- **Persistent Favorites** — Favorite status is saved to `music.json`, allowing liked tracks to remain marked after refreshing the player or restarting the server.
+- **Favorites Filtering** — Browse your library to find favorited tracks more easily.
+
+### Backend Scripts
+
+| Script | Purpose |
+|---|---|
+| `favorites.py` | Handles favorite-track functionality and updates favorite status through the Flask API. |
+| `setup_db.py` | Sets up the project's database environment. |
+| `start_server.py` | Launches the server components required to run Musibile. |
+
+### How It Works
+
+1. The player sends a `POST` request to the Flask backend when a track's favorite status changes.
+2. The backend processes the request and updates the corresponding track entry in `music.json`.
+3. The updated favorite status is saved to disk.
+4. The player updates its interface after receiving confirmation from the backend.
+
+This approach keeps favorite management connected to the existing music library, without requiring a separate favorites file.
+
+### Running the Server
+
+Use `start_server.py` to launch the server components from your Python environment:
+
+```bash
+python start_server.py
+```
+
+Make sure the required Python dependencies are installed and the project paths are configured correctly before starting the server.
+
+---
+
+## Future Development
+
+Musibile is designed to evolve alongside the needs of its music library. Planned improvements may include **custom playlists**, more efficient library updates, and additional playback features while preserving the project's self-hosted approach.
 
 ### Features
 

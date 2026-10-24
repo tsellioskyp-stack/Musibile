@@ -66,11 +66,60 @@
         }
 
 
+        .library-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
         .library-title {
             font-size: 22px;
             font-weight: bold;
+            margin-bottom: 0;
+        }
 
-            margin-bottom: 15px;
+        #favoritesFilterButton {
+            width: 32px;
+            height: 32px;
+            flex: 0 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            background: #171717;
+            color: #888;
+            border: 1px solid #333;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #favoritesFilterButton svg {
+            width: 17px;
+            height: 17px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        #favoritesFilterButton:hover {
+            background: #222;
+            color: #ddd;
+        }
+
+        #favoritesFilterButton.active {
+            background: #303030;
+            color: #999;
+            border-color: #777;
+        }
+
+        #favoritesFilterButton.active svg {
+            fill: currentColor;
         }
 
 
@@ -1124,8 +1173,8 @@ transform-origin: center center;
 }
 
 @keyframes favorite-cover-spin {
-    from { transform: rotateY(0deg); }
-    to   { transform: rotateY(360deg); }
+    from { transform: rotateZ(0deg); }
+    to   { transform: rotateZ(360deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1903,37 +1952,44 @@ button:focus-visible {
         .right-controls {
             display: none;
         }
+
+        /* Mobile: playback mode left, track controls centered, favorite right. */
+        .controls {
+            grid-template-columns: 46px minmax(0, 1fr) 46px;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .left-controls {
+            display: contents;
+        }
+
+        #playbackModeButton {
+            grid-column: 1;
+            grid-row: 1;
+            justify-self: start;
+        }
+
+        .main-controls {
+            grid-column: 2;
+            grid-row: 1;
+            justify-self: center;
+            gap: 8px;
+        }
+
+        #favoriteButton {
+            grid-column: 3;
+            grid-row: 1;
+            justify-self: end;
+        }
     }
 
-    /* Mobile: position favorite button opposite playback mode */
-@media (max-width: 700px) {
-    .controls {
-        grid-template-columns: 46px minmax(0, 1fr) 46px;
-        gap: 4px;
-        align-items: center;
-    }
-
-    .left-controls {
-        display: contents;
-    }
-
-    #playbackModeButton {
-        grid-column: 1;
-        grid-row: 1;
-        justify-self: start;
-    }
-
-    .main-controls {
-        grid-column: 2;
-        grid-row: 1;
-        justify-self: center;
-        gap: 8px;
-    }
-
-    #favoriteButton {
-        grid-column: 3;
-        grid-row: 1;
-        justify-self: end;
+    @media (max-width: 700px) {
+    #favoritesFilterButton {
+        position: fixed;
+        top: 20px;
+        left: min(218px, calc(85vw - 102px));
+        z-index: 1003;
     }
 }
 
@@ -1969,8 +2025,22 @@ button:focus-visible {
 
         <div class="library-header">
 
-            <div class="library-title">
-                Library
+            <div class="library-title-row">
+                <div class="library-title">
+                    Library
+                </div>
+
+                <button
+                    id="favoritesFilterButton"
+                    type="button"
+                    aria-label="Show favorite songs only"
+                    aria-pressed="false"
+                    title="Show favorite songs only"
+                >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
+                    </svg>
+                </button>
             </div>
 
 
@@ -2447,6 +2517,12 @@ const search =
     document.getElementById("search");
 
 
+const favoritesFilterButton =
+    document.getElementById("favoritesFilterButton");
+
+let showFavoritesOnly = false;
+
+
 const progress =
     document.getElementById("progress");
 
@@ -2745,15 +2821,13 @@ function renderLibrary(filter = "") {
 
             const matchingSongs =
                 albumSongs.filter(song =>
-                    matchesSearch(
-                        song,
-                        query
-                    )
+                    (!showFavoritesOnly || Boolean(song.favorite)) &&
+                    matchesSearch(song, query)
                 );
 
 
             if (
-                query &&
+                (query || showFavoritesOnly) &&
                 matchingSongs.length === 0
             ) {
 
@@ -2800,7 +2874,7 @@ function renderLibrary(filter = "") {
 
 
             const visibleSongs =
-                query
+                (query || showFavoritesOnly)
                     ? matchingSongs
                     : albumSongs;
 
@@ -2924,15 +2998,11 @@ function renderLibrary(filter = "") {
 
 
         if (
-            !query ||
-            albumsElement.children.length > 0
-        ) {
-
-            libraryElement.appendChild(
-                artistElement
-            );
-
-        }
+    (!query && !showFavoritesOnly) ||
+    albumsElement.children.length > 0
+) {
+    libraryElement.appendChild(artistElement);
+}
 
     });
 
@@ -2985,6 +3055,23 @@ search.addEventListener(
 
     }
 );
+
+
+favoritesFilterButton.addEventListener("click", () => {
+    showFavoritesOnly = !showFavoritesOnly;
+
+    favoritesFilterButton.classList.toggle("active", showFavoritesOnly);
+    favoritesFilterButton.setAttribute("aria-pressed", String(showFavoritesOnly));
+    favoritesFilterButton.setAttribute(
+        "aria-label",
+        showFavoritesOnly ? "Show all songs" : "Show favorite songs only"
+    );
+    favoritesFilterButton.title = showFavoritesOnly
+        ? "Show all songs"
+        : "Show favorite songs only";
+
+    renderLibrary(search.value);
+});
 
 
 
@@ -3558,6 +3645,23 @@ async function toggleFavorite() {
 
         // Update the in-memory library only after Flask confirms the save.
         song.favorite = nextFavorite;
+
+        // buildLibrary() stores copies, so sync the matching library entry too.
+        Object.values(library).forEach(albums => {
+            Object.values(albums).forEach(albumSongs => {
+                albumSongs.forEach(track => {
+                    if (track.index === currentSong) {
+                        track.favorite = nextFavorite;
+                    }
+                });
+            });
+        });
+
+        // If filtering favorites, immediately reflect a like/unlike in the list.
+        if (showFavoritesOnly) {
+            renderLibrary(search.value);
+        }
+
         updateFavoriteButton();
 
         if (nextFavorite) {
