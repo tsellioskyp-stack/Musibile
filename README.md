@@ -43,13 +43,13 @@ HTML, CSS, and JavaScript — Frontend interface and playback logic.
 
 Python — Music metadata scanning, artwork extraction, and album importing.
 
-Flask (Python) - Backend that handles POST requests from the browser player, updating the favorite status of a track
-
 Mutagen — Reading audio metadata and embedded artwork.
 
 JSON — Storing and exchanging music library metadata.
 
 HTTP server — Hosting the web interface and music files.
+
+Tailscale — Optional private-network connectivity for accessing the server remotely.
 
 ## == Library Management ==
 
@@ -99,6 +99,7 @@ Built as a personal project to combine music, programming, and self-hosted infra
 
 - Python 3
 - Mutagen, for reading audio metadata and embedded artwork
+- Flask and Flask CORS, for the backend
 - An existing music library directory
 
 Install the required dependency from your project's virtual environment:
@@ -334,64 +335,32 @@ Musibile includes a custom-built, browser-based music player designed to provide
 
 The interface features a **dark theme**, album artwork, a blurred artwork background, and a collapsible music library organized by **album artist → album → track**. Search functionality makes it easy to find songs by title, artist, album, or genre.
 
----
-
-## Backend API & Favorites
-
-Musibile includes a **Python-powered backend built with Flask** to handle requests from the web-based music player. This allows the frontend to interact with the music library and persist changes directly to `music.json`.
-
-### Features
-
-- **Flask API** — Provides backend endpoints for communication between the HTML player and the Python server.
-- **POST Requests** — Accepts requests from the player to update music library data.
-- **Favorite Tracks** — Like and unlike individual tracks directly from the player interface.
-- **Persistent Favorites** — Favorite status is saved to `music.json`, allowing liked tracks to remain marked after refreshing the player or restarting the server.
-- **Favorites Filtering** — Browse your library to find favorited tracks more easily.
-
-### Backend Scripts
-
-| Script | Purpose |
-|---|---|
-| `favorites.py` | Handles favorite-track functionality and updates favorite status through the Flask API. |
-| `setup_db.py` | Sets up the project's database environment. |
-| `start_server.py` | Launches the server components required to run Musibile. |
-
-### How It Works
-
-1. The player sends a `POST` request to the Flask backend when a track's favorite status changes.
-2. The backend processes the request and updates the corresponding track entry in `music.json`.
-3. The updated favorite status is saved to disk.
-4. The player updates its interface after receiving confirmation from the backend.
-
-This approach keeps favorite management connected to the existing music library, without requiring a separate favorites file.
-
-### Running the Server
-
-Use `start_server.py` to launch the server components from your Python environment:
-
-```bash
-python start_server.py
-```
-
-Make sure the required Python dependencies are installed and the project paths are configured correctly before starting the server.
-
----
-
-## Future Development
-
-Musibile is designed to evolve alongside the needs of its music library. Planned improvements may include **custom playlists**, more efficient library updates, and additional playback features while preserving the project's self-hosted approach.
-
 ### Features
 
 - **Music Library Browser** — Browse albums and tracks through a collapsible library tree.
 - **Album Artwork** — Display album covers with animated transitions and surrounding artwork previews.
 - **Playback Controls** — Play, pause, skip tracks, adjust volume, and monitor playback progress.
 - **Playback Modes** — Switch between sequential playback, shuffle, and repeat-current-track modes.
+- **Favorites - Liked SOngs** - Like / Un-like a track and update it's metadata in music.json file in real time
 - **Album Navigation** — Scroll or swipe vertically through albums, with animated cover transitions and previews of neighboring albums.
 - **Track Navigation** — Move between tracks using playback controls, with horizontal album artwork previews.
 - **Visual Effects** — Real-time audio spectrum visualization and a blurred album-art background.
 - **Buffering Information** — Monitor playback buffering and network transfer activity.
 - **Responsive Interface** — A mobile-friendly layout with touch gestures and adapted controls for smaller screens.
 - **Local Music Streaming** — Stream music hosted on a personal computer over the home network, with remote access possible through a private network connection.
+
+## Getting Started from Scratch
+
+**Musibile** can be set up using nothing more than a directory containing your music library. You do not need an existing `music.json` file or a preconfigured database to begin.
+
+1. **Prepare your music library:** Place your music files in a directory, preferably organized into folders by artist and album. Musibile supports `.FLAC`, `.MP3`, and `.M4A` files.
+2. **Configure and scan your library:** Set the music directory in the scanner's configuration (as in-line arhuments) so it points to your collection. Run the library scanner to discover your tracks, extract their metadata and embedded artwork, and generate the initial `music.json` file. This step can be performed to UPDATE your `music.json`, after having it already created. This is to append new insertions in the `music.json` for newly added albums, without having to re-parse the whole music library!
+3. **Initialize the database:** Run `setupdb.py` to create the database required by Musibile.
+4. **Start the server:** Run `start_server.py` to launch the backend and make your library available to the web player.
+5. **Open the player:** Navigate to the player in your browser and start browsing, searching, and playing your music.
+
+Once the initial setup is complete, you can stream your collection, manage favorite tracks, and use the available playback features. When adding new albums later, use the library update workflow to add them without rescanning your entire collection.
+
+**Note:** The exact commands and configuration depend on the scanner and server setup included in your installation.
 
 Enjoy!
