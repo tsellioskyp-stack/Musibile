@@ -2716,6 +2716,8 @@ let currentSong = -1;
 
 let playbackMode = "sequential";
 
+let playlistQueue = null;
+
 const playbackModeButton = document.getElementById("playbackModeButton");
 const playbackModeIcon = document.getElementById("playbackModeIcon");
 const favoriteButton = document.getElementById("favoriteButton");
@@ -3316,7 +3318,7 @@ function renderLibrary(filter = "") {
                     event => {
 
                         event.stopPropagation();
-
+                        playlistQueue = null;
                         playSong(song.index);
 
                     }
@@ -3581,8 +3583,16 @@ trackResult.tracks.forEach(track => {
 
     if (song) {
         entry.addEventListener("click", () => {
-            playSong(songIndex);
-        });
+    if (songIndex === -1) return;
+
+    playlistQueue = trackResult.tracks
+        .map(track =>
+            songs.findIndex(song => song.file === track.file)
+        )
+        .filter(index => index !== -1);
+
+    playSong(songIndex);
+});
     }
 
     tracksList.appendChild(entry);
@@ -4507,6 +4517,18 @@ function nextSong() {
     if (playbackMode === "repeat") {
     playSong(currentSong);
     return;
+}
+
+    if (playlistQueue) {
+    const position = playlistQueue.indexOf(currentSong);
+
+    if (position !== -1 && position < playlistQueue.length - 1) {
+        playSong(playlistQueue[position + 1]);
+    } else {
+        playlistQueue = null;
+    }
+
+    if (playlistQueue) return;
 }
 
     if (playbackMode === "shuffle") {
