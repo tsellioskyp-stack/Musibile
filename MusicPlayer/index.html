@@ -2366,7 +2366,52 @@ button:focus-visible {
     color: #999;
 }
 
+.toast-notification {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 10000;
 
+    max-width: min(360px, calc(100vw - 48px));
+    padding: 12px 16px;
+
+    background: #252525;
+    color: #eee;
+    border: 1px solid #404040;
+    border-radius: 8px;
+
+    font-size: 13px;
+    box-shadow: 0 6px 20px #0006;
+
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.toast-notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast-notification.error {
+    border-color: #713737;
+    color: #ff7777;
+}
+
+.toast-notification.success {
+    border-color: #356344;
+    color: #8ee0a5;
+}
+
+@media (max-width: 600px) {
+    .toast-notification {
+        right: 16px;
+        bottom: 20px;
+        left: 16px;
+        max-width: none;
+    }
+}
     </style>
 
 </head>
@@ -2441,9 +2486,9 @@ button:focus-visible {
                 <button
                     id="favoritesFilterButton"
                     type="button"
-                    aria-label="Show favorite songs only"
+                    aria-label="Favorite Tracks"
                     aria-pressed="false"
-                    title="Show favorite songs only"
+                    title="Favorite Tracks"
                 >
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
@@ -3636,7 +3681,7 @@ deleteButton.addEventListener("click", async event => {
 
         await loadPlaylists();
     } catch (error) {
-        alert(error.message);
+        showToast(error.message, "error");
     }
 });
 
@@ -3661,10 +3706,10 @@ renameButton.addEventListener("click", async event => {
         if (!response.ok || result.success !== true) {
             throw new Error(result.error || "Could not rename playlist.");
         }
-
+        showToast("Playlist Renamed Successfully.", "success");
         await loadPlaylists();
     } catch (error) {
-        alert(error.message);
+        showToast(error.message, "error");
     }
 });
 
@@ -3689,10 +3734,10 @@ duplicateButton.addEventListener("click", async event => {
         if (!response.ok || result.success !== true) {
             throw new Error(result.error || "Could not duplicate playlist.");
         }
-
+        showToast("Playlist Duplicated Successfully.", "success");
         await loadPlaylists();
     } catch (error) {
-        alert(error.message);
+        showToast(error.message, "error");
     }
 });
 
@@ -3837,7 +3882,7 @@ const quickAddPlaylistMenu =
 
 quickAddPlaylistButton.addEventListener("click", async () => {
     if (currentSong < 0 || !songs[currentSong]) {
-        alert("Play a track first.");
+        showToast("Play a track first!");
         return;
     }
 
@@ -3911,7 +3956,7 @@ quickAddPlaylistButton.addEventListener("click", async () => {
                     }, 600);
 
                 } catch (error) {
-                    alert(error.message);
+                    showToast(error.message, "error");
                     item.disabled = false;
                     item.textContent = name;
                 }
@@ -4043,11 +4088,11 @@ favoritesFilterButton.addEventListener("click", () => {
     favoritesFilterButton.setAttribute("aria-pressed", String(showFavoritesOnly));
     favoritesFilterButton.setAttribute(
         "aria-label",
-        showFavoritesOnly ? "Show all songs" : "Show favorite songs only"
+        showFavoritesOnly ? "Show all songs" : "Favorite Tracks"
     );
     favoritesFilterButton.title = showFavoritesOnly
         ? "Show all songs"
-        : "Show favorite songs only";
+        : "Favorite Tracks";
 
     renderLibrary(search.value);
 });
@@ -5713,9 +5758,33 @@ document.addEventListener("keydown", (event) => {
     }
 });
 
+let toastTimeout;
+
+function showToast(message, type = "") {
+    const toast = document.getElementById("toastNotification");
+
+    toast.textContent = message;
+    toast.className = "toast-notification";
+
+    if (type) {
+        toast.classList.add(type);
+    }
+
+    // Restart the animation if another toast is already visible.
+    void toast.offsetWidth;
+
+    toast.classList.add("show");
+
+    clearTimeout(toastTimeout);
+
+    toastTimeout = setTimeout(() => {
+        toast.classList.remove("show");
+    }, 3000);
+}
 
 </script>
 
+<div id="toastNotification" class="toast-notification"></div>
 
 </body>
 

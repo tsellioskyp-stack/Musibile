@@ -270,6 +270,7 @@ def scan_library(music_folder: str) -> None:
 def update_library(music_folder: str, valid_folders: list) -> None:
     project_folder = os.path.dirname(music_folder)
     json_path = os.path.join(music_folder, "music.json")
+    update_json_path = os.path.join(music_folder, "updates.json")
     existing_songs_paths_path = os.path.join(music_folder, "existing_songs_paths.txt")
     songs = []
 
@@ -360,7 +361,11 @@ def update_library(music_folder: str, valid_folders: list) -> None:
                         }
                     )
 
-        # Update already existing music.json
+        # Update already existing music.json but first create a updates.json to use in the update database script
+
+        # Create an "update.json" in the music folder directory
+        with open(update_json_path, "w", encoding="utf-8") as u:
+            json.dump(songs, u, indent=4, ensure_ascii=False)
 
         try:
 

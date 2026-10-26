@@ -2,7 +2,7 @@ import sqlite3, json, sys, os
 
 if len(sys.argv) != 2:
     sys.exit(
-        "Usage: python favorites_api.py [Path to music library where all the albums and .json file are, and where the databse will be stored (e.g. C://Users/Music)"
+        "Usage: python setupdb.py [Path to music library where all the albums and .json files are, and where the database will be stored (e.g.: python setupdb.py 'C:/Users/Music')"
     )
 if not os.path.isdir(sys.argv[1]):
     sys.exit("Path to music library does not exist!")
