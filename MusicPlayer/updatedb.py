@@ -36,6 +36,8 @@ cursor = conn.cursor()
 
 ### INSERT into DB ###################################################################
 
+inserted = []
+ignored = []
 with open(UPDATE_JSON_PATH, "r", encoding="utf-8") as updates:
     tracks = json.load(updates)
     for track in tracks:
@@ -76,9 +78,21 @@ with open(UPDATE_JSON_PATH, "r", encoding="utf-8") as updates:
                 track["favorite"],
             ),
         )
+        (
+            ignored.append(track["file"])
+            if cursor.rowcount == 0
+            else inserted.append(track["file"])
+        )
+
 conn.commit()
 conn.close()
 os.remove(UPDATE_JSON_PATH)
 print(
-    f"Your database was successfully updated! All the scheduled album updates in updates.json were commited, and the updates.json was deleted!"
+    f"\n{"=" * os.get_terminal_size().columns}\nYour database was successfully updated! All the scheduled album updates in updates.json were commited, and the updates.json was deleted!\n{"=" * os.get_terminal_size().columns}\n"
 )
+print(f"Tracks added to the database: \n")
+for i in inserted:
+    print(i)
+print(f"Tracks that were duplicates in the database (ignored): \n")
+for i in ignored:
+    print(f"\t{i}")
