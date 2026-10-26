@@ -69,8 +69,8 @@
         .library-title-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 10px;
+            justify-content: flex-start;
+            gap: 6px;
             margin-bottom: 15px;
         }
 
@@ -78,6 +78,7 @@
             font-size: 22px;
             font-weight: bold;
             margin-bottom: 0;
+            margin-right: auto;
         }
 
         #favoritesFilterButton {
@@ -120,6 +121,194 @@
 
         #favoritesFilterButton.active svg {
             fill: currentColor;
+        }
+
+
+        #playlistsButton {
+            width: 32px;
+            height: 32px;
+            flex: 0 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            background: #171717;
+            color: #888;
+            border: 1px solid #333;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #playlistsButton svg {
+            width: 17px;
+            height: 17px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        #playlistsButton:hover,
+        #playlistsButton.active {
+            background: #222;
+            color: #ddd;
+            border-color: #777;
+        }
+
+        #playlistsPanel {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 10px 20px 20px;
+        }
+
+        #playlistsPanel[hidden],
+        #library[hidden] {
+            display: none !important;
+        }
+
+        .playlist-item {
+    margin-bottom: 3px;
+}
+
+.playlist-entry {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 10px;
+    text-align: left;
+    background: transparent;
+    color: #ccc;
+    border: 0;
+    border-radius: 6px;
+    font: inherit;
+    cursor: pointer;
+}
+
+.playlist-entry:hover,
+.playlist-item.open > .playlist-entry {
+    background: #1d1d1d;
+    color: white;
+}
+
+.playlist-arrow {
+    display: inline-block;
+    width: 12px;
+    flex-shrink: 0;
+    font-size: 10px;
+    transition: transform 0.15s ease;
+}
+
+.playlist-item.open .playlist-arrow {
+    transform: rotate(90deg);
+}
+
+.playlist-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.playlist-track {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    text-align: left;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.playlist-track:disabled {
+    cursor: default;
+}
+
+.playlist-tracks .song {
+    margin: 0;
+}
+
+.playlist-tracks .song-title {
+    flex: 1;
+    min-width: 0;
+}
+
+.playlist-tracks .song-artist {
+    flex: 0 1 40%;
+    text-align: right;
+}
+
+.playlist-tracks .song + .song {
+    border-top: 1px solid #1d1d1d;
+}
+
+.playlist-tracks .song:hover {
+    background: #1b1b1b;
+}
+
+
+        #createPlaylistArea {
+            margin-top: 10px;
+            padding: 10px;
+            border-top: 1px solid #252525;
+        }
+
+        #createPlaylistToggle {
+            padding: 0;
+            background: none;
+            color: #aaa;
+            border: 0;
+            font: italic 13px Arial, Helvetica, sans-serif;
+            cursor: pointer;
+        }
+
+        #createPlaylistToggle:hover {
+            color: white;
+        }
+
+        #createPlaylistForm {
+            margin-top: 9px;
+        }
+
+        #newPlaylistName {
+            width: 100%;
+            padding: 8px 9px;
+            color: white;
+            background: #1d1d1d;
+            border: 1px solid #444;
+            border-radius: 6px;
+            outline: none;
+            font-size: 13px;
+        }
+
+        #newPlaylistName:focus {
+            border-color: #777;
+        }
+
+        #playlistNameMessage {
+            min-height: 16px;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #888;
+            overflow-wrap: anywhere;
+        }
+
+        #playlistNameMessage.error {
+            color: #ff5c5c;
+        }
+
+        #playlistNameMessage.success {
+            color: #8acb8a;
+        }
+
+        .playlist-create-hint {
+            margin-top: 4px;
+            color: #666;
+            font-size: 11px;
         }
 
 
@@ -1007,6 +1196,13 @@ transform-origin: center center;
         .track-info-wrapper {
             position: absolute;
             left: 0;
+            top: calc(100% - 180px);
+            z-index: 20;
+        }
+
+        .track-download-wrapper {
+            position: absolute;
+            right: 0;
             top: calc(100% - 180px);
             z-index: 20;
         }
@@ -1991,7 +2187,107 @@ button:focus-visible {
         left: min(218px, calc(85vw - 102px));
         z-index: 1003;
     }
+
+    #playlistsButton {
+        position: fixed;
+        top: 20px;
+        left: calc(min(218px, calc(85vw - 102px)) - 38px);
+        z-index: 1003;
+    }
+    }
+
+    
+#quickAddPlaylistButton {
+    display: none;
 }
+
+@media (max-width: 700px) {
+    #quickAddPlaylistButton {
+        display: flex;
+        position: fixed;
+        top: 14px;
+        right: 14px;
+        z-index: 1002;
+
+        width: 44px;
+        height: 44px;
+        padding: 10px;
+        align-items: center;
+        justify-content: center;
+
+        background: rgba(25, 25, 25, 0.92);
+        color: white;
+        border: 1px solid #383838;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    #quickAddPlaylistButton svg {
+    display: block;
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    }
+}
+
+#quickAddPlaylistMenu {
+    position: fixed;
+    top: 66px;
+    right: 14px;
+    z-index: 1100;
+    width: min(240px, calc(100vw - 28px));
+    max-height: 50vh;
+    overflow-y: auto;
+    padding: 6px;
+    background: #171717;
+    border: 1px solid #383838;
+    border-radius: 10px;
+    box-shadow: 0 8px 28px #0009;
+}
+
+#quickAddPlaylistMenu[hidden] {
+    display: none;
+}
+
+#quickAddPlaylistMenu button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: white;
+    text-align: left;
+    cursor: pointer;
+}
+
+#quickAddPlaylistMenu button:hover {
+    background: #292929;
+}
+
+
+
+#quickAddPlaylistButton {
+    display: flex !important;
+    position: fixed !important;
+    top: 14px !important;
+    right: 14px !important;
+    z-index: 99999 !important;
+    width: 44px !important;
+    height: 44px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: white !important;
+    background: #222 !important;
+    border: 1px solid white !important;
+    border-radius: 10px !important;
+    font-size: 26px !important;
+}
+
 
     </style>
 
@@ -2012,6 +2308,27 @@ button:focus-visible {
     ☰
 </button>
 
+
+<button
+    id="quickAddPlaylistButton"
+    type="button"
+    aria-label="Add current track to playlist"
+    title="Add to playlist"
+>
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 6h12"/>
+        <path d="M3 11h12"/>
+        <path d="M3 16h7"/>
+        <path d="M18 14v7"/>
+        <path d="M14.5 17.5h7"/>
+    </g>
+</svg>
+</button>
+
+<div id="quickAddPlaylistMenu" hidden></div>
+
+
 <div
     id="libraryBackdrop"
     class="library-backdrop"
@@ -2029,6 +2346,19 @@ button:focus-visible {
                 <div class="library-title">
                     Library
                 </div>
+
+                <button
+                    id="playlistsButton"
+                    type="button"
+                    aria-label="Playlists"
+                    title="Playlists"
+                    aria-pressed="false"
+                >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 6h16M4 12h16M4 18h10" />
+                        <path d="M18 16v5l2-1.5 2 1.5v-5" />
+                    </svg>
+                </button>
 
                 <button
                     id="favoritesFilterButton"
@@ -2052,6 +2382,20 @@ button:focus-visible {
 
         </div>
 
+
+        <div id="playlistsPanel" hidden>
+            <div id="playlistsList" aria-live="polite"></div>
+            <div id="createPlaylistArea">
+                <button id="createPlaylistToggle" type="button">Create a Playlist</button>
+                <div id="createPlaylistForm" hidden>
+                    <input id="newPlaylistName" type="text" maxlength="64"
+                           autocomplete="off" aria-label="New playlist name"
+                           placeholder="Playlist name">
+                    <div id="playlistNameMessage" role="status" aria-live="polite"></div>
+                    <div class="playlist-create-hint">Press Enter to create</div>
+                </div>
+            </div>
+        </div>
 
         <div id="library"></div>
 
@@ -2235,6 +2579,20 @@ button:focus-visible {
             </div>
         </div>
 
+        <!-- DOWNLOAD TRACK BUTTON -->
+        <div class="track-download-wrapper">
+            <button
+                id="trackDownloadButton"
+                class="track-info-button"
+                type="button"
+                aria-label="Download Track"
+                title="Download Track"
+            >
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;">
+                    <path d="M12 3v12 M7 10l5 5 5-5 M5 17v3h14v-3" />
+                </svg>
+            </button>
+        </div>
 
             <!-- NETWORK SPEED -->
 
@@ -2347,6 +2705,7 @@ let playbackMode = "sequential";
 const playbackModeButton = document.getElementById("playbackModeButton");
 const playbackModeIcon = document.getElementById("playbackModeIcon");
 const favoriteButton = document.getElementById("favoriteButton");
+const trackDownloadButton = document.getElementById("trackDownloadButton");
 
 // Flask runs separately from the static HTML server, on port 5000.
 const favoritesApiUrl =
@@ -2519,6 +2878,15 @@ const search =
 
 const favoritesFilterButton =
     document.getElementById("favoritesFilterButton");
+const playlistsButton = document.getElementById("playlistsButton");
+const playlistsPanel = document.getElementById("playlistsPanel");
+const playlistsList = document.getElementById("playlistsList");
+const createPlaylistToggle = document.getElementById("createPlaylistToggle");
+const createPlaylistForm = document.getElementById("createPlaylistForm");
+const newPlaylistName = document.getElementById("newPlaylistName");
+const playlistNameMessage = document.getElementById("playlistNameMessage");
+const playlistsApiUrl =
+    `${window.location.protocol}//${window.location.hostname}:5001/api/playlists`;
 
 let showFavoritesOnly = false;
 
@@ -3056,6 +3424,386 @@ search.addEventListener(
     }
 );
 
+
+/* ============================================================
+   PLAYLISTS
+   ============================================================ */
+
+let playlistNameCheckRequest = 0;
+let playlistNameIsAvailable = false;
+let playlistRequestInProgress = false;
+
+function setPlaylistMessage(message = "", type = "") {
+    playlistNameMessage.textContent = message;
+    playlistNameMessage.classList.toggle("error", type === "error");
+    playlistNameMessage.classList.toggle("success", type === "success");
+}
+
+function validPlaylistName(name) {
+    // Names become SQLite table names, so allow ordinary names without SQL punctuation.
+    return /^[\p{L}\p{N} _-]{1,64}$/u.test(name);
+}
+
+
+async function loadPlaylists() {
+    playlistsList.replaceChildren();
+
+    const loading = document.createElement("div");
+    loading.className = "playlists-empty";
+    loading.textContent = "Loading playlists...";
+    playlistsList.appendChild(loading);
+
+    try {
+        const response = await fetch(playlistsApiUrl, {
+            cache: "no-store"
+        });
+        const result = await response.json();
+
+        if (!response.ok || result.success !== true) {
+            throw new Error(result.error || `HTTP ${response.status}`);
+        }
+
+        playlistsList.replaceChildren();
+
+        if (!result.playlists.length) {
+            const empty = document.createElement("div");
+            empty.className = "playlists-empty";
+            empty.textContent = "No playlists yet.";
+            playlistsList.appendChild(empty);
+            return;
+        }
+
+        result.playlists.forEach(name => {
+            const playlist = document.createElement("div");
+            playlist.className = "playlist-item";
+
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "playlist-entry";
+            button.setAttribute("aria-expanded", "false");
+
+            const arrow = document.createElement("span");
+            arrow.className = "playlist-arrow";
+            arrow.textContent = "▶";
+
+            const label = document.createElement("span");
+            label.className = "playlist-name";
+            label.textContent = name;
+
+            button.append(arrow, label);
+            button.title = name;
+
+            const tracksList = document.createElement("div");
+            tracksList.className = "playlist-tracks";
+            tracksList.hidden = true;
+
+            button.addEventListener("click", async () => {
+                const opening = !playlist.classList.contains("open");
+
+                playlist.classList.toggle("open", opening);
+                button.setAttribute("aria-expanded", String(opening));
+                tracksList.hidden = !opening;
+
+                if (!opening || tracksList.dataset.loaded === "true") {
+                    return;
+                }
+
+                tracksList.replaceChildren();
+
+                const status = document.createElement("div");
+                status.className = "playlists-empty";
+                status.textContent = "Loading songs...";
+                tracksList.appendChild(status);
+
+                try {
+                    const trackResponse = await fetch(
+                        `${playlistsApiUrl}/${encodeURIComponent(name)}/tracks`,
+                        { cache: "no-store" }
+                    );
+
+                    const trackResult = await trackResponse.json();
+
+                    if (!trackResponse.ok || trackResult.success !== true) {
+                        throw new Error(
+                            trackResult.error || `HTTP ${trackResponse.status}`
+                        );
+                    }
+
+                    tracksList.replaceChildren();
+
+                    if (!trackResult.tracks.length) {
+                        const empty = document.createElement("div");
+                        empty.className = "playlists-empty";
+                        empty.textContent = "No songs in this playlist yet.";
+                        tracksList.appendChild(empty);
+                    } else {
+                        
+trackResult.tracks.forEach(track => {
+    const songIndex = songs.findIndex(
+        item => item.file === track.file
+    );
+
+    const song = songIndex !== -1 ? songs[songIndex] : null;
+
+    const entry = document.createElement("button");
+    entry.type = "button";
+    entry.className = "song playlist-track";
+    entry.disabled = !song;
+
+    const title = document.createElement("span");
+    title.className = "song-title";
+    title.textContent = song?.title || track.file.split(/[\\/]/).pop();
+
+    const artist = document.createElement("span");
+    artist.className = "song-artist";
+    artist.textContent = song?.artist || "Unknown Artist";
+
+    entry.append(title, artist);
+
+    if (song) {
+        entry.addEventListener("click", () => {
+            playSong(songIndex);
+        });
+    }
+
+    tracksList.appendChild(entry);
+});
+
+                    }
+
+                    tracksList.dataset.loaded = "true";
+                } catch (error) {
+                    tracksList.replaceChildren();
+
+                    const message = document.createElement("div");
+                    message.className = "playlists-empty";
+                    message.textContent =
+                        `Could not load songs: ${error.message}`;
+                    tracksList.appendChild(message);
+                }
+            });
+
+            playlist.append(button, tracksList);
+            playlistsList.appendChild(playlist);
+        });
+    } catch (error) {
+        playlistsList.replaceChildren();
+
+        const message = document.createElement("div");
+        message.className = "playlists-empty";
+        message.textContent =
+            `Could not load playlists: ${error.message}`;
+        playlistsList.appendChild(message);
+    }
+}
+
+
+const quickAddPlaylistButton =
+    document.getElementById("quickAddPlaylistButton");
+
+const quickAddPlaylistMenu =
+    document.getElementById("quickAddPlaylistMenu");
+
+quickAddPlaylistButton.addEventListener("click", async () => {
+    if (currentSong < 0 || !songs[currentSong]) {
+        alert("Play a track first.");
+        return;
+    }
+
+    const opening = quickAddPlaylistMenu.hidden;
+
+    quickAddPlaylistMenu.hidden = !opening;
+
+    if (!opening) return;
+
+    quickAddPlaylistMenu.replaceChildren();
+
+    try {
+        const response = await fetch(playlistsApiUrl, {
+            cache: "no-store"
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || result.success !== true) {
+            throw new Error(result.error || "Could not load playlists.");
+        }
+
+        if (!result.playlists.length) {
+            const message = document.createElement("button");
+            message.textContent = "No playlists yet";
+            message.disabled = true;
+            quickAddPlaylistMenu.appendChild(message);
+            return;
+        }
+
+        result.playlists.forEach(name => {
+            const item = document.createElement("button");
+            item.type = "button";
+            item.textContent = name;
+
+            item.addEventListener("click", async () => {
+                const song = songs[currentSong];
+
+                if (!song) return;
+
+                item.disabled = true;
+                item.textContent = `Adding to ${name}...`;
+
+                try {
+                    const addResponse = await fetch(
+                        `${playlistsApiUrl}/add`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                name,
+                                file: song.file
+                            })
+                        }
+                    );
+
+                    const addResult = await addResponse.json();
+
+                    if (!addResponse.ok || addResult.success !== true) {
+                        throw new Error(
+                            addResult.error || "Could not add track."
+                        );
+                    }
+
+                    item.textContent = `Added to ${name} ✓`;
+
+                    setTimeout(() => {
+                        quickAddPlaylistMenu.hidden = true;
+                    }, 600);
+
+                } catch (error) {
+                    alert(error.message);
+                    item.disabled = false;
+                    item.textContent = name;
+                }
+            });
+
+            quickAddPlaylistMenu.appendChild(item);
+        });
+
+    } catch (error) {
+        quickAddPlaylistMenu.replaceChildren();
+
+        const message = document.createElement("button");
+        message.textContent = error.message;
+        quickAddPlaylistMenu.appendChild(message);
+    }
+});
+
+document.addEventListener("click", event => {
+    if (
+        !quickAddPlaylistButton.contains(event.target) &&
+        !quickAddPlaylistMenu.contains(event.target)
+    ) {
+        quickAddPlaylistMenu.hidden = true;
+    }
+});
+
+
+playlistsButton.addEventListener("click", async () => {
+    const showPlaylists = playlistsPanel.hidden;
+    playlistsPanel.hidden = !showPlaylists;
+    document.getElementById("library").hidden = showPlaylists;
+    playlistsButton.classList.toggle("active", showPlaylists);
+    playlistsButton.setAttribute("aria-pressed", String(showPlaylists));
+    favoritesFilterButton.disabled = showPlaylists;
+    if (showPlaylists) await loadPlaylists();
+});
+
+createPlaylistToggle.addEventListener("click", () => {
+    createPlaylistForm.hidden = !createPlaylistForm.hidden;
+    if (!createPlaylistForm.hidden) {
+        newPlaylistName.focus();
+    } else {
+        newPlaylistName.value = "";
+        playlistNameIsAvailable = false;
+        setPlaylistMessage();
+    }
+});
+
+newPlaylistName.addEventListener("input", async () => {
+    const name = newPlaylistName.value.trim();
+    const requestId = ++playlistNameCheckRequest;
+    playlistNameIsAvailable = false;
+
+    if (!name) {
+        setPlaylistMessage();
+        return;
+    }
+    if (!validPlaylistName(name)) {
+        setPlaylistMessage("Use letters, numbers, spaces, hyphens or underscores.", "error");
+        return;
+    }
+
+    setPlaylistMessage("Checking name...");
+    try {
+        const response = await fetch(
+            `${playlistsApiUrl}/check?name=${encodeURIComponent(name)}`,
+            { cache: "no-store" }
+        );
+        const result = await response.json().catch(() => ({}));
+        if (requestId !== playlistNameCheckRequest) return;
+        if (!response.ok || result.success !== true) {
+            throw new Error(result.error || `HTTP ${response.status}`);
+        }
+        if (result.exists) {
+            setPlaylistMessage(`A playlist named "${name}" already exists.`, "error");
+        } else {
+            playlistNameIsAvailable = true;
+            setPlaylistMessage("Name available — press Enter to create.", "success");
+        }
+    } catch (error) {
+        if (requestId === playlistNameCheckRequest) {
+            setPlaylistMessage(`Could not check name: ${error.message}`, "error");
+        }
+    }
+});
+
+newPlaylistName.addEventListener("keydown", async event => {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    if (playlistRequestInProgress) return;
+
+    const name = newPlaylistName.value.trim();
+    if (!validPlaylistName(name)) {
+        setPlaylistMessage("Enter a valid playlist name first.", "error");
+        return;
+    }
+
+    // Always let the server make the final duplicate check to avoid race conditions.
+    playlistRequestInProgress = true;
+    newPlaylistName.disabled = true;
+    setPlaylistMessage("Creating playlist...");
+    try {
+        const response = await fetch(`${playlistsApiUrl}/create`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name })
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || result.success !== true) {
+            throw new Error(result.error || `HTTP ${response.status}`);
+        }
+        setPlaylistMessage(`Created "${name}".`, "success");
+        newPlaylistName.value = "";
+        playlistNameIsAvailable = false;
+        await loadPlaylists();
+        newPlaylistName.focus();
+    } catch (error) {
+        setPlaylistMessage(error.message, "error");
+    } finally {
+        playlistRequestInProgress = false;
+        newPlaylistName.disabled = false;
+    }
+});
 
 favoritesFilterButton.addEventListener("click", () => {
     showFavoritesOnly = !showFavoritesOnly;
@@ -4656,6 +5404,18 @@ function escapeHTML(text) {
    INFO BUTTON
    ============================================================ */
     
+trackDownloadButton.addEventListener("click", () => {
+    const song = songs[currentSong];
+    if (!song?.file) return;
+
+    const link = document.createElement("a");
+    link.href = encodeURI(song.file);
+    link.download = decodeURIComponent(song.file.split(/[\\/]/).pop());
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+});
+
 const trackInfoButton = document.getElementById("trackInfoButton");
 const trackInfoPopup = document.getElementById("trackInfoPopup");
 

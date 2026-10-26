@@ -4,7 +4,8 @@ from pathlib import Path
 import time
 
 BASE_DIR = Path(__file__).resolve().parent
-API_SCRIPT = BASE_DIR / "favorites.py"
+FAVORITES_API_SCRIPT = BASE_DIR / "favorites.py"
+PLAYLIST_API_SCRIPT = BASE_DIR / "playlists_api.py"
 if len(sys.argv) != 2:
     sys.exit(
         "Please specify the path to your music library directory.\n"
@@ -40,15 +41,27 @@ try:
     favorites = subprocess.Popen(
         [
             sys.executable,
-            str(API_SCRIPT),
+            str(FAVORITES_API_SCRIPT),
             str(LIBRARY_DIR),
         ],
         cwd=BASE_DIR,
     )
     processes.append(favorites)
 
+    # Start the playlists API using this venv's Python
+    playlists = subprocess.Popen(
+        [
+            sys.executable,
+            str(PLAYLIST_API_SCRIPT),
+            str(LIBRARY_DIR),
+        ],
+        cwd=BASE_DIR,
+    )
+    processes.append(playlists)
+
     print("HTML player: http://localhost:8080")
     print("Favorites API: http://localhost:5000")
+    print("Playlists API: http://localhost:5001")
     print("Press Ctrl+C to stop both servers.")
 
     # Keep the launcher alive while both servers run
