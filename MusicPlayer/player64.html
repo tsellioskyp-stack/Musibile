@@ -2437,7 +2437,7 @@ button:focus-visible {
     width: 100%;
     height: 100%;
     border-radius: 8px;
-    overflow: hidden;
+    overflow: visible;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
 }
@@ -4169,11 +4169,16 @@ function updateLyricsHighlight() {
     });
 
     if (activeLine >= 0) {
-        lines[activeLine].scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-        });
-    }
+    const line = lines[activeLine];
+
+    const containerCenter = lyricsContent.clientHeight / 2;
+    const lineCenter = line.offsetTop + line.offsetHeight / 2;
+
+    lyricsContent.scrollTo({
+        top: lineCenter - containerCenter,
+        behavior: "smooth"
+    });
+}
 }
 
 player.addEventListener("timeupdate", updateLyricsHighlight);
