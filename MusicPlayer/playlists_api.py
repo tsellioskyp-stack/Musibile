@@ -296,7 +296,7 @@ def get_playlist_tracks(name):
             tracks = connection.execute(f"""
                 SELECT song_file, added_at
                 FROM {quoted_name}
-                ORDER BY added_at DESC, position DESC
+                ORDER BY position DESC
                 """).fetchall()
 
             return jsonify(
@@ -316,6 +316,101 @@ def get_playlist_tracks(name):
     except sqlite3.Error as error:
         app.logger.exception("Could not get playlist tracks")
         return json_error(f"Could not get playlist tracks: {error}", 500)
+
+
+@app.route("/api/playlists/remove", methods=["POST", "OPTIONS"])
+def remove_track_from_playlist():
+    if request.method == "OPTIONS":
+        return "", 204
+
+    payload = request.get_json(silent=True) or {}
+    name = validate_name(payload.get("name"))
+    song_file = payload.get("file")
+    if name is None or not isinstance(song_file, str) or not song_file:
+        return json_error("Invalid playlist name or track file.", 400)
+
+    try:
+        with db_connection() as connection:
+            row = connection.execute(
+                "SELECT name FROM playlists WHERE name = ? COLLATE NOCASE", (name,)
+            ).fetchone()
+            if row is None or not table_exists(connection, row["name"]):
+                return json_error("Playlist not found.", 404)
+
+            name = row["name"]
+            quoted_name = '"' + name.replace('"', '""') + '"'
+            cursor = connection.execute(
+                f"DELETE FROM {quoted_name} WHERE song_file = ?", (song_file,)
+            )
+            if cursor.rowcount == 0:
+                return json_error("Track not found in playlist.", 404)
+
+            # Compact positions while preserving the currently displayed order.
+            rows = connection.execute(
+                f"SELECT song_file FROM {quoted_name} ORDER BY position DESC"
+            ).fetchall()
+            for index, track in enumerate(rows):
+                connection.execute(
+                    f"UPDATE {quoted_name} SET position = ? WHERE song_file = ?",
+                    (len(rows) - index, track["song_file"]),
+                )
+
+            return jsonify(success=True, playlist=name, file=song_file)
+    except LibraryDatabaseMissing as error:
+        return json_error(str(error), 503)
+    except sqlite3.Error as error:
+        app.logger.exception("Could not remove track from playlist")
+        return json_error(f"Could not remove track: {error}", 500)
+
+
+@app.route("/api/playlists/reorder", methods=["POST", "OPTIONS"])
+def reorder_playlist_tracks():
+    if request.method == "OPTIONS":
+        return "", 204
+
+    payload = request.get_json(silent=True) or {}
+    name = validate_name(payload.get("name"))
+    files = payload.get("files")
+    if name is None or not isinstance(files, list) or any(
+        not isinstance(file, str) or not file for file in files
+    ):
+        return json_error("Invalid playlist name or track order.", 400)
+    if len(files) != len(set(files)):
+        return json_error("Track order contains duplicate files.", 400)
+
+    try:
+        with db_connection() as connection:
+            row = connection.execute(
+                "SELECT name FROM playlists WHERE name = ? COLLATE NOCASE", (name,)
+            ).fetchone()
+            if row is None or not table_exists(connection, row["name"]):
+                return json_error("Playlist not found.", 404)
+
+            name = row["name"]
+            quoted_name = '"' + name.replace('"', '""') + '"'
+            existing = {
+                track["song_file"]
+                for track in connection.execute(
+                    f"SELECT song_file FROM {quoted_name}"
+                ).fetchall()
+            }
+            if set(files) != existing:
+                return json_error("Track order does not match the playlist contents.", 409)
+
+            # The API displays positions in descending order, so the first visible
+            # track receives the highest position number.
+            for index, song_file in enumerate(files):
+                connection.execute(
+                    f"UPDATE {quoted_name} SET position = ? WHERE song_file = ?",
+                    (len(files) - index, song_file),
+                )
+
+            return jsonify(success=True, playlist=name, files=files)
+    except LibraryDatabaseMissing as error:
+        return json_error(str(error), 503)
+    except sqlite3.Error as error:
+        app.logger.exception("Could not reorder playlist tracks")
+        return json_error(f"Could not reorder playlist: {error}", 500)
 
 
 @app.route("/api/playlists/rename", methods=["POST", "OPTIONS"])
