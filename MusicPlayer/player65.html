@@ -2774,6 +2774,7 @@ button:focus-visible {
                 id="cover"
                 src=""
                 alt="Album cover"
+                onerror="this.onerror=null; this.src='/images/no_artwork.png';"
             >
             <canvas id="spectrumCanvas"></canvas>
         </div>
@@ -4665,11 +4666,7 @@ function getAdjacentAlbumTrack(direction) {
 function showAlbumGhost(direction, targetTrack = null) {
     targetTrack ??= getAdjacentAlbumTrack(direction);
 
-    if (targetTrack?.cover) {
-        verticalGhost.src = encodeURI(targetTrack.cover);
-    } else {
-        verticalGhost.removeAttribute("src");
-    }
+    setArtworkImage(verticalGhost, targetTrack?.cover);
 }
 
 let shuffleAlbumIndex = null;
@@ -4690,11 +4687,7 @@ function updateVerticalGhost() {
 
         const targetTrack = albums[shuffleAlbumIndex].songs[0];
 
-        if (targetTrack?.cover) {
-            verticalGhost.src = encodeURI(targetTrack.cover);
-        } else {
-            verticalGhost.removeAttribute("src");
-        }
+        setArtworkImage(verticalGhost, targetTrack?.cover);
 
         return;
     }
@@ -4703,11 +4696,7 @@ function updateVerticalGhost() {
 
     const targetTrack = getAdjacentAlbumTrack(-1);
 
-    if (targetTrack?.cover) {
-        verticalGhost.src = encodeURI(targetTrack.cover);
-    } else {
-        verticalGhost.removeAttribute("src");
-    }
+    setArtworkImage(verticalGhost, targetTrack?.cover);
 }
 
 function changeAlbum(direction) {
@@ -4786,6 +4775,16 @@ function getPlaybackSequence() {
    UPDATE SIDE COVERS
    ============================================================ */
 
+function setArtworkImage(image, coverPath) {
+    image.onerror = () => {
+        image.onerror = null;
+        image.src = "/images/no_artwork.png";
+    };
+
+    image.src = coverPath
+        ? encodeURI(coverPath)
+        : "/images/no_artwork.png";
+}
 
 function updateSideCovers() {
     const sequence = getPlaybackSequence();
@@ -4804,11 +4803,7 @@ function updateSideCovers() {
     }
 
     function setCoverImage(element, song) {
-        if (song?.cover) {
-            element.src = encodeURI(song.cover);
-        } else {
-            element.removeAttribute("src");
-        }
+    setArtworkImage(element, song?.cover);
     }
 
     // SHUFFLE: randomize the side covers and ghosts.
@@ -5079,28 +5074,36 @@ updateScrollingText(
     /* COVER */
 
     cover.classList.remove("favorite-spin");
-    if (song.cover) {
 
-        const coverURL =
-            encodeURI(song.cover);
-        cover.src =
-            coverURL;
-        background.style.backgroundImage =
-            `url("${coverURL}")`;
-        coverReflection.src = encodeURI(song.cover);
+const noArtwork = "/images/no_artwork.png";
 
-    }
-    else {
+if (song.cover) {
+    const coverURL = encodeURI(song.cover);
 
-        cover.removeAttribute("src");
+    cover.onerror = () => {
+        cover.onerror = null;
+        cover.src = noArtwork;
+    };
 
-        background.style.backgroundImage =
-            "none";
-        coverReflection.removeAttribute("src");
+    cover.src = coverURL;
 
-    }
+    background.style.backgroundImage = `url("${coverURL}")`;
+    coverReflection.src = coverURL;
 
+    coverReflection.onerror = () => {
+        coverReflection.onerror = null;
+        coverReflection.src = noArtwork;
+    };
+}
+else {
+    cover.src = noArtwork;
+    cover.onerror = null;
 
+    background.style.backgroundImage = `url("${noArtwork}")`;
+
+    coverReflection.src = noArtwork;
+    coverReflection.onerror = null;
+}
 
     /* LOAD */
 
