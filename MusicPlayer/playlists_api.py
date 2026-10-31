@@ -371,8 +371,10 @@ def reorder_playlist_tracks():
     payload = request.get_json(silent=True) or {}
     name = validate_name(payload.get("name"))
     files = payload.get("files")
-    if name is None or not isinstance(files, list) or any(
-        not isinstance(file, str) or not file for file in files
+    if (
+        name is None
+        or not isinstance(files, list)
+        or any(not isinstance(file, str) or not file for file in files)
     ):
         return json_error("Invalid playlist name or track order.", 400)
     if len(files) != len(set(files)):
@@ -395,7 +397,9 @@ def reorder_playlist_tracks():
                 ).fetchall()
             }
             if set(files) != existing:
-                return json_error("Track order does not match the playlist contents.", 409)
+                return json_error(
+                    "Track order does not match the playlist contents.", 409
+                )
 
             # The API displays positions in descending order, so the first visible
             # track receives the highest position number.
@@ -547,4 +551,12 @@ if __name__ == "__main__":
         )
 
     print(f"Musibile playlists API using database: {DB_PATH}")
-    app.run(host="0.0.0.0", port=5001, debug=False)
+    if sys.argv[2] == "http":
+        app.run(host="0.0.0.0", port=5001, debug=False)
+    else:
+        app.run(
+            host="0.0.0.0",
+            port=5001,
+            debug=False,
+            ssl_context=("cert.pem", "key.pem"),
+        )

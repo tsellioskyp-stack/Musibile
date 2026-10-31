@@ -6,3 +6,6 @@ MusicPlayer/.mypy_cache
 MusicPlayer/node_modules
 MusicPlayer/package-lock.json
 MusicPlayer/package.json
+MusicPlayer/cert.pem
+MusicPlayer/key.pem
+MusicPlayer/mkcert.exe

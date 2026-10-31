@@ -11,7 +11,7 @@ from flask_cors import CORS
 
 # Configuration
 
-if len(sys.argv) != 2:
+if len(sys.argv) != 3:
     sys.exit(
         "Usage: python favorites_api.py [Path to music library where all the albums, .json file and databse are stored (C://Users/Music)]"
     )
@@ -132,4 +132,13 @@ def update_favorite():
 # Start API server
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    if sys.argv[2] == "http":
+        print(sys.argv[2])
+        app.run(host="0.0.0.0", port=5000, debug=False)
+    else:
+        app.run(
+            host="0.0.0.0",
+            port=5000,
+            debug=False,
+            ssl_context=("cert.pem", "key.pem"),
+        )

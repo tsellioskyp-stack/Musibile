@@ -2,18 +2,34 @@ import subprocess
 import sys
 from pathlib import Path
 import time
+import argparse
 
 BASE_DIR = Path(__file__).resolve().parent
 FAVORITES_API_SCRIPT = BASE_DIR / "favorites.py"
 PLAYLIST_API_SCRIPT = BASE_DIR / "playlists_api.py"
-if len(sys.argv) != 2:
-    sys.exit(
-        "Please specify the path to your music library directory.\n"
-        "The database directory must be the same as your music library directory.\n"
-        "Usage: python start_server.py 'C:/Users/.../MusicLibraryFolder'"
-    )
 
-LIBRARY_DIR = Path(sys.argv[1]).resolve()
+parser = argparse.ArgumentParser()
+mode = parser.add_mutually_exclusive_group(required=True)
+mode.add_argument(
+    "--http",
+    action="store_true",
+    help="Launch an HTTP server (for the APIs too)",
+)
+
+mode.add_argument(
+    "--https",
+    action="store_true",
+    help="Launch an HTTPS server (for the APIs too)",
+)
+
+# Music library / database path
+parser.add_argument(
+    "library_path",
+    help="Path to the music library/database ('C:/....')",
+)
+args = parser.parse_args()
+
+LIBRARY_DIR = Path(args.library_path).resolve()
 
 if not LIBRARY_DIR.is_dir():
     sys.exit(
@@ -21,75 +37,149 @@ if not LIBRARY_DIR.is_dir():
     )
 
 processes = []
+if args.http:
+    try:
+        print("Starting Musibile servers...")
+        # Start the HTTP server
+        http_server = subprocess.Popen(
+            [
+                "powershell.exe",
+                "-NoProfile",
+                "-Command",
+                "http-server . -p 8080 -c-1",
+            ],
+            cwd=BASE_DIR,
+        )
+        processes.append(http_server)
 
-try:
-    print("Starting Musibile servers...")
+        # Start the favorites API using this venv's Python
+        favorites = subprocess.Popen(
+            [
+                sys.executable,
+                str(FAVORITES_API_SCRIPT),
+                str(LIBRARY_DIR),
+                "http",
+            ],
+            cwd=BASE_DIR,
+        )
+        processes.append(favorites)
 
-    # Start the static HTML server
-    http_server = subprocess.Popen(
-        [
-            "powershell.exe",
-            "-NoProfile",
-            "-Command",
-            "http-server . -p 8080 -c-1",
-        ],
-        cwd=BASE_DIR,
-    )
-    processes.append(http_server)
+        # Start the playlists API using this venv's Python
+        playlists = subprocess.Popen(
+            [
+                sys.executable,
+                str(PLAYLIST_API_SCRIPT),
+                str(LIBRARY_DIR),
+                "http",
+            ],
+            cwd=BASE_DIR,
+        )
+        processes.append(playlists)
 
-    # Start the favorites API using this venv's Python
-    favorites = subprocess.Popen(
-        [
-            sys.executable,
-            str(FAVORITES_API_SCRIPT),
-            str(LIBRARY_DIR),
-        ],
-        cwd=BASE_DIR,
-    )
-    processes.append(favorites)
+        print("HTML player: http://localhost:8080")
+        print("Favorites API: http://localhost:5000")
+        print("Playlists API: http://localhost:5001")
+        print("Press Ctrl+C to stop both servers.")
 
-    # Start the playlists API using this venv's Python
-    playlists = subprocess.Popen(
-        [
-            sys.executable,
-            str(PLAYLIST_API_SCRIPT),
-            str(LIBRARY_DIR),
-        ],
-        cwd=BASE_DIR,
-    )
-    processes.append(playlists)
+        # Keep the launcher alive while both servers run
+        while True:
+            for process in processes:
+                if process.poll() is not None:
+                    raise RuntimeError(
+                        f"A server stopped unexpectedly "
+                        f"(exit code {process.returncode})."
+                    )
+            time.sleep(1)
 
-    print("HTML player: http://localhost:8080")
-    print("Favorites API: http://localhost:5000")
-    print("Playlists API: http://localhost:5001")
-    print("Press Ctrl+C to stop both servers.")
+    except KeyboardInterrupt:
+        print("\nStopping Musibile servers...")
 
-    # Keep the launcher alive while both servers run
-    while True:
+    except RuntimeError as error:
+        print(error)
+
+    finally:
         for process in processes:
-            if process.poll() is not None:
-                raise RuntimeError(
-                    f"A server stopped unexpectedly "
-                    f"(exit code {process.returncode})."
-                )
-        time.sleep(1)
+            if process.poll() is None:
+                process.terminate()
 
-except KeyboardInterrupt:
-    print("\nStopping Musibile servers...")
+        for process in processes:
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
 
-except RuntimeError as error:
-    print(error)
+        print("Musibile servers stopped.")
+if args.https:
+    try:
+        print("Starting Musibile servers...")
+        # Start the HTTP server
+        http_server = subprocess.Popen(
+            [
+                "powershell.exe",
+                "-NoProfile",
+                "-Command",
+                "http-server -S -C 'cert.pem' -K 'key.pem' -p 8080",
+            ],
+            cwd=BASE_DIR,
+        )
+        processes.append(http_server)
 
-finally:
-    for process in processes:
-        if process.poll() is None:
-            process.terminate()
+        # Start the favorites API using this venv's Python
+        favorites = subprocess.Popen(
+            [
+                sys.executable,
+                str(FAVORITES_API_SCRIPT),
+                str(LIBRARY_DIR),
+                "https",
+            ],
+            cwd=BASE_DIR,
+        )
+        processes.append(favorites)
 
-    for process in processes:
-        try:
-            process.wait(timeout=5)
-        except subprocess.TimeoutExpired:
-            process.kill()
-            process.wait()
+        # Start the playlists API using this venv's Python
+        playlists = subprocess.Popen(
+            [
+                sys.executable,
+                str(PLAYLIST_API_SCRIPT),
+                str(LIBRARY_DIR),
+                "https",
+            ],
+            cwd=BASE_DIR,
+        )
+        processes.append(playlists)
 
-    print("Musibile servers stopped.")
+        print("HTML player: http://localhost:8080")
+        print("Favorites API: http://localhost:5000")
+        print("Playlists API: http://localhost:5001")
+        print("Press Ctrl+C to stop both servers.")
+
+        # Keep the launcher alive while both servers run
+        while True:
+            for process in processes:
+                if process.poll() is not None:
+                    raise RuntimeError(
+                        f"A server stopped unexpectedly "
+                        f"(exit code {process.returncode})."
+                    )
+            time.sleep(1)
+
+    except KeyboardInterrupt:
+        print("\nStopping Musibile servers...")
+
+    except RuntimeError as error:
+        print(error)
+
+    finally:
+        for process in processes:
+            if process.poll() is None:
+                process.terminate()
+
+        for process in processes:
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+
+        print("Musibile servers stopped.")
