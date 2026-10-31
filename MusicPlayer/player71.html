@@ -2961,9 +2961,12 @@ button:focus-visible {
 
             <div id="trackInfoPopup" class="track-info-popup" hidden>
                 <div class="track-info-heading">Track Information</div>
-
                 <div class="track-info-row">
-                    <span>File size</span>
+                    <span>Track Number</span>
+                    <span id="infoTrackNumber">—</span>
+                </div>
+                <div class="track-info-row">
+                    <span>File Size</span>
                     <span id="infoSize">—</span>
                 </div>
                 <div class="track-info-row">
@@ -2971,15 +2974,19 @@ button:focus-visible {
                     <span id="infoBitrate">—</span>
                 </div>
                 <div class="track-info-row">
-                    <span>Sample rate</span>
+                    <span>Sample Rate</span>
                     <span id="infoSampleRate">—</span>
+                </div>
+                <div class="track-info-row">
+                    <span>Bit Depth</span>
+                    <span id="infoBitDepth">—</span>
                 </div>
                 <div class="track-info-row">
                     <span>Length</span>
                     <span id="infoLength">—</span>
                 </div>
                 <div class="track-info-row">
-                    <span>File type</span>
+                    <span>File Type</span>
                     <span id="infoFileType">—</span>
                 </div>
             </div>
@@ -6594,9 +6601,11 @@ const trackInfoButton = document.getElementById("trackInfoButton");
 const trackInfoPopup = document.getElementById("trackInfoPopup");
 
 const trackInfoFields = {
+    track_number: document.getElementById("infoTrackNumber"),
     size: document.getElementById("infoSize"),
     bitrate: document.getElementById("infoBitrate"),
     sample_rate: document.getElementById("infoSampleRate"),
+    bit_depth: document.getElementById("infoBitDepth"),
     length: document.getElementById("infoLength"),
     file_type: document.getElementById("infoFileType")
 };

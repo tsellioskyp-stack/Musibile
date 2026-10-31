@@ -45,7 +45,7 @@ def check_for_embedded_cover_images(music_folder: str) -> None:
 
         for file in files:
 
-            if not file.lower().endswith((".flac", ".mp3", ".m4a", ".opus")):
+            if not file.lower().endswith((".flac")):
                 continue
 
             path = os.path.join(root, file)
@@ -110,7 +110,7 @@ def scan_library(music_folder: str) -> None:
                 continue
 
             # METADATA
-
+            track_number = get_tag(audio, "tracknumber")
             title = get_tag(audio, "title")
             artist = get_tag(audio, "artist")
             albumartist = get_tag(audio, "albumartist")
@@ -124,6 +124,11 @@ def scan_library(music_folder: str) -> None:
             sample_rate = (
                 f"{((audio.info.sample_rate) / 1000):.1f}" + "kHz"
                 if getattr(audio.info, "sample_rate", None) is not None
+                else None
+            )
+            bit_depth = (
+                f"{audio.info.bits_per_sample}-bit"
+                if getattr(audio.info, "bits_per_sample", None)
                 else None
             )
             length = (
@@ -234,6 +239,7 @@ def scan_library(music_folder: str) -> None:
                     ),
                     "bitrate": bitrate,
                     "sample_rate": sample_rate,
+                    "bit_depth": bit_depth,
                     "length": length,
                     "file_type": file_type,
                     "favorite": False,
@@ -349,6 +355,11 @@ def update_library(music_folder: str, valid_folders: list) -> None:
                             "sample_rate": (
                                 f"{((audio.info.sample_rate) / 1000):.1f}" + "kHz"
                                 if getattr(audio.info, "sample_rate", None) is not None
+                                else None
+                            ),
+                            "bit_depth": (
+                                f"{audio.info.bits_per_sample}-bit"
+                                if getattr(audio.info, "bits_per_sample", None)
                                 else None
                             ),
                             "length": (
