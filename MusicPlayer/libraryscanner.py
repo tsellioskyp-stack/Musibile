@@ -115,6 +115,7 @@ def scan_library(music_folder: str) -> None:
             artist = get_tag(audio, "artist")
             albumartist = get_tag(audio, "albumartist")
             album = get_tag(audio, "album")
+            album_tracks = get_tag(audio, "tracktotal")
             year = get_tag(audio, "date")
             bitrate = (
                 f"{((audio.info.bitrate) / 1000):.1f}" + "kbps"
@@ -224,10 +225,12 @@ def scan_library(music_folder: str) -> None:
 
             songs.append(
                 {
+                    "track_number": track_number,
                     "title": title,
                     "artist": artist,
                     "albumartist": albumartist,
                     "album": album,
+                    "album_tracks": album_tracks,
                     "year": year,
                     "genre": genre,
                     "cover": relative_cover,
@@ -334,10 +337,12 @@ def update_library(music_folder: str, valid_folders: list) -> None:
 
                     songs.append(
                         {
+                            "track_number": audio.get("tracknumber", [None])[0],
                             "title": audio.get("title", [None])[0],
                             "artist": audio.get("artist", [None])[0],
                             "albumartist": audio.get("albumartist", [None])[0],
                             "album": audio.get("album", [None])[0],
+                            "album_tracks": audio.get("tracktotal", [None])[0],
                             "year": audio.get("date", [None])[0],
                             "genre": ", ".join(audio.get("genre", [])),
                             "cover": relative_cover,
