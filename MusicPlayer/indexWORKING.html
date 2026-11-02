@@ -10,6 +10,14 @@
 
     <title>Music Player</title>
 
+    <link rel="manifest" href="/manifest.webmanifest">
+
+    <meta name="theme-color" content="#101010">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Musibile">
+
+<link rel="apple-touch-icon" href="/icons/musibile-192.png">
 
     <style>
 
@@ -671,6 +679,45 @@
             text-overflow: ellipsis;
         }
 
+        /* LIBRARY SONG LINE SCROLL */
+
+.song-line {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.song-line-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: max-content;
+    white-space: nowrap;
+}
+
+.song-line .song-title,
+.song-line .song-artist {
+    flex: 0 0 auto;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+.library-song-scroll {
+    animation: library-song-marquee var(--scroll-duration, 6s)
+               linear infinite alternate;
+    will-change: transform;
+}
+
+@keyframes library-song-marquee {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(var(--scroll-distance));
+    }
+}
+
 
         /* =========================================================
            PLAYER AREA
@@ -1203,7 +1250,8 @@ transform-origin: center center;
 /* Apply the same scrolling animation to all three lines. */
 #song-title .title-scroll,
 #song-artist .title-scroll,
-#song-album .title-scroll {
+#song-album .title-scroll,
+.track-info-row span:last-child .title-scroll {
     display: inline-block;
     white-space: nowrap;
     will-change: transform;
@@ -1433,10 +1481,13 @@ transform-origin: center center;
         }
 
         .track-info-row span:last-child {
-            color: #eee;
-            text-align: right;
-            overflow-wrap: anywhere;
-        }
+    color: #eee;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: right;
+}
 
         /* =========================================================
            MAIN CONTROLS
@@ -2962,6 +3013,30 @@ button:focus-visible {
             <div id="trackInfoPopup" class="track-info-popup" hidden>
                 <div class="track-info-heading">Track Information</div>
                 <div class="track-info-row">
+                    <span>Title</span>
+                    <span id="infoTitle">—</span>
+                </div>
+                <div class="track-info-row">
+                    <span>Album</span>
+                    <span id="infoAlbum">—</span>
+                </div>
+                <div class="track-info-row">
+                    <span>Genre(s)</span>
+                    <span id="infoGenre">—</span>
+                </div>
+                <div class="track-info-row">
+                    <span>Year</span>
+                    <span id="infoYear">—</span>
+                </div>
+                <div class="track-info-row">
+                    <span>Album Artist</span>
+                    <span id="infoAlbumArtist">—</span>
+                </div>
+                <div class="track-info-row">
+                    <span>Track Artist(s)</span>
+                    <span id="infoTrackArtist">—</span>
+                </div>
+                <div class="track-info-row">
                     <span>Track Number</span>
                     <span id="infoTrackNumber">—</span>
                 </div>
@@ -2988,6 +3063,10 @@ button:focus-visible {
                 <div class="track-info-row">
                     <span>File Type</span>
                     <span id="infoFileType">—</span>
+                </div>
+                <div class="track-info-row">
+                    <span>Source</span>
+                    <span id="infoSource">—</span>
                 </div>
             </div>
         </div>
@@ -3538,6 +3617,36 @@ function buildLibrary() {
    RENDER LIBRARY
    ============================================================ */
 
+function updateLibrarySongScrolling(container = libraryElement) {
+    requestAnimationFrame(() => {
+        container.querySelectorAll(".song-line").forEach(line => {
+            const content = line.querySelector(".song-line-content");
+
+            if (!line.clientWidth) return;
+
+            const overflow = content.scrollWidth - line.clientWidth;
+
+            if (overflow > 2) {
+                content.style.setProperty(
+                    "--scroll-distance",
+                    `-${overflow}px`
+                );
+
+                content.style.setProperty(
+                    "--scroll-duration",
+                    `${Math.max(5, overflow / 18)}s`
+                );
+
+                content.classList.add("library-song-scroll");
+            } else {
+                content.classList.remove("library-song-scroll");
+                content.style.removeProperty("--scroll-distance");
+                content.style.removeProperty("--scroll-duration");
+            }
+        });
+    });
+}
+
 function renderLibrary(filter = "") {
 
     libraryElement.innerHTML = "";
@@ -3687,6 +3796,16 @@ function renderLibrary(filter = "") {
                     song.index;
 
 
+                const songLine = document.createElement("div");
+songLine.className = "song-line";
+
+const songLineContent = document.createElement("div");
+songLineContent.className = "song-line-content";
+                const trackNumberElement = document.createElement("span");
+                trackNumberElement.className = "song-artist";
+                trackNumberElement.textContent = song.track_number
+                ? String(song.track_number).split("/")[0].trim()
+                : "";
 
                 const titleElement =
                     document.createElement("span");
@@ -3712,14 +3831,15 @@ function renderLibrary(filter = "") {
 
 
 
-                songElement.appendChild(
-                    titleElement
-                );
+                if (trackNumberElement.textContent) {
+    songLineContent.appendChild(trackNumberElement);
+}
 
+songLineContent.appendChild(titleElement);
+songLineContent.appendChild(artistElement);
 
-                songElement.appendChild(
-                    artistElement
-                );
+songLine.appendChild(songLineContent);
+songElement.appendChild(songLine);
 
 
 
@@ -3759,6 +3879,9 @@ function renderLibrary(filter = "") {
                     albumElement.classList.toggle(
                         "open"
                     );
+                    if (albumElement.classList.contains("open")) {
+    updateLibrarySongScrolling(albumElement);
+}
 
                 }
             );
@@ -3786,6 +3909,9 @@ function renderLibrary(filter = "") {
                 artistElement.classList.toggle(
                     "open"
                 );
+                if (artistElement.classList.contains("open")) {
+    updateLibrarySongScrolling(artistElement);
+}
 
             }
         );
@@ -3804,6 +3930,10 @@ function renderLibrary(filter = "") {
     updateSongList();
 
 }
+
+window.addEventListener("resize", () => {
+    updateLibrarySongScrolling();
+});
 
 function focusPlayingLibraryTrack() {
     let track = libraryElement.querySelector(
@@ -5490,7 +5620,9 @@ if (song.cover) {
 
     player.load();
 
+    if (window.matchMedia("(min-width: 701px)").matches) {
     setupSpectrumAnalyzer();
+}
     player.play();
 
 
@@ -6601,13 +6733,20 @@ const trackInfoButton = document.getElementById("trackInfoButton");
 const trackInfoPopup = document.getElementById("trackInfoPopup");
 
 const trackInfoFields = {
+    title: document.getElementById("infoTitle"),
+    album: document.getElementById("infoAlbum"),
+    genre: document.getElementById("infoGenre"),
+    year: document.getElementById("infoYear"),
+    albumartist: document.getElementById("infoAlbumArtist"),
+    artist: document.getElementById("infoTrackArtist"),
     track_number: document.getElementById("infoTrackNumber"),
     size: document.getElementById("infoSize"),
     bitrate: document.getElementById("infoBitrate"),
     sample_rate: document.getElementById("infoSampleRate"),
     bit_depth: document.getElementById("infoBitDepth"),
     length: document.getElementById("infoLength"),
-    file_type: document.getElementById("infoFileType")
+    file_type: document.getElementById("infoFileType"),
+    source: document.getElementById("infoSource")
 };
 
 function updateTrackInfo() {
@@ -6624,8 +6763,18 @@ function updateTrackInfo() {
 
             continue;
         }
+        if (key === "source") {
+    const filePath = song?.file;
 
-        element.textContent = song?.[key] ?? "Unavailable";
+    updateScrollingText(element, filePath
+    ? "/" + String(filePath).replace(/\\/g, "/").replace(/^\/+/, "")
+    : "Unavailable"
+);
+
+    continue;
+}
+
+        updateScrollingText(element, song?.[key] ?? "Unavailable");
     }
 }
 
@@ -6655,6 +6804,18 @@ document.addEventListener("keydown", (event) => {
         trackInfoPopup.hidden = true;
         trackInfoButton.setAttribute("aria-expanded", "false");
         trackInfoButton.focus();
+    }
+});
+
+document.addEventListener("visibilitychange", () => {
+    if (!spectrumAudioContext) return;
+
+    if (document.hidden) {
+        cancelAnimationFrame(spectrumAnimationId);
+        spectrumAudioContext.suspend();
+    } else {
+        spectrumAudioContext.resume();
+        drawSpectrum();
     }
 });
 

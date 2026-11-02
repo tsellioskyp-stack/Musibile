@@ -1250,7 +1250,8 @@ transform-origin: center center;
 /* Apply the same scrolling animation to all three lines. */
 #song-title .title-scroll,
 #song-artist .title-scroll,
-#song-album .title-scroll {
+#song-album .title-scroll,
+.track-info-row span:last-child .title-scroll {
     display: inline-block;
     white-space: nowrap;
     will-change: transform;
@@ -1480,10 +1481,13 @@ transform-origin: center center;
         }
 
         .track-info-row span:last-child {
-            color: #eee;
-            text-align: right;
-            overflow-wrap: anywhere;
-        }
+    color: #eee;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: right;
+}
 
         /* =========================================================
            MAIN CONTROLS
@@ -2711,6 +2715,126 @@ button:focus-visible {
     font-weight: 600;
 }
 
+.track-info-tabs {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.track-info-tab {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #888;
+    font: inherit;
+    font-size: 14px;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+.track-info-tab.active {
+    color: #fff;
+    font-weight: bold;
+}
+
+.track-info-tab:hover {
+    color: #fff;
+}
+
+.track-info-tabs {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 15px;
+
+    padding-bottom: 10px;
+    border-bottom: 1px solid #444;
+}
+
+/* Artist Information */
+
+#trackInfoArtistTab {
+    max-height: 280px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    color: #ccc;
+}
+
+/* Dark scrollbar */
+
+#trackInfoArtistTab {
+    scrollbar-width: thin;
+    scrollbar-color: #555 #222;
+}
+
+#trackInfoArtistTab::-webkit-scrollbar {
+    width: 7px;
+}
+
+#trackInfoArtistTab::-webkit-scrollbar-track {
+    background: #222;
+    border-radius: 10px;
+}
+
+#trackInfoArtistTab::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 10px;
+}
+
+#trackInfoArtistTab::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+
+.artist-info-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    min-width: 0;
+}
+
+#artistInfoImage {
+    width: 85px;
+    height: 85px;
+    flex-shrink: 0;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+#artistInfoImage[hidden] {
+    display: none;
+}
+
+#artistInfoName {
+    font-size: 16px;
+    color: #fff;
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+#artistInfoBio {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #aaa;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    margin-bottom: 12px;
+}
+
+#artistInfoLink {
+    font-size: 12px;
+    color: #888;
+    text-decoration: none;
+}
+
+#artistInfoLink:hover {
+    color: #fff;
+    text-decoration: underline;
+}
     </style>
 
 </head>
@@ -3007,36 +3131,107 @@ button:focus-visible {
 </button>
 
             <div id="trackInfoPopup" class="track-info-popup" hidden>
-                <div class="track-info-heading">Track Information</div>
-                <div class="track-info-row">
-                    <span>Track Number</span>
-                    <span id="infoTrackNumber">—</span>
-                </div>
-                <div class="track-info-row">
-                    <span>File Size</span>
-                    <span id="infoSize">—</span>
-                </div>
-                <div class="track-info-row">
-                    <span>Bitrate</span>
-                    <span id="infoBitrate">—</span>
-                </div>
-                <div class="track-info-row">
-                    <span>Sample Rate</span>
-                    <span id="infoSampleRate">—</span>
-                </div>
-                <div class="track-info-row">
-                    <span>Bit Depth</span>
-                    <span id="infoBitDepth">—</span>
-                </div>
-                <div class="track-info-row">
-                    <span>Length</span>
-                    <span id="infoLength">—</span>
-                </div>
-                <div class="track-info-row">
-                    <span>File Type</span>
-                    <span id="infoFileType">—</span>
-                </div>
-            </div>
+
+    <div class="track-info-tabs">
+        <button class="track-info-tab active" data-tab="track" type="button">
+            Track Information
+        </button>
+
+        <button class="track-info-tab" data-tab="artist" type="button">
+            Artist Information
+        </button>
+    </div>
+
+    <!-- Track Information -->
+    <div id="trackInfoTrackTab">
+
+        <div class="track-info-row">
+            <span>Title</span>
+            <span id="infoTitle">—</span>
+        </div>
+        <div class="track-info-row">
+            <span>Album</span>
+            <span id="infoAlbum">—</span>
+        </div>
+        <div class="track-info-row">
+            <span>Genre(s)</span>
+            <span id="infoGenre">—</span>
+        </div>
+        <div class="track-info-row">
+            <span>Year</span>
+            <span id="infoYear">—</span>
+        </div>
+        <div class="track-info-row">
+            <span>Album Artist</span>
+            <span id="infoAlbumArtist">—</span>
+        </div>
+        <div class="track-info-row">
+            <span>Track Artist(s)</span>
+            <span id="infoTrackArtist">—</span>
+        </div>
+        <div class="track-info-row">
+            <span>Track Number</span>
+            <span id="infoTrackNumber">—</span>
+        </div>
+        <div class="track-info-row">
+            <span>File Size</span>
+            <span id="infoSize">—</span>
+        </div>
+        <div class="track-info-row">
+            <span>Bitrate</span>
+            <span id="infoBitrate">—</span>
+        </div>
+        <div class="track-info-row">
+            <span>Sample Rate</span>
+            <span id="infoSampleRate">—</span>
+        </div>
+        <div class="track-info-row">
+            <span>Bit Depth</span>
+            <span id="infoBitDepth">—</span>
+        </div>
+        <div class="track-info-row">
+            <span>Length</span>
+            <span id="infoLength">—</span>
+        </div>
+        <div class="track-info-row">
+            <span>File Type</span>
+            <span id="infoFileType">—</span>
+        </div>
+        <div class="track-info-row">
+            <span>Source</span>
+            <span id="infoSource">—</span>
+        </div>
+
+    </div>
+
+    <!-- Artist Information -->
+    <div id="trackInfoArtistTab" hidden>
+
+        <div class="artist-info-header">
+            <img id="artistInfoImage" alt="">
+            <h3 id="artistInfoName"></h3>
+        </div>
+
+        <div id="artistInfoBio"></div>
+
+        <a id="artistInfoLink"
+           href="#"
+           target="_blank"
+           rel="noopener noreferrer">
+            Read more on Wikipedia
+        </a>
+
+        <div id="artistInfoLoading" hidden>
+            Loading artist information...
+        </div>
+
+        <div id="artistInfoError" hidden>
+            Artist information unavailable.
+        </div>
+
+    </div>
+
+</div>
         </div>
 
         <!-- DOWNLOAD TRACK BUTTON -->
@@ -5588,7 +5783,9 @@ if (song.cover) {
 
     player.load();
 
+    if (window.matchMedia("(min-width: 701px)").matches) {
     setupSpectrumAnalyzer();
+}
     player.play();
 
 
@@ -6699,14 +6896,22 @@ const trackInfoButton = document.getElementById("trackInfoButton");
 const trackInfoPopup = document.getElementById("trackInfoPopup");
 
 const trackInfoFields = {
+    title: document.getElementById("infoTitle"),
+    album: document.getElementById("infoAlbum"),
+    genre: document.getElementById("infoGenre"),
+    year: document.getElementById("infoYear"),
+    albumartist: document.getElementById("infoAlbumArtist"),
+    artist: document.getElementById("infoTrackArtist"),
     track_number: document.getElementById("infoTrackNumber"),
     size: document.getElementById("infoSize"),
     bitrate: document.getElementById("infoBitrate"),
     sample_rate: document.getElementById("infoSampleRate"),
     bit_depth: document.getElementById("infoBitDepth"),
     length: document.getElementById("infoLength"),
-    file_type: document.getElementById("infoFileType")
+    file_type: document.getElementById("infoFileType"),
+    source: document.getElementById("infoSource")
 };
+
 
 function updateTrackInfo() {
     const song = songs[currentSong];
@@ -6722,8 +6927,18 @@ function updateTrackInfo() {
 
             continue;
         }
+        if (key === "source") {
+    const filePath = song?.file;
 
-        element.textContent = song?.[key] ?? "Unavailable";
+    updateScrollingText(element, filePath
+    ? "/" + String(filePath).replace(/\\/g, "/").replace(/^\/+/, "")
+    : "Unavailable"
+);
+
+    continue;
+}
+
+        updateScrollingText(element, song?.[key] ?? "Unavailable");
     }
 }
 
@@ -6753,6 +6968,169 @@ document.addEventListener("keydown", (event) => {
         trackInfoPopup.hidden = true;
         trackInfoButton.setAttribute("aria-expanded", "false");
         trackInfoButton.focus();
+    }
+});
+
+// ========================================
+// ARTIST INFORMATION
+// ========================================
+
+const artistTabs = document.querySelectorAll(".track-info-tab");
+
+const trackTabContent = document.getElementById("trackInfoTrackTab");
+const artistTabContent = document.getElementById("trackInfoArtistTab");
+
+const artistLoading = document.getElementById("artistInfoLoading");
+const artistError = document.getElementById("artistInfoError");
+const artistImage = document.getElementById("artistInfoImage");
+const artistName = document.getElementById("artistInfoName");
+const artistBio = document.getElementById("artistInfoBio");
+const artistLink = document.getElementById("artistInfoLink");
+
+// Cache Wikipedia results
+const artistCache = new Map();
+
+// Prevent older requests from overwriting newer ones
+let artistRequestId = 0;
+
+
+// Switch between tabs
+artistTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+
+        const selectedTab = tab.dataset.tab;
+        const showArtist = selectedTab === "artist";
+
+        // Update active tab
+        artistTabs.forEach(button => {
+            button.classList.toggle(
+                "active",
+                button === tab
+            );
+        });
+
+        // Switch content
+        trackTabContent.hidden = showArtist;
+        artistTabContent.hidden = !showArtist;
+
+        // Load artist information when selected
+        if (showArtist) {
+            loadArtistInformation();
+        }
+    });
+});
+
+
+// Fetch artist information from Wikipedia
+async function loadArtistInformation() {
+
+    const requestId = ++artistRequestId;
+
+    const artist = songs[currentSong]?.albumartist?.trim();
+
+    // Reset previous display
+    artistName.textContent = "";
+    artistBio.textContent = "";
+    artistImage.hidden = true;
+    artistLink.hidden = true;
+
+    artistError.hidden = true;
+    artistLoading.hidden = false;
+
+    if (!artist) {
+        showArtistError("No album artist available.");
+        return;
+    }
+
+    try {
+
+        let data = artistCache.get(artist.toLowerCase());
+
+        // Search Wikipedia if not cached
+        if (!data) {
+
+            const searchResponse = await fetch(
+                `https://en.wikipedia.org/w/rest.php/v1/search/page?q=${encodeURIComponent(artist)}&limit=1`
+            );
+
+            if (!searchResponse.ok) {
+                throw new Error("Wikipedia search failed");
+            }
+
+            const searchData = await searchResponse.json();
+            const page = searchData.pages?.[0];
+
+            if (!page) {
+                throw new Error("Artist not found");
+            }
+
+            // Get article summary
+            const summaryResponse = await fetch(
+                `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(page.title)}`
+            );
+
+            if (!summaryResponse.ok) {
+                throw new Error("Wikipedia summary unavailable");
+            }
+
+            data = await summaryResponse.json();
+
+            if (data.type !== "standard" || !data.extract) {
+                throw new Error("No biography available");
+            }
+
+            artistCache.set(artist.toLowerCase(), data);
+        }
+
+        // Ignore results from an older request
+        if (requestId !== artistRequestId) return;
+
+        // Display information
+        artistName.textContent = data.title;
+        artistBio.textContent = data.extract;
+
+        // Artist thumbnail
+        if (data.thumbnail?.source) {
+            artistImage.src = data.thumbnail.source;
+            artistImage.alt = data.title;
+            artistImage.hidden = false;
+        }
+
+        // Wikipedia article
+        artistLink.href =
+            data.content_urls?.desktop?.page ||
+            `https://en.wikipedia.org/wiki/${encodeURIComponent(data.title.replace(/ /g, "_"))}`;
+
+        artistLink.hidden = false;
+
+        artistLoading.hidden = true;
+
+    } catch (error) {
+
+        if (requestId !== artistRequestId) return;
+
+        console.error("Artist information error:", error);
+
+        showArtistError("Could not retrieve artist information.");
+    }
+}
+
+// Display an error
+function showArtistError(message) {
+    artistLoading.hidden = true;
+    artistError.textContent = message;
+    artistError.hidden = false;
+}
+
+document.addEventListener("visibilitychange", () => {
+    if (!spectrumAudioContext) return;
+
+    if (document.hidden) {
+        cancelAnimationFrame(spectrumAnimationId);
+        spectrumAudioContext.suspend();
+    } else {
+        spectrumAudioContext.resume();
+        drawSpectrum();
     }
 });
 

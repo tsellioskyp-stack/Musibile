@@ -27,16 +27,63 @@ def safe_filename(name: str) -> str:
 
 
 def get_tag(audio, tag):
-    """
-    Safely get the first value of a Mutagen tag.
-    """
+    """Safely retrieve metadata from FLAC, MP3 and other Mutagen formats."""
 
+    tags = getattr(audio, "tags", None)
+
+    # MP3 / ID3 metadata
+    if tags and hasattr(tags, "getall"):
+
+        id3_tags = {
+            "tracknumber": "TRCK",
+            "title": "TIT2",
+            "artist": "TPE1",
+            "albumartist": "TPE2",
+            "album": "TALB",
+            "date": ("TDRC", "TYER", "TDRL"),
+            "genre": "TCON",
+        }
+
+        if tag == "tracktotal":
+            track = get_tag(audio, "tracknumber")
+            return track.split("/", 1)[1] if track and "/" in track else None
+
+        frame_ids = id3_tags.get(tag)
+
+        if frame_ids:
+            if isinstance(frame_ids, str):
+                frame_ids = (frame_ids,)
+
+            for frame_id in frame_ids:
+                frames = tags.getall(frame_id)
+
+                if frames:
+                    return str(frames[0])
+
+        return None
+
+    # FLAC / Vorbis-style metadata
     value = audio.get(tag)
 
     if value:
-        return value[0]
+        return str(value[0])
 
     return None
+
+
+def get_pictures(audio):
+
+    # FLAC and formats with a pictures attribute
+    if hasattr(audio, "pictures"):
+        return audio.pictures
+
+    # MP3 artwork (ID3 APIC frames)
+    tags = getattr(audio, "tags", None)
+
+    if tags and hasattr(tags, "getall"):
+        return tags.getall("APIC")
+
+    return []
 
 
 def check_for_embedded_cover_images(music_folder: str) -> None:
@@ -139,12 +186,7 @@ def scan_library(music_folder: str) -> None:
             )
             file_type: str = pathlib.Path(full_path).suffix
 
-            genres = audio.get("genre", [])
-
-            if genres:
-                genre = ", ".join(genres)
-            else:
-                genre = ""
+            genre = get_tag(audio, "genre") or ""
 
             # COVER ART
 
@@ -158,7 +200,7 @@ def scan_library(music_folder: str) -> None:
                 cover_file = os.path.join(dir_path, safe_album + ".jpg")
 
             # Look for embedded pictures
-            pictures = getattr(audio, "pictures", [])
+            pictures = get_pictures(audio)
 
             if pictures:
 
@@ -314,7 +356,7 @@ def update_library(music_folder: str, valid_folders: list) -> None:
                     # created as a file yet
                     if cover_file is not None and not os.path.exists(cover_file):
 
-                        for picture in audio.pictures:
+                        for picture in get_pictures(audio):
 
                             if picture.type == 3:  # 3 = front cover
 
@@ -337,14 +379,14 @@ def update_library(music_folder: str, valid_folders: list) -> None:
 
                     songs.append(
                         {
-                            "track_number": audio.get("tracknumber", [None])[0],
-                            "title": audio.get("title", [None])[0],
-                            "artist": audio.get("artist", [None])[0],
-                            "albumartist": audio.get("albumartist", [None])[0],
-                            "album": audio.get("album", [None])[0],
-                            "album_tracks": audio.get("tracktotal", [None])[0],
-                            "year": audio.get("date", [None])[0],
-                            "genre": ", ".join(audio.get("genre", [])),
+                            "track_number": get_tag(audio, "tracknumber"),
+                            "title": get_tag(audio, "title"),
+                            "artist": get_tag(audio, "artist"),
+                            "albumartist": get_tag(audio, "albumartist"),
+                            "album": get_tag(audio, "album"),
+                            "album_tracks": get_tag(audio, "tracktotal"),
+                            "year": get_tag(audio, "date"),
+                            "genre": get_tag(audio, "genre") or "",
                             "cover": relative_cover,
                             "file": relative_file,
                             "size": (
