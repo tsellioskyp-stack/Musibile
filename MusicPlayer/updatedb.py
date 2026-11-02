@@ -43,17 +43,18 @@ with open(UPDATE_JSON_PATH, "r", encoding="utf-8") as updates:
     for track in tracks:
         cursor.execute(
             """
-                            INSERT OR IGNORE INTO tracks VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            INSERT OR IGNORE INTO tracks VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """,
             (
-                track["title"],
-                track["artist"],
-                track["albumartist"],
-                track["album"],
+                track["track_number"] if track["track_number"] is not None else None,
+                track["title"] if track["title"] is not None else None,
+                track["artist"] if track["artist"] is not None else None,
+                track["albumartist"] if track["albumartist"] is not None else None,
+                track["album"] if track["album"] is not None else None,
                 int(track["year"]) if track["year"] is not None else None,
-                track["genre"],
-                track["cover"],
-                track["file"],
+                track["genre"] if track["genre"] is not None else None,
+                track["cover"] if track["cover"] is not None else None,
+                track["file"] if track["file"] is not None else None,
                 (
                     float(track["size"].replace(" MB", ""))
                     if track["size"] is not None
@@ -70,11 +71,16 @@ with open(UPDATE_JSON_PATH, "r", encoding="utf-8") as updates:
                     else None
                 ),
                 (
+                    int(track["bit_depth"].replace("-bit", ""))
+                    if track["bit_depth"] is not None
+                    else None
+                ),
+                (
                     float(track["length"].replace("s", ""))
                     if track["length"] is not None
                     else None
                 ),
-                track["file_type"],
+                track["file_type"] if track["file_type"] is not None else None,
                 track["favorite"],
             ),
         )
