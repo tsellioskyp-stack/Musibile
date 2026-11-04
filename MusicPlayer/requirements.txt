@@ -1,3 +1,4 @@
 mutagen
 flask
 flask-cors
+vlc
