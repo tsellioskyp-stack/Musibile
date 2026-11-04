@@ -7,6 +7,7 @@ import argparse
 BASE_DIR = Path(__file__).resolve().parent
 FAVORITES_API_SCRIPT = BASE_DIR / "favorites.py"
 PLAYLIST_API_SCRIPT = BASE_DIR / "playlists_api.py"
+VLC_RECEIVER_SCRIPT = BASE_DIR / "musibile_receiver_api.py"
 
 parser = argparse.ArgumentParser()
 mode = parser.add_mutually_exclusive_group(required=True)
@@ -76,9 +77,22 @@ if args.http:
         )
         processes.append(playlists)
 
+        # Start the VLC Receiver API
+        vlc_receiver = subprocess.Popen(
+            [
+                sys.executable,
+                str(VLC_RECEIVER_SCRIPT),
+                "http",
+                LIBRARY_DIR,
+            ],
+            cwd=BASE_DIR,
+        )
+        processes.append(vlc_receiver)
+
         print("HTML player: http://localhost:8080")
         print("Favorites API: http://localhost:5000")
         print("Playlists API: http://localhost:5001")
+        print("VLC Receiver API: http://localhost:5002")
         print("Press Ctrl+C to stop both servers.")
 
         # Keep the launcher alive while both servers run
@@ -149,9 +163,17 @@ if args.https:
         )
         processes.append(playlists)
 
-        print("HTML player: http://localhost:8080")
-        print("Favorites API: http://localhost:5000")
-        print("Playlists API: http://localhost:5001")
+        # Start the VLC Receiver API
+        vlc_receiver = subprocess.Popen(
+            [sys.executable, str(VLC_RECEIVER_SCRIPT), "https", LIBRARY_DIR],
+            cwd=BASE_DIR,
+        )
+        processes.append(vlc_receiver)
+
+        print("HTML player: https://localhost:8080")
+        print("Favorites API: https://localhost:5000")
+        print("Playlists API: https://localhost:5001")
+        print("VLC Receiver API: https://localhost:5002")
         print("Press Ctrl+C to stop both servers.")
 
         # Keep the launcher alive while both servers run
