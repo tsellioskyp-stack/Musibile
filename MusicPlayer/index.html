@@ -3411,164 +3411,6 @@ const outputSelector = document.getElementById("outputSelector");
 const receiverURL =
     `${window.location.protocol}//${window.location.hostname}:5002`;
 
-// Unique ID for this browser
-let browserId = localStorage.getItem("musibileBrowserId");
-
-if (!browserId) {
-    browserId = crypto.randomUUID();
-    localStorage.setItem("musibileBrowserId", browserId);
-}
-
-const sessionURL = `${receiverURL}/session`;
-
-
-// Claim this browser as the active playback device
-async function claimBrowser() {
-    const response = await fetch(`${sessionURL}/claim`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            browser_id: browserId
-        })
-    });
-
-    if (!response.ok) {
-        throw new Error("Could not claim browser playback");
-    }
-
-    return response.json();
-}
-
-
-// Retrieve shared playback session
-async function getSession() {
-    const response = await fetch(
-        `${sessionURL}?browser_id=${encodeURIComponent(browserId)}`
-    );
-
-    if (!response.ok) {
-        throw new Error("Could not retrieve playback session");
-    }
-
-    return response.json();
-}
-
-
-// Report this browser's playback state
-async function reportPlayback() {
-    if (outputSelector.value !== "browser") return;
-
-    await fetch(`${sessionURL}/report`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            browser_id: browserId,
-            track: songs[currentSong]?.file || null,
-            playing: !player.paused,
-            position: player.currentTime || 0,
-            duration: Number.isFinite(player.duration)
-                ? player.duration
-                : 0,
-            volume: player.volume
-        })
-    });
-}
-
-async function handleRemoteCommand(command) {
-
-    const data = command.data || {};
-
-    switch (command.name) {
-
-        case "play": {
-            const index = songs.findIndex(
-                song => song.file === data.path
-            );
-
-            if (index !== -1) {
-                outputSelector.value = "browser";
-                playSong(index);
-            }
-            break;
-        }
-
-        case "pause":
-            player.pause();
-            break;
-
-        case "resume":
-            await player.play();
-            break;
-
-        case "seek":
-            if (Number.isFinite(data.seconds)) {
-                player.currentTime = data.seconds;
-            }
-            break;
-
-        case "volume":
-            if (Number.isFinite(data.value)) {
-                player.volume = Math.max(
-                    0,
-                    Math.min(1, data.value)
-                );
-            }
-            break;
-
-        case "stop":
-            player.pause();
-            player.currentTime = 0;
-            break;
-    }
-}
-
-let lastCommandId = 0;
-
-async function syncPlaybackSession() {
-    try {
-        const state = await getSession();
-
-        // Execute a new command only once.
-        const command = state.command;
-
-        if (
-            state.browser_id === browserId &&
-            command &&
-            command.id > lastCommandId
-        ) {
-            lastCommandId = command.id;
-
-            await handleRemoteCommand(command);
-
-            await fetch(`${sessionURL}/ack`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    command_id: command.id
-                })
-            });
-        }
-
-        // Report playback if this browser owns the audio output.
-        if (outputSelector.value === "browser") {
-            await reportPlayback();
-        }
-
-    } catch (error) {
-        console.error("Playback session sync failed:", error);
-    }
-}
-
-
-// Check the server twice per second.
-setInterval(syncPlaybackSession, 500);
-
 // Flask runs separately from the static HTML server, on port 5000.
 const favoritesApiUrl =
     `${window.location.protocol}//${window.location.hostname}:5000/api/favorites`;
@@ -3712,11 +3554,15 @@ if ("mediaSession" in navigator) {
 }
 
 player.addEventListener("play", () => {
+    if (outputSelector.value === "laptop") return;
+
     playButton.classList.add("is-playing");
     playButton.setAttribute("aria-label", "Pause");
 });
 
 player.addEventListener("pause", () => {
+    if (outputSelector.value === "laptop") return;
+
     playButton.classList.remove("is-playing");
     playButton.setAttribute("aria-label", "Play");
 });
@@ -5878,28 +5724,6 @@ async function receiverCommand(endpoint, data = {}) {
     return result;
 }
 
-async function sendSessionCommand(command, data = {}) {
-
-    const response = await fetch(`${sessionURL}/command`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            command,
-            ...data
-        })
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.error || "Session command failed");
-    }
-
-    return result;
-}
-
 outputSelector.addEventListener("change", async () => {
 
     const song = songs[currentSong];
@@ -5908,24 +5732,22 @@ outputSelector.addEventListener("change", async () => {
 
     if (outputSelector.value === "laptop") {
 
-        try {
-            // Tell the shared session that laptop is now the output.
-            await fetch(`${sessionURL}/output`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    output: "laptop"
-                })
-            });
+    const position = player.currentTime;
+const volume = Math.round(player.volume * 100);
 
-            player.pause();
+player.pause();
 
-            await receiverCommand("play", {
-                path: song.file
-            });
+try {
+    await receiverCommand("volume", {
+        value: volume
+    });
 
+    await receiverCommand("play", {
+            path: song.file,
+            position: position
+        });
+        playButton.classList.add("is-playing");
+        playButton.setAttribute("aria-label", "Pause");
         } catch (error) {
             console.error("Laptop playback failed:", error);
         }
@@ -5933,23 +5755,28 @@ outputSelector.addEventListener("change", async () => {
     } else {
 
         try {
-            await receiverCommand("stop");
+    const statusResponse = await fetch(`${receiverURL}/status`);
+    const status = await statusResponse.json();
 
-            await claimBrowser();
+    const position = Math.max(0, status.position_ms / 1000);
 
-            playSong(currentSong);
+    // Convert VLC volume (0–100) to browser volume (0.0–1.0).
+    player.volume = status.volume / 100;
 
-            await reportPlayback();
+    await receiverCommand("pause");
 
-        } catch (error) {
-            console.error("Could not switch back to browser:", error);
-        }
+    // We'll resume the browser at this position.
+    playSong(currentSong, position);
+
+} catch (error) {
+    console.error("Could not switch back to browser:", error);
+}
 
     }
 
 });
 
-function playSong(index) {
+function playSong(index, position = 0) {
 
     if (
         index < 0 ||
@@ -6086,9 +5913,15 @@ if (song.cover) {
 
 } else {
 
-    claimBrowser().catch(error => {
-        console.error("Could not claim browser playback:", error);
-    });
+    if (position > 0) {
+        player.addEventListener("loadedmetadata", () => {
+            player.currentTime = position;
+
+            player.play().catch(error => {
+                console.error("Browser playback failed:", error);
+            });
+        }, { once: true });
+    }
 
     player.load();
 
@@ -6096,7 +5929,9 @@ if (song.cover) {
         setupSpectrumAnalyzer();
     }
 
-    player.play();
+    if (position <= 0) {
+        player.play();
+    }
 
 }
 
@@ -6208,35 +6043,48 @@ favoriteButton.addEventListener("click", toggleFavorite);
 
 playButton.addEventListener("click", async () => {
 
-    try {
-        const state = await getSession();
+    // LAPTOP MODE
+    if (outputSelector.value === "laptop") {
 
-        if (!state.track) {
-    if (songs.length > 0) {
-        const index = currentSong >= 0 ? currentSong : 0;
+        try {
+            const response = await fetch(`${receiverURL}/status`);
+            const status = await response.json();
 
-        if (state.output === "browser" &&
-            (!state.browser_id || state.browser_id === browserId)) {
+            if (!response.ok) {
+                throw new Error("Could not get VLC status");
+            }
 
-            await claimBrowser();
-            outputSelector.value = "browser";
-            playSong(index);
+            if (status.playing) {
+                await receiverCommand("pause");
+                playButton.classList.remove("is-playing");
+            } else {
+                await receiverCommand("resume");
+                playButton.classList.add("is-playing");
+            }
 
-        } else {
-            await sendSessionCommand("play", {
-                path: songs[index].file
-            });
+        } catch (error) {
+            console.error("VLC play/pause failed:", error);
         }
+
+        return;
     }
-    return;
-}
 
-        await sendSessionCommand(
-            state.playing ? "pause" : "resume"
-        );
+    // BROWSER MODE (existing behavior)
+    if (!player.src) {
+        if (songs.length > 0) {
+            playSong(0);
+        }
+        return;
+    }
 
-    } catch (error) {
-        console.error("Playback control failed:", error);
+    if (player.paused) {
+        player.play();
+    } else {
+        player.pause();
+
+        if ("mediaSession" in navigator) {
+            navigator.mediaSession.playbackState = "paused";
+        }
     }
 
 });
@@ -6596,43 +6444,101 @@ player.addEventListener(
    SEEK
    ============================================================ */
 
+let vlcDuration = 0;
+let isSeeking = false;
+let vlcEndedHandled = false;
+
 progress.addEventListener("input", () => {
 
-    // Browser output: update the local playback position while dragging.
-    if (outputSelector.value === "browser") {
+    if (outputSelector.value === "laptop") {
+        isSeeking = true;
 
-        if (!Number.isFinite(player.duration)) return;
+        if (vlcDuration > 0) {
+            const position =
+                (progress.value / 100) * vlcDuration;
 
-        const position =
-            (progress.value / 100) * player.duration;
+            currentTime.textContent = formatTime(position);
+        }
 
-        player.currentTime = position;
-        currentTime.textContent = formatTime(position);
+        return;
     }
 
+    // Existing browser playback behaviour
+    if (!Number.isFinite(player.duration)) return;
+
+    player.currentTime =
+        (progress.value / 100) * player.duration;
+
+    currentTime.textContent = formatTime(player.currentTime);
 });
 
 
-// Send the final seek position when the user releases the slider.
 progress.addEventListener("change", async () => {
 
+    if (outputSelector.value !== "laptop") return;
+    if (vlcDuration <= 0) return;
+
+    const position =
+        (progress.value / 100) * vlcDuration;
+
     try {
-        const state = await getSession();
-
-        if (!state.duration) return;
-
-        const position =
-            (progress.value / 100) * state.duration;
-
-        await sendSessionCommand("seek", {
+        await receiverCommand("seek", {
             seconds: position
         });
-
     } catch (error) {
-        console.error("Seeking failed:", error);
+        console.error("VLC seek failed:", error);
+    } finally {
+        isSeeking = false;
+    }
+});
+
+setInterval(async () => {
+
+    if (outputSelector.value !== "laptop" || isSeeking) return;
+
+    try {
+        const response = await fetch(`${receiverURL}/status`, {
+            cache: "no-store"
+        });
+
+        if (!response.ok) return;
+
+        const status = await response.json();
+
+        // Detect when VLC finishes the current track.
+if (String(status.state).toLowerCase().includes("ended")) {
+
+    if (!vlcEndedHandled) {
+        vlcEndedHandled = true;
+        nextSong();
     }
 
-});
+    return;
+}
+
+// Re-arm detection once VLC starts another playback state.
+vlcEndedHandled = false;
+
+        vlcDuration = status.duration_ms / 1000;
+
+        const position = status.position_ms / 1000;
+
+        if (vlcDuration > 0) {
+
+            progress.value =
+                (position / vlcDuration) * 100;
+
+            currentTime.textContent = formatTime(position);
+            duration.textContent = formatTime(vlcDuration);
+        }
+
+    } catch (error) {
+        console.error("VLC status sync failed:", error);
+    }
+
+}, 500);
+
+
 
 /* ============================================================
    VOLUME

@@ -117,29 +117,11 @@ def report_session():
 
 @app.route("/session", methods=["GET"])
 def get_session():
-    browser_id = request.args.get("browser_id")
-
     with session_lock:
         state = session.copy()
 
-        if browser_id != session["browser_id"]:
-            state["command"] = None
-
-        output = session["output"]
-
-    if output == "laptop":
-        with player_lock:
-            state.update(
-                {
-                    "track": current_file,
-                    "playing": bool(player.is_playing()),
-                    "position": max(0, player.get_time()) / 1000,
-                    "duration": max(0, player.get_length()) / 1000,
-                    "volume": max(0, player.audio_get_volume()) / 100,
-                }
-            )
-
-    elif state["playing"]:
+    # Estimate the current position between browser updates.
+    if state["playing"]:
         elapsed = time.time() - state["updated_at"]
         state["position"] += elapsed
 
@@ -151,66 +133,18 @@ def get_session():
 
 @app.route("/session/command", methods=["POST"])
 def session_command():
-    global current_file
-
     data = request.get_json(silent=True) or {}
-    command = data.get("command")
 
+    command = data.get("command")
     allowed_commands = {"play", "pause", "resume", "seek", "volume", "stop"}
 
     if command not in allowed_commands:
         return jsonify({"error": "Invalid command"}), 400
 
     with session_lock:
-        output = session["output"]
+        if session["output"] != "browser":
+            return jsonify({"error": "Laptop output is not implemented yet"}), 409
 
-    # Laptop output: execute commands directly through VLC.
-    if output == "laptop":
-
-        try:
-            with player_lock:
-
-                if command == "play":
-                    path = data.get("path")
-                    resolved_path = resolve_track_path(path)
-
-                    if not resolved_path:
-                        return jsonify({"error": "Invalid track path"}), 400
-
-                    media = instance.media_new(str(resolved_path))
-                    player.stop()
-                    player.set_media(media)
-                    current_file = path
-                    result = player.play()
-
-                    if result == -1:
-                        return jsonify({"error": "VLC playback failed"}), 500
-
-                elif command == "pause":
-                    player.set_pause(1)
-
-                elif command == "resume":
-                    player.set_pause(0)
-
-                elif command == "seek":
-                    seconds = float(data["seconds"])
-                    player.set_time(max(0, int(seconds * 1000)))
-
-                elif command == "volume":
-                    value = max(0, min(100, int(data["value"])))
-                    player.audio_set_volume(value)
-
-                elif command == "stop":
-                    player.stop()
-                    current_file = None
-
-            return jsonify({"success": True})
-
-        except (KeyError, TypeError, ValueError):
-            return jsonify({"error": "Invalid command data"}), 400
-
-    # Browser output: queue the command for the active browser.
-    with session_lock:
         session["command_id"] += 1
 
         session["command"] = {
@@ -219,9 +153,7 @@ def session_command():
             "data": data,
         }
 
-        command_id = session["command_id"]
-
-    return jsonify({"success": True, "command_id": command_id})
+    return jsonify({"success": True, "command_id": session["command_id"]})
 
 
 @app.route("/session/ack", methods=["POST"])
@@ -253,31 +185,17 @@ def claim_browser():
     return jsonify({"success": True})
 
 
-@app.route("/session/output", methods=["POST"])
-def set_session_output():
-    data = request.get_json(silent=True) or {}
-    output = data.get("output")
-
-    if output not in ("browser", "laptop"):
-        return jsonify({"error": "Invalid output"}), 400
-
-    with session_lock:
-        session["output"] = output
-        session["command"] = None
-        session["updated_at"] = time.time()
-
-        if output == "laptop":
-            session["browser_id"] = None
-
-    return jsonify({"success": True, "output": output})
-
-
 @app.route("/play", methods=["POST"])
 def play():
     global current_file
 
     data = request.get_json(silent=True) or {}
     relative_path = data.get("path", "")
+
+    try:
+        position = max(0.0, float(data.get("position", 0)))
+    except (TypeError, ValueError):
+        return jsonify({"error": "Invalid playback position"}), 400
 
     resolved_path = resolve_track_path(relative_path)
 
@@ -287,6 +205,17 @@ def play():
     with player_lock:
         if current_file == relative_path and player.get_state() == vlc.State.Paused:
             result = player.play()
+
+            if result != -1:
+                deadline = time.monotonic() + 3
+
+                while time.monotonic() < deadline:
+                    if player.is_playing():
+                        break
+                    time.sleep(0.05)
+
+                if position > 0:
+                    player.set_time(int(position * 1000))
         else:
             media = instance.media_new(str(resolved_path))
             player.stop()
@@ -295,10 +224,23 @@ def play():
             current_file = relative_path
             result = player.play()
 
-    if result == -1:
-        return jsonify({"error": "VLC could not start playback"}), 500
+        if result == -1:
+            return jsonify({"error": "VLC could not start playback"}), 500
 
-    return jsonify({"message": "Playback started", "file": current_file})
+        # Wait for VLC to start playing before seeking.
+        deadline = time.monotonic() + 3
+
+        while time.monotonic() < deadline:
+            if player.is_playing():
+                break
+            time.sleep(0.05)
+
+        if position > 0:
+            player.set_time(int(position * 1000))
+
+    return jsonify(
+        {"message": "Playback started", "file": current_file, "position": position}
+    )
 
 
 @app.route("/pause", methods=["POST"])
