@@ -757,7 +757,7 @@
 
             background-size: cover;
 
-            filter: blur(75px);
+            filter: blur(55px);
             opacity: 0.58;
 
             transform: scale(1.1);
@@ -771,7 +771,7 @@
 
             inset: 0;
 
-            background: rgba(0, 0, 0, 0.68);
+            background: rgba(0, 0, 0, 0.48);
 
             z-index: 1;
         }
@@ -1257,12 +1257,6 @@ transform-origin: center center;
     margin-top: 4px;
     color: #666;
     font-size: 14px;
-}
-
-#song-album.album-scroll-area {
-    width: calc(100% - 90px);
-    margin-left: 60px;
-    box-sizing: border-box;
 }
 
 /* Apply the same scrolling animation to all three lines. */
@@ -6297,19 +6291,11 @@ function updateScrollingText(element, content) {
     element.appendChild(text);
 
     requestAnimationFrame(() => {
-        const isAlbum = element.id === "song-album";
-
-const availableWidth = isAlbum
-    ? element.parentElement.clientWidth - 90
-    : element.clientWidth;
+        const availableWidth = element.clientWidth;
         const textWidth = text.getBoundingClientRect().width;
         const overflow = textWidth - availableWidth;
 
         if (overflow > 2) {
-
-    if (isAlbum) {
-        element.classList.add("album-scroll-area");
-    }
 
     text.classList.add("title-scroll");
 
@@ -6324,10 +6310,6 @@ const availableWidth = isAlbum
     );
 
 } else {
-
-    if (isAlbum) {
-        element.classList.remove("album-scroll-area");
-    }
 
 }
     });

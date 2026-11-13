@@ -3,8 +3,10 @@ import sys
 from pathlib import Path
 import time
 import argparse
+import os
 
 BASE_DIR = Path(__file__).resolve().parent
+IS_WINDOWS = os.name == "nt"
 FAVORITES_API_SCRIPT = BASE_DIR / "favorites.py"
 PLAYLIST_API_SCRIPT = BASE_DIR / "playlists_api.py"
 VLC_RECEIVER_SCRIPT = BASE_DIR / "musibile_receiver_api.py"
@@ -42,13 +44,19 @@ if args.http:
     try:
         print("Starting Musibile servers...")
         # Start the HTTP server
-        http_server = subprocess.Popen(
+        http_server_command = (
             [
                 "powershell.exe",
                 "-NoProfile",
                 "-Command",
                 "http-server . -p 8080 -c-1",
-            ],
+            ]
+            if IS_WINDOWS
+            else ["http-server", ".", "-p", "8080", "-c-1"]
+        )
+
+        http_server = subprocess.Popen(
+            http_server_command,
             cwd=BASE_DIR,
         )
         processes.append(http_server)
@@ -83,7 +91,7 @@ if args.http:
                 sys.executable,
                 str(VLC_RECEIVER_SCRIPT),
                 "http",
-                LIBRARY_DIR,
+                str(LIBRARY_DIR),
             ],
             cwd=BASE_DIR,
         )
@@ -128,13 +136,29 @@ if args.https:
     try:
         print("Starting Musibile servers...")
         # Start the HTTP server
-        http_server = subprocess.Popen(
+        http_server_command = (
             [
                 "powershell.exe",
                 "-NoProfile",
                 "-Command",
-                "http-server -S -C 'cert.pem' -K 'key.pem' -p 8080",
-            ],
+                "http-server -S -C 'cert.pem' -K 'key.pem' -p 8080 -c-1",
+            ]
+            if IS_WINDOWS
+            else [
+                "http-server",
+                "-S",
+                "-C",
+                "cert.pem",
+                "-K",
+                "key.pem",
+                "-p",
+                "8080",
+                "-c-1",
+            ]
+        )
+
+        http_server = subprocess.Popen(
+            http_server_command,
             cwd=BASE_DIR,
         )
         processes.append(http_server)
