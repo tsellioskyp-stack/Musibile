@@ -17,12 +17,11 @@ def resolve_track_path(relative_path):
 
     relative_path = relative_path.replace("\\", "/")
 
-    # Remove the /songs/ URL prefix.
-    if not relative_path.startswith("/songs/"):
+    # Remove the /Music/ URL prefix.
+    if not relative_path.startswith("/Music/"):
         return None
 
-    relative_path = relative_path[len("/songs/") :]
-
+    relative_path = relative_path[len("/Music/") :]
     track_path = Path(relative_path)
 
     if ".." in track_path.parts:
