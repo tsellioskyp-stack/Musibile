@@ -5030,16 +5030,16 @@ function parseSyncedLyrics(lyrics) {
 }
 
 
-function updateLyricsHighlight() {
+function updateLyricsHighlight(playbackPosition = player.currentTime) {
     if (!coverContainer.classList.contains("show-lyrics")) return;
 
     const lines = lyricsContent.querySelectorAll(".lyric-line");
-    if (!lines.length || !Number.isFinite(player.currentTime)) return;
+    if (!lines.length || !Number.isFinite(playbackPosition)) return;
 
     let activeLine = -1;
 
     lines.forEach((line, index) => {
-        if (Number(line.dataset.time) <= player.currentTime) {
+        if (Number(line.dataset.time) <= playbackPosition) {
             activeLine = index;
         }
     });
@@ -5049,19 +5049,19 @@ function updateLyricsHighlight() {
     });
 
     if (activeLine >= 0) {
-    const line = lines[activeLine];
+        const line = lines[activeLine];
 
-    const containerCenter = lyricsContent.clientHeight / 2;
-    const lineCenter = line.offsetTop + line.offsetHeight / 2;
+        const containerCenter = lyricsContent.clientHeight / 2;
+        const lineCenter = line.offsetTop + line.offsetHeight / 2;
 
-    lyricsContent.scrollTo({
-        top: lineCenter - containerCenter,
-        behavior: "smooth"
-    });
+        lyricsContent.scrollTo({
+            top: lineCenter - containerCenter,
+            behavior: "smooth"
+        });
+    }
 }
-}
 
-player.addEventListener("timeupdate", updateLyricsHighlight);
+player.addEventListener("timeupdate", () => updateLyricsHighlight());
 
 
 document.addEventListener("click", event => {
@@ -7219,6 +7219,7 @@ vlcEndedHandled = false;
 
             currentTime.textContent = formatTime(position);
             duration.textContent = formatTime(vlcDuration);
+            updateLyricsHighlight(position);
         }
 
     } catch (error) {

@@ -9,3 +9,4 @@ MusicPlayer/package.json
 MusicPlayer/cert.pem
 MusicPlayer/key.pem
 MusicPlayer/mkcert.exe
+MusicPlayer/start_serverOG.py
