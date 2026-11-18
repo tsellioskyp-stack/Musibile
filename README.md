@@ -1,19 +1,39 @@
 ```text
-███╗   ███╗██╗   ██╗███████╗██╗██████╗ ██╗██╗     ███████╗
-████╗ ████║██║   ██║██╔════╝██║██╔══██╗██║██║     ██╔════╝
-██╔████╔██║██║   ██║███████╗██║██████╔╝██║██║     █████╗
-██║╚██╔╝██║██║   ██║╚════██║██║██╔══██╗██║██║     ██╔══╝
-██║ ╚═╝ ██║╚██████╔╝███████║██║██████╔╝██║███████╗███████╗
-╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝╚═════╝ ╚═╝╚══════╝╚══════╝
+	███╗   ███╗██╗   ██╗███████╗██╗██████╗ ██╗██╗     ███████╗
+	████╗ ████║██║   ██║██╔════╝██║██╔══██╗██║██║     ██╔════╝
+	██╔████╔██║██║   ██║███████╗██║██████╔╝██║██║     █████╗
+	██║╚██╔╝██║██║   ██║╚════██║██║██╔══██╗██║██║     ██╔══╝
+	██║ ╚═╝ ██║╚██████╔╝███████║██║██████╔╝██║███████╗███████╗
+	╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝╚═════╝ ╚═╝╚══════╝╚══════╝
 ```
+<img src="./assets/demo1.png" alt="Demo GIF" width="100%" />
 
-## A self-hosted personal music library and web-based music player built for high-quality local music streaming.
+---
+<p align="center">
+<small><em>Desktop View</em></small>
+</p>
+
+---
+<p align="center">
+<img src="./assets/demo4.jpg" alt="Demo GIF" width="32%" />
+<img src="./assets/demo_mobile.gif" alt="Demo GIF" width="34%" />
+<img src="./assets/demo5.jpg" alt="Demo GIF" width="32%" />
+
+---
+<p align="center"><small><em>Mobile View</em></small>
+</p>
+
+---
+*Disclaimer: Album covers and artist names shown in the screenshots belong to their respective copyright owners and are displayed solely for demonstration purposes.*
+
+## <p align="center">A self-hosted personal music library and web-based music player built for high-quality local music streaming.
 
 Musibile is a personal music server project designed to make a large local music collection accessible through a custom web interface. It combines a lightweight web-based music player with Python-powered library management, allowing you to organize, browse, search, and play your music directly from your own computer.
 
+
 Built with a focus on simplicity, customization, and self-hosting, Musibile is designed to handle a large music collection without relying on third-party streaming platforms or cloud music services.
 
-## == Features ==
+## <span style="color: lime;">== Features ==
 
 Custom web-based music player — A dark-themed interface with album artwork, playback controls, and a clean, responsive layout.
 
@@ -37,7 +57,7 @@ Local music hosting — Serve your music library over a local network, with the 
 
 Lossless audio support — Designed to work with formats such as FLAC, alongside MP3 and M4A files supported by the library scanner.
 
-## == Technologies ==
+## <span style="color: lime;">== Technologies ==
 
 HTML, CSS, and JavaScript — Frontend interface and playback logic.
 
@@ -51,7 +71,7 @@ HTTP server — Hosting the web interface and music files.
 
 Tailscale — Optional private-network connectivity for accessing the server remotely.
 
-## == Library Management ==
+## <span style="color: lime;">== Library Management ==
 
 Musibile includes Python scripts for scanning music directories and extracting metadata from supported audio files. The scanner collects information such as track titles, artists, albums, genres, and release years, while also extracting embedded front-cover artwork where available.
 
@@ -59,17 +79,17 @@ An incremental album-import workflow is intended to make library maintenance mor
 
 This approach is particularly useful for large libraries containing thousands of tracks.
 
-## == Self-Hosting ==
+## <span style="color: lime;">== Self-Hosting ==
 
 The project is designed to run on your own computer, which acts as the music server. Other devices can access the web player through a browser over the same local network.
 
 With an appropriately configured private network, such as Tailscale, the player can also be accessed remotely without making the music server publicly accessible to the entire internet.
 
-## == Responsive Interface ==
+## <span style="color: lime;">== Responsive Interface ==
 
 The player is designed for desktop and mobile use, with a compact layout, album artwork animations, touch-based track navigation, and familiar playback controls.
 
-## == Project Goals ==
+## <span style="color: lime;">== Project Goals ==
 
 Build a personal alternative to cloud-based music streaming.
 
@@ -81,45 +101,31 @@ Learn and apply Python, JavaScript, HTML, and CSS through a practical project.
 
 Explore self-hosting, networking, metadata processing, and media delivery.
 
-## == Project Status ==
+## <span style="color: lime;">== Project Status ==
 
 Musibile is an ongoing personal project. Features, performance, and library-management workflows are being refined as the project develops.
 
-## == Privacy and Ownership ==
+## <span style="color: lime;">== Privacy and Ownership ==
 
 Your music library remains on your own hardware. The project is intended for personal use, giving you control over your files, library organization, and access to your music.
 
 Built as a personal project to combine music, programming, and self-hosted infrastructure.
 
-# Library Scanner — Terminal Usage
+## <span style="color: lime;">Requirements
 
-`libraryscan.py` is the command-line library management script used by Musibile. It scans audio files, extracts metadata and album artwork, generates `music.json`, and supports incremental imports of new music folders.
-
-## Requirements
-
-- Python 3
-- Mutagen, for reading audio metadata and embedded artwork
-- Flask and Flask CORS, for the backend
+- <span style="color: lime;">Python 3
+- <span style="color: lime;">Mutagen</span>, for reading audio metadata and embedded artwork
+- <span style="color: lime;">Flask</span> and <span style="color: lime;">Flask CORS</span>, for the backend
+- <span style="color: lime;">Node.js</span> installed on your machine to be able to create a server over http or https
 - An existing music library directory
+- <span style="color: lime;">VLC</span> & <span style="color: lime;">vlc-python</span> library installed on the machine
+- <span style="color: lime;">sqlite3</span> library, for playlists functionality
 
-Install the required dependency from your project's virtual environment:
-
+Install the required python dependencies from your project's virtual environment:
 ```bash
 pip install -r requirements.txt
 ```
-
-## Command Syntax
-
-Run the script from your terminal using the following syntax:
-
-```bash
-python libraryscan.py [OPTIONS] MUSIC_FOLDER
-```
-
-`MUSIC_FOLDER` is the root directory of your music library, such as `MusicPlayer/songs`.
-
-The script supports two mutually exclusive operating modes: scanning and updating. An optional flag enables an embedded-artwork check during scanning.
-
+## Steps: 
 ## 1. Full Library Scan
 
 Generate a new library database by scanning all supported audio files inside the specified music directory and its subdirectories.
@@ -127,7 +133,7 @@ Generate a new library database by scanning all supported audio files inside the
 **Command:**
 
 ```bash
-python libraryscan.py --scan "C:\Users...\YourLIbraryOfMusic"
+python libraryscanner.py --scan "C:\Users...\YourLIbraryOfMusic"
 ```
 
 Short form:
@@ -149,10 +155,12 @@ python libraryscan.py -s "C:\Users...\YourLIbraryOfMusic"
 
 | Field | Description |
 |---|---|
+| `track_number` | The sequential index number of a track within the album |
 | `title` | Track title |
 | `artist` | Track artist |
 | `albumartist` | Album artist |
 | `album` | Album name |
+| `album_tracks` | Total number of tracks within the album |
 | `year` | Release date or year tag |
 | `genre` | Genre or comma-separated genres |
 | `cover` | Relative web path to the album artwork, or `null` |
@@ -160,8 +168,10 @@ python libraryscan.py -s "C:\Users...\YourLIbraryOfMusic"
 | `size` | File size in MB |
 | `bitrate` | Bitrate in kbps, if available |
 | `sample_rate` | Sample rate in kHz, if available |
+| `bit_depth` | Bit depth of track, in bits, if available |
 | `length` | Duration in seconds |
 | `file_type` | Audio file extension |
+| `favorite` | A True/False flag that by default is False in the scan |
 
 Missing metadata is generally stored as `null` or an empty string, depending on the field.
 
@@ -173,6 +183,32 @@ The full scan generates two files inside the music directory:
 - **`existing_songs_paths.txt`** — a sorted list of the directories containing discovered audio files.
 
 Both files are overwritten during a full scan.
+
+During a full scan, the terminal displays the file currently being processed:
+
+```text
+============================================================
+Scanning music library at: "C:\Users...\YourLIbraryOfMusic"
+============================================================
+
+Scanning: C:\...\songs\Artist\Album\01 - Track.flac
+  ✓ Cover created: Album.jpg
+
+Scanning: C:\...\songs\Artist\Album\02 - Track.flac
+  ✓ Cover already exists: Album.jpg
+
+Scanning: C:\...\songs\Artist\Album\03 - Track.mp3
+  - No embedded artwork
+
+============================================================
+Music library generated successfully!
+============================================================
+JSON: C:\...\songs\music.json
+Existing songs paths .txt file output at: C:\...\songs\existing_songs_paths.txt
+Songs found: 3
+```
+
+The example above illustrates the output format; actual messages depend on the files encountered.
 
 ## 2. Incremental Library Update
 
@@ -190,7 +226,7 @@ Short form:
 python libraryscan.py "C:\Users...\YourLIbraryOfMusic" -u "C:\Music\Artist A\Album 1" "C:\Music\Artist B\Album 2" "C:\Music\Artist C\Album 3" ..."
 ```
 
-The argument prior to `-u` is always the root music library directory. The paths immediately following `-u` are the folders to import.
+The argument prior to `-u` is always the root music library directory, where the source-of-truth music.json must be stored. The paths immediately following `-u` are the folders to import.
 
 ### What it does
 
@@ -202,8 +238,22 @@ The argument prior to `-u` is always the root music library directory. The paths
 6. Extracts metadata and attempts to extract front-cover artwork.
 7. Appends the new track entries to the existing `music.json`.
 8. Updates `existing_songs_paths.txt`.
+9. Creates a file `updates.json` in the same directory as `music.json`. This will be later used to append newly updated tracks in the music.json file, to the pre-existing `library.db`, without re-forming the entire database from scratch.
 
 If any supplied directory is invalid, the script asks whether to continue with the valid directories or cancel the update.
+
+During an incremental update, the script displays the directories to import, requests confirmation, and finally reports the number of song entries added:
+
+```text
+Updating music library at: "C:\Users...\YourLIbraryOfMusic"
+
+Valid directories to add:
+  C:\Music\Artist\Album
+
+Continue with the update ? (Invalid directories will be skipped) (y/n): y
+
+Songs added: 12
+```
 
 **Important:** The update operation appends entries without checking whether those tracks already exist in `music.json`. Importing the same directory twice can therefore create duplicate entries. Use this mode for new, not-yet-imported folders.
 
@@ -251,64 +301,38 @@ To display the available options:
 ```bash
 python libraryscan.py --help
 ```
+## 5. Setup New Database
 
-## 5. Terminal Output
+Using the `setupdb.py` script to generate from scratch, a new database (sqlite3) containing all the data from `music.json`
 
-During a full scan, the terminal displays the file currently being processed:
-
-```text
-============================================================
-Scanning music library at: "C:\Users...\YourLIbraryOfMusic"
-============================================================
-
-Scanning: C:\...\songs\Artist\Album\01 - Track.flac
-  ✓ Cover created: Album.jpg
-
-Scanning: C:\...\songs\Artist\Album\02 - Track.flac
-  ✓ Cover already exists: Album.jpg
-
-Scanning: C:\...\songs\Artist\Album\03 - Track.mp3
-  - No embedded artwork
-
-============================================================
-Music library generated successfully!
-============================================================
-JSON: C:\...\songs\music.json
-Existing songs paths .txt file output at: C:\...\songs\existing_songs_paths.txt
-Songs found: 3
+```bash
+python setupdb.py 'C:/Users/Music'
 ```
 
-The example above illustrates the output format; actual messages depend on the files encountered.
+, where `'C:/Users/Music'` is the directory of `music.json` source-of-truth file. This database will be used to store/create/edit/delete playlists.
 
-During an incremental update, the script displays the directories to import, requests confirmation, and finally reports the number of song entries added:
+## 6. Update Existing Database
+Using the `updatedb.py` script to update a pre-existing database of tracks by providing through command-line arguments the path of `library.db`, in which same directory an `updates.json` file must be present (after executing the `libraryscanner.py` script with its `--update` function).
 
-```text
-Updating music library at: "C:\Users...\YourLIbraryOfMusic"
-
-Valid directories to add:
-  C:\Music\Artist\Album
-
-Continue with the update ? (Invalid directories will be skipped) (y/n): y
-
-Songs added: 12
+```bash
+python updatedb.py 'C:/Users/Music'
 ```
+`'C:/Users/Music'`: Directory to music library where all the albums and .json files are, and where the database is stored. After successfully updating the database, the `updates.json` file is <span style="color: red;">**deleted**</span>.
 
-## 6. Error Handling
+## 7. Start a Server
+Running the `start_server.py` script, a sequence of actions takes place. Particularly, the HTML browser-based server is launched, alongside the Favorites API, Playlists API and the VLC Playback Source API, providing a ready-to-use application.
 
-The script handles several common problems:
+```bash
+python start_server.py './Music' --https [OR] --http
+```
+, where `./Music` is the directory containing the albums and tracks, alongside the `music.json` and `library.db` files.
 
-- **Root directory not found:** execution terminates with an error.
-- **Invalid import directory:** the path is reported and skipped.
-- **Unreadable audio file during a full scan:** the error is printed and scanning continues.
-- **Missing embedded artwork:** the track is still added to the library.
-- **Missing existing `music.json` during an update:** the script starts with an empty library and writes the imported entries.
+There are two options to launch the server, over http or, using valid certificates present in the root directory of the project, over https. <span style="color: lime;">Launching the server over https provides the option for Musibile to be used as an installable PWA app on mobile!</span>
 
-Some errors in update mode, including certain metadata-reading and artwork-extraction failures, are not caught individually and may terminate the operation.
-
-## 7. Important Usage Considerations
+## 8. Important Usage Considerations
 
 - Always quote Windows paths containing spaces.
-- Run a full scan when you need to regenerate the entire library database.
+- Run a full scan when you need to regenerate the entire library `music.json`.
 - Use incremental updates to avoid repeatedly processing an established collection.
 - Back up `music.json` before importing new music, especially while the update workflow is being developed.
 - Avoid importing the same albums more than once.
@@ -341,19 +365,63 @@ The interface features a **dark theme**, album artwork, a blurred artwork backgr
 - **Album Artwork** — Display album covers with animated transitions and surrounding artwork previews.
 - **Playback Controls** — Play, pause, skip tracks, adjust volume, and monitor playback progress.
 - **Playback Modes** — Switch between sequential playback, shuffle, and repeat-current-track modes.
-- **Favorites - Liked Songs** - Like / Un-like a track and update it's metadata in the music.json file in real time
+- **Favorites - Liked Songs** - Like / Un-like a track and update it's metadata in the music.json file in real time.
+- **Playlists** - Create, edit, delete playlists on the browser by storing-removing elements in/out of the `library.db` database.
 - **Album Navigation** — Scroll or swipe vertically through albums, with animated cover transitions and previews of neighboring albums.
 - **Track Navigation** — Move between tracks using playback controls, with horizontal album artwork previews.
 - **Visual Effects** — Real-time audio spectrum visualization and a blurred album-art background.
 - **Buffering Information** — Monitor playback buffering and network transfer activity.
 - **Responsive Interface** — A mobile-friendly layout with touch gestures and adapted controls for smaller screens.
+- **Lyrics & Artist Info Fetching** from web APIs (LRCLIB & Wiki).
+<p align="center">
+<img src="./assets/demo2.png" alt="Demo GIF" width=90%" />
+</p>
+
 - **Local Music Streaming** — Stream music hosted on a personal computer over the home network, with remote access possible through a private network connection.
+- **Playback Source Switching** — Toggle between playback coming out of the servers audio output (if available) or any connected devices to the local server.
 
 ## Getting Started from Scratch
 
 **Musibile** can be set up using nothing more than a directory containing your music library. You do not need an existing `music.json` file or a preconfigured database to begin.
 
-1. **Prepare your music library:** Place your music files in a directory, preferably organized into folders by artist and album. Musibile supports `.FLAC`, `.MP3`, and `.M4A` files.
+1. **Prepare your music library:** Place your music files in a directory, preferably organized into folders by artist and album. Musibile supports `.FLAC`, `.MP3`, and `.M4A` files. The root folder containing all sub-folders of artists, albums etc must be named **Music**. <span style="color: lime;">A typical application directory would look like this:  
+```bash
+.
+├── icons
+│   ├── musibile-192.png
+│   └── musibile-512.png
+├── images
+│   └── no_artwork.png
+├── Music
+│   ├── Artist_1
+│   │   └── Album_1
+│   │       ├── 1-01 Track1.flac
+│   │       ├── 1-02 Track2.flac
+│   │       └── 2-01 Track2.mp3
+│   ├── Artist_2
+│   │   └── Album_1
+│   │       ├── 1-02 Track1.flac
+│   │       └── 2-01 Track2.mp3
+│   ├── existing_songs_paths.txt (created after running `libraryscanner.py` with `-s`)
+│   ├── library.db (created after running `setupdb.py`)
+│   ├── music.json (created after running `libraryscanner.py` with `-s`)
+│   └── updates.json (created after running `libraryscanner.py` with `-u`)
+├── cert.pem (optional for running the server over https)
+├── favicon.ico
+├── favorites.py
+├── index.html
+├── key.pem (optional for running the server over https)
+├── libraryscanner.py
+├── manifest.webmanifest
+├── musibile_receiver_api.py
+├── package-lock.json
+├── package.json
+├── playlists_api.py
+├── requirements.txt
+├── setupdb.py
+├── start_server.py
+└── updatedb.py
+```
 2. **Configure and scan your library:** Set the music directory in the scanner's configuration (as in-line arguments) so it points to your collection. Run the library scanner to discover your tracks, extract their metadata and embedded artwork, and generate the initial `music.json` file. This step can be performed to UPDATE your `music.json`, after having it already created. This is to append new insertions in the `music.json` for newly added albums, without having to re-parse the whole music library!
 3. **Initialize the database:** Run `setupdb.py` to create the database required by Musibile.
 4. **Start the server:** Run `start_server.py` to launch the backend and make your library available to the web player.
@@ -363,4 +431,6 @@ Once the initial setup is complete, you can stream your collection, manage favor
 
 **Note:** The exact commands and configuration depend on the scanner and server setup included in your installation.
 
-Enjoy!
+<p align="center">
+<span style="color: lime;">🎵 Enjoy! 🎶
+</p>
