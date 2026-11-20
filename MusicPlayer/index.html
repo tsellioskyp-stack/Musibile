@@ -1373,21 +1373,6 @@ transform-origin: center center;
             font-size: 12px;
         }
 
-
-        /* =========================================================
-           NETWORK
-           ========================================================= */
-
-        .network-info {
-            text-align: center;
-
-            margin-top: 6px;
-
-            color: #666;
-
-            font-size: 11px;
-        }
-
         /* =========================================================
            INFO BUTTON
            ========================================================= */
@@ -3417,16 +3402,6 @@ button:focus-visible {
             </button>
         </div>
 
-            <!-- NETWORK SPEED -->
-
-            <div class="network-info">
-
-                <span id="downloadSpeed">
-                    Buffering: -- MB/s
-                </span>
-
-            </div>
-
 <!-- PLAYER CONTROLS -->
 
 <div class="controls">
@@ -3759,6 +3734,23 @@ const newPlaylistName = document.getElementById("newPlaylistName");
 const playlistNameMessage = document.getElementById("playlistNameMessage");
 const playlistsApiUrl =
     `${window.location.protocol}//${window.location.hostname}:5001/api/playlists`;
+const sessionApiUrl =
+    `${window.location.protocol}//${window.location.hostname}:5001/api/session`;
+
+
+function saveLastSession(song) {
+    fetch(sessionApiUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            file: song.file
+        })
+    }).catch(error => {
+        console.error("Could not save last session:", error);
+    });
+}
 
 let showFavoritesOnly = false;
 
@@ -3797,11 +3789,6 @@ const shuffleButton =
 
 const repeatButton =
     document.getElementById("repeatButton");
-
-
-const downloadSpeed =
-    document.getElementById("downloadSpeed");
-
 
 const bufferBar =
     document.getElementById("bufferBar");
@@ -3913,17 +3900,47 @@ fetch("Music/music.json")
 
     })
 
-    .then(data => {
+    .then(async data => {
 
-        songs = data;
+    songs = data;
 
-        buildLibrary();
+    buildLibrary();
 
-        renderLibrary();
+    renderLibrary();
 
-        buildMobileAlbumCarousel();
+    buildMobileAlbumCarousel();
 
-    })
+    // Restore last session
+    try {
+
+        const response = await fetch(sessionApiUrl, {
+            cache: "no-store"
+        });
+
+        if (!response.ok) {
+            throw new Error("Could not load last session");
+        }
+
+        const result = await response.json();
+        const savedFile = result.session?.file;
+
+        if (!savedFile) {
+            return;
+        }
+
+        const savedIndex = songs.findIndex(
+            song => song.file === savedFile
+        );
+
+        if (savedIndex !== -1) {
+            playSong(savedIndex, 0, false);
+        }
+
+    } catch (error) {
+        console.error("Could not restore last session:", error);
+    }
+
+})
 
     .catch(error => {
 
@@ -6464,7 +6481,7 @@ try {
 
 });
 
-function playSong(index, position = 0) {
+function playSong(index, position = 0, autoplay = true) {
 
     if (
         index < 0 ||
@@ -6488,6 +6505,7 @@ function playSong(index, position = 0) {
     updateVerticalGhost();
 
     const song = songs[currentSong];
+    saveLastSession(song);
     updateMobileAlbumCarouselForSong(song);
     if (coverContainer.classList.contains("show-lyrics")) 
     {
@@ -6495,24 +6513,6 @@ function playSong(index, position = 0) {
     }
     updateFavoriteButton();
     updateMediaSession(song);
-
-    /* RESET NETWORK MEASUREMENT */
-
-    currentSongSize =
-        song.size || 0;
-
-
-    lastBufferedEnd = 0;
-
-
-    lastSpeedTime =
-        performance.now();
-
-
-    downloadSpeed.textContent =
-        "Buffering: measuring...";
-
-
 
     /* RESET PROGRESS */
 
@@ -6590,19 +6590,25 @@ if (song.cover) {
 }
     /* LOAD */
 
-    if (outputSelector.value === "laptop") {
+if (outputSelector.value === "laptop") {
 
     player.pause();
 
-    receiverCommand("play", {
-        path: song.file
-    }).catch(error => {
-        console.error("Laptop playback failed:", error);
-    });
+    if (autoplay) {
+        receiverCommand("play", {
+            path: song.file
+        }).catch(error => {
+            console.error("Laptop playback failed:", error);
+        });
+    } else {
+        receiverCommand("pause").catch(error => {
+            console.error("Could not pause laptop playback:", error);
+        });
+    }
 
 } else {
 
-    if (position > 0) {
+    if (autoplay && position > 0) {
         player.addEventListener("loadedmetadata", () => {
             player.currentTime = position;
 
@@ -6618,15 +6624,14 @@ if (song.cover) {
         setupSpectrumAnalyzer();
     }
 
-    if (position <= 0) {
-        player.play();
+    if (autoplay && position <= 0) {
+        player.play().catch(error => {
+            console.error("Browser playback failed:", error);
+        });
     }
 
 }
-
-
     updateSongList();
-
 }
 
 
@@ -7567,150 +7572,6 @@ setInterval(
     updateBufferBar,
     250
 );
-
-
-
-/* ============================================================
-   NETWORK SPEED
-   ============================================================ */
-
-setInterval(
-    () => {
-
-
-        /*
-         * We need:
-         *
-         * 1. Song duration
-         * 2. Song file size
-         * 3. Some buffered data
-         */
-
-        if (
-            !Number.isFinite(
-                player.duration
-            )
-
-            ||
-
-            !currentSongSize
-
-            ||
-
-            player.buffered.length === 0
-        ) {
-
-            downloadSpeed.textContent =
-                "Buffering: -- MB/s";
-
-            return;
-
-        }
-
-
-
-        const bufferedEnd =
-            getBufferedEnd();
-
-
-        const now =
-            performance.now();
-
-
-        const elapsed =
-            (
-                now -
-                lastSpeedTime
-            ) / 1000;
-
-
-        const bufferedGrowth =
-            bufferedEnd -
-            lastBufferedEnd;
-
-
-
-        /*
-         * Buffer has grown.
-         */
-
-        if (
-            elapsed > 0 &&
-            bufferedGrowth > 0
-        ) {
-
-
-            /*
-             * Estimate how many bytes
-             * one second of audio represents.
-             */
-
-            const bytesPerAudioSecond =
-                currentSongSize /
-                player.duration;
-
-
-
-            /*
-             * How many audio seconds are
-             * being buffered per real second.
-             */
-
-            const audioSecondsPerSecond =
-                bufferedGrowth /
-                elapsed;
-
-
-
-            /*
-             * Estimated bytes per second.
-             */
-
-            const bytesPerSecond =
-                bytesPerAudioSecond *
-                audioSecondsPerSecond;
-
-
-
-            const mbPerSecond =
-                bytesPerSecond /
-                (1024 * 1024);
-
-
-
-            downloadSpeed.textContent =
-                "Buffering: " +
-                mbPerSecond.toFixed(2) +
-                " MB/s";
-
-        }
-
-        else {
-
-            downloadSpeed.textContent =
-                "Buffering: 0.00 MB/s";
-
-        }
-
-
-
-        /*
-         * Save measurement.
-         */
-
-        lastBufferedEnd =
-            bufferedEnd;
-
-
-        lastSpeedTime =
-            now;
-
-
-    },
-    250
-);
-
-
 
 /* ============================================================
    FORMAT TIME

@@ -11,6 +11,7 @@ import sqlite3
 import sys
 from contextlib import contextmanager
 from pathlib import Path
+import json
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -90,6 +91,43 @@ def table_exists(connection, name):
 
 def json_error(message, status):
     return jsonify(success=False, error=message), status
+
+
+@app.get("/api/session")
+def get_last_session():
+    session_path = DB_PATH.parent / "last_session.json"
+
+    if not session_path.exists():
+        return jsonify(success=True, session=None)
+
+    try:
+        with session_path.open("r", encoding="utf-8") as file:
+            session = json.load(file)
+
+        return jsonify(success=True, session=session)
+
+    except (OSError, json.JSONDecodeError) as error:
+        return json_error(f"Could not read last session: {error}", 500)
+
+
+@app.post("/api/session")
+def save_last_session():
+    data = request.get_json(silent=True) or {}
+    track_file = data.get("file")
+
+    if not isinstance(track_file, str) or not track_file.strip():
+        return json_error("Invalid track file.", 400)
+
+    session_path = DB_PATH.parent / "last_session.json"
+
+    try:
+        with session_path.open("w", encoding="utf-8") as file:
+            json.dump({"file": track_file}, file, indent=4)
+
+        return jsonify(success=True)
+
+    except OSError as error:
+        return json_error(f"Could not save last session: {error}", 500)
 
 
 @app.after_request
